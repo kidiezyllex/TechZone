@@ -11,13 +11,12 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Loader2, Eye, EyeOff } from "lucide-react"
-import { toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'; 
 import { useUser } from "@/context/useUserContext"
 import { motion } from "framer-motion"
 import { useRegister } from "@/hooks/authentication"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ClerkSignUpGoogleButton } from "@/components/auth/ClerkSignInButton"
+import { toastService } from '@/services/toast.service'
 
 const registerSchema = z.object({
   username: z.string().min(4, "Tên đăng nhập phải có ít nhất 4 ký tự"),

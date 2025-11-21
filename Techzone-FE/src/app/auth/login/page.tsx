@@ -11,12 +11,11 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Loader2, Eye, EyeOff } from "lucide-react"
-import { toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from "@/context/useUserContext"
 import { motion } from "framer-motion"
 import { useLogin } from "@/hooks/authentication"
 import { ClerkSignInGoogleButton } from "@/components/auth/ClerkSignInButton"
+import { toastService } from '@/services/toast.service'
 
 const loginSchema = z.object({
   email: z.string().email("Email không hợp lệ").min(1, "Email không được để trống"),
@@ -44,7 +43,6 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
       const response = await signInMutation.mutateAsync(data as any)
       if (response && response.success && response.data?.token && (response.data as any)?.account) {
         loginUser((response.data as any)?.account, response.data?.token)
-        toast.success("Đăng nhập thành công")
         if ((response.data as any)?.account?.role === "ADMIN") {
           navigate("/admin/statistics");
         } else {
@@ -53,7 +51,6 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
       }
     } catch (error: any) {
       console.error("Lỗi đăng nhập:", error)
-      toast.error("Đăng nhập thất bại")
     }
   }
 

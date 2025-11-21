@@ -20,6 +20,8 @@ import {
 } from "@tanstack/react-query";
 import cookies from "js-cookie";
 import { useChangePassword, useUpdateUserProfile } from './account';
+import { toastService } from '@/services/toast.service';
+
 export const useLogin = (): UseMutationResult<
   IAuthResponse,
   Error,
@@ -28,12 +30,15 @@ export const useLogin = (): UseMutationResult<
   return useMutation<IAuthResponse, Error, ISignIn>({
     mutationFn: (params: ISignIn) => login(params),
     onSuccess: (result: IAuthResponse) => {
-      // Lưu token vào cookie khi đăng nhập thành công
       if (result.success && result.data.token) {
         cookies.set("accessToken", result.data.token);
+        toastService.success('Đăng nhập thành công')
       }
       return result;
     },
+    onError: (error: any) => {
+      toastService.error(error?.response?.data?.message || 'Đăng nhập thất bại')
+    }
   });
 };
 
@@ -47,6 +52,15 @@ export const useRegister = (): UseMutationResult<
 > => {
   return useMutation<IAuthResponse, Error, IRegister>({
     mutationFn: (params: IRegister) => register(params),
+    onSuccess: (result: IAuthResponse) => {
+      if (result.success) {
+        toastService.success('Đăng ký thành công')
+      }
+      return result;
+    },
+    onError: (error: any) => {
+      toastService.error(error?.response?.data?.message || 'Đăng ký thất bại')
+    }
   });
 };
 
@@ -60,11 +74,14 @@ export const useLogout = (): UseMutationResult<
 > => {
   return useMutation<{success: boolean; message: string}, Error, void>({
     mutationFn: () => logout(),
-    onSuccess: () => {
-      // Xóa token khi đăng xuất
+    onSuccess: (result) => {
       cookies.remove("accessToken");
       localStorage.clear();
+      toastService.success('Đã đăng xuất')
     },
+    onError: (error: any) => {
+      toastService.error(error?.response?.data?.message || 'Đăng xuất thất bại')
+    }
   });
 };
 

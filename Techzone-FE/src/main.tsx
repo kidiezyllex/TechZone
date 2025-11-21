@@ -5,6 +5,7 @@ import './app/globals.css'
 import "flag-icons/css/flag-icons.min.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from '@/components/Common/ToastContainer'
 import { ClerkProvider } from '@clerk/clerk-react'
 
 // Import Clerk Publishable Key
@@ -16,6 +17,7 @@ if (!PUBLISHABLE_KEY) {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
+    <ToastContainer />
     {PUBLISHABLE_KEY ? (
       <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
         <App />
