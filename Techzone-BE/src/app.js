@@ -3,9 +3,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
+import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
 import { testConnection } from './config/database.config.js';
 import { errorHandler, notFound } from './middleware/errorHandler.middleware.js';
+import { specs } from './config/swagger.config.js';
 import authRoutes from './routes/auth.routes.js';
 import productRoutes from './routes/product.routes.js';
 import categoryRoutes from './routes/category.routes.js';
@@ -50,6 +52,18 @@ app.get('/health', (req, res) => {
     message: 'Techzone API đang hoạt động',
     timestamp: new Date().toISOString()
   });
+});
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+  swaggerOptions: {
+    url: '/swagger.json'
+  }
+}));
+
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(specs);
 });
 
 // API Routes
