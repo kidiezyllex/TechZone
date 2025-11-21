@@ -1,4 +1,4 @@
-import { useUser as useClerkUser } from '@clerk/clerk-react'
+import { useUser as useClerkUser, useAuth as useClerkAuth } from '@clerk/clerk-react'
 import { useMutation } from '@tanstack/react-query'
 import { register as registerUser, login as loginUser } from '@/api/authentication'
 import { useUser } from '@/context/useUserContext'
@@ -9,6 +9,7 @@ import { toast } from 'react-toastify'
  */
 export const useClerkAuthSync = () => {
   const { user: clerkUser, isSignedIn } = useClerkUser()
+  const { getToken } = useClerkAuth()
   const { loginUser: loginTechzoneUser } = useUser()
 
   const syncClerkTechzoneAuth = useMutation({
@@ -21,14 +22,14 @@ export const useClerkAuthSync = () => {
         const email = clerkUser.emailAddresses[0]?.emailAddress
         if (!email) throw new Error('Email not found in Clerk user')
 
-        // Get ID token from Clerk
-        const token = await clerkUser.getIdToken()
+        // Get token from Clerk
+        const token = await getToken()
 
         // Sync với backend - backend sẽ tạo tài khoản nếu chưa tồn tại
         const response = await loginUser({
           email,
           // Sử dụng Clerk token để verify
-          clerk_id_token: token,
+          clerk_token: token,
         } as any)
 
         // Lưu token vào local storage
@@ -58,6 +59,7 @@ export const useClerkAuthSync = () => {
  */
 export const useClerkRegister = () => {
   const { user: clerkUser, isSignedIn } = useClerkUser()
+  const { getToken } = useClerkAuth()
   const { loginUser: loginTechzoneUser } = useUser()
 
   return useMutation({
@@ -72,13 +74,13 @@ export const useClerkRegister = () => {
         
         if (!email) throw new Error('Email not found')
 
-        const token = await clerkUser.getIdToken()
+        const token = await getToken()
 
         // Register on backend via Clerk token
         const response = await registerUser({
           email,
           full_name: fullName,
-          clerk_id_token: token,
+          clerk_token: token,
           via_oauth: true,
         } as any)
 

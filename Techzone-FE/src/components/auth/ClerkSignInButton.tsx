@@ -15,7 +15,7 @@ export function ClerkSignInGoogleButton({
   className = '',
 }: ClerkSignInButtonProps) {
   return (
-    <SignInButton mode="modal" redirectUrl="/">
+    <SignInButton mode="modal" fallbackRedirectUrl="/">
       <Button variant={variant} size={size} className={`w-full ${className}`}>
         <Icon path={mdiGoogle} size={0.8} className="mr-2" />
         Đăng nhập với Google
@@ -30,7 +30,7 @@ export function ClerkSignUpGoogleButton({
   className = '',
 }: ClerkSignInButtonProps) {
   return (
-    <SignUpButton mode="modal" redirectUrl="/">
+    <SignUpButton mode="modal" fallbackRedirectUrl="/">
       <Button variant={variant} size={size} className={`w-full ${className}`}>
         <Icon path={mdiGoogle} size={0.8} className="mr-2" />
         Đăng ký với Google
@@ -41,7 +41,7 @@ export function ClerkSignUpGoogleButton({
 
 export function ClerkSignInWithOTP() {
   return (
-    <SignInButton mode="modal" redirectUrl="/">
+    <SignInButton mode="modal" fallbackRedirectUrl="/">
       <Button variant="outline" className="w-full">
         Đăng nhập qua Email/OTP
       </Button>

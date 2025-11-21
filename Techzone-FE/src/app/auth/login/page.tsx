@@ -16,6 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from "@/context/useUserContext"
 import { motion } from "framer-motion"
 import { useLogin } from "@/hooks/authentication"
+import { ClerkSignInGoogleButton } from "@/components/auth/ClerkSignInButton"
 
 const loginSchema = z.object({
   email: z.string().email("Email không hợp lệ").min(1, "Email không được để trống"),
@@ -40,7 +41,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const response = await signInMutation.mutateAsync(data)
+      const response = await signInMutation.mutateAsync(data as any)
       if (response && response.success && response.data?.token && (response.data as any)?.account) {
         loginUser((response.data as any)?.account, response.data?.token)
         toast.success("Đăng nhập thành công")
@@ -116,6 +117,20 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
             Quên mật khẩu?
           </a>
         </div>
+
+        <div className="my-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">hoặc</span>
+            </div>
+          </div>
+        </div>
+
+        <ClerkSignInGoogleButton variant="outline" />
+
         <div className="flex justify-center flex-1 h-full items-end mt-4">
           <Button
             type="submit"
