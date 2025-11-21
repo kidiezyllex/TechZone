@@ -1,7 +1,5 @@
 import { defineConfig } from 'vite'
-
 import react from '@vitejs/plugin-react'
-
 import path from 'path'
 
 export default defineConfig({
@@ -12,7 +10,10 @@ export default defineConfig({
       usePolling: true,
     },
     middlewareMode: false,
-    allowedHosts: 'all'
+    allowedHosts: 'all',
+    fs: {
+      cachedChecks: false
+    }
   },
 
   plugins: [
@@ -23,6 +24,23 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    },
+    chunkSizeWarningLimit: 5000,
+    minify: 'esbuild',
+    cssMinify: true
+  },
+
+  optimize: {
+    esbuild: {
+      drop: ['console', 'debugger']
+    }
   },
 
   base: '/',
