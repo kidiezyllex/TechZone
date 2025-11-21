@@ -1,0 +1,137 @@
+You are an expert full-stack developer. Build a complete, production-ready e-commerce + management system for "Techzone" - a laptop and computer parts retail chain in Vietnam.
+Tôi đã import sẵn 2 source Techzone-BE và Techzone-FE, hãy tận dụng 2 thư mục này vì nó là base
+
+Tech stack MUST be exactly:
+- Techzone-BE: Node.js + Express.js
+- Database: MySQL (pure MySQL, no Prisma or TypeORM)
+- Techzone-FE: React 18 + Vite + Tailwind CSS + ShadCN/ui + React Router v6 + Axios
+- Authentication: JWT + OTP via email (Clerk, hướng dãn set-up Clerk trong Techzone-FE ở dưới)
+- File upload: Multer (for product images)
+- API Document: Swagger
+- Ngôn ngữ dùng trong Project này: các biến, hàm vẫn dùng tiếng Anh để đặt tên, nhưng nội dung text thì hãy sử dụng tiếng Việt
+The system must have ALL the following 8 modules and features exactly as listed (in Vietnamese naming convention for models, routes, components):
+
+### 1. Quản lý tài khoản người dùng
+- Đăng ký, đăng nhập, quên mật khẩu
+- Xác thực OTP qua email khi đăng ký và đổi mật khẩu
+- Cập nhật thông tin cá nhân, avatar
+- Phân vai trò: Admin, Nhân viên, Khách hàng
+
+### 2. Quản lý sản phẩm và danh mục
+- Quản lý danh mục (Category) và thương hiệu (Brand) có phân cấp (danh mục cha - con)
+- CRUD sản phẩm đầy đủ: tên, mã SKU, giá nhập, giá bán, khuyến mãi, mô tả, thông số kỹ thuật (dạng JSON), nhiều ảnh
+- Tìm kiếm sản phẩm nâng cao (theo tên, danh mục, thương hiệu, khoảng giá, thông số)
+- Hiển thị sản phẩm chi tiết + sản phẩm liên quan
+
+### 3. Quản lý giỏ hàng & đơn hàng
+- Giỏ hàng lưu trong database (không chỉ localStorage)
+- Thêm/sửa/xóa sản phẩm trong giỏ
+- Tạo đơn hàng, chọn chi nhánh nhận hàng hoặc giao tận nơi
+- Thanh toán online (giả lập) + COD
+- Trạng thái đơn hàng: Chờ xác nhận → Đã xác nhận → Đang đóng gói → Đang giao → Hoàn thành → Đã hủy
+- Khách hàng xem lịch sử đơn hàng + chi tiết
+- Đánh giá & bình luận sản phẩm sau khi nhận hàng
+
+### 4. Quản lý kho hàng
+- Quản lý tồn kho theo từng chi nhánh (mỗi sản phẩm có số lượng riêng ở từng cửa hàng)
+- Tự động trừ tồn kho khi tạo đơn hàng thành công
+- Nhập kho (phiếu nhập hàng từ nhà cung cấp)
+- Trả hàng về kho (tăng tồn kho khi khách trả hàng)
+- Lịch sử nhập/xuất/Điều chuyển kho
+
+### 5. Quản lý nhân sự
+- CRUD tài khoản nhân viên
+- Phân quyền chi tiết theo role (sử dụng middleware check permission)
+- Gán nhân viên vào chi nhánh cụ thể
+- Lịch sử đăng nhập nhân viên
+
+### 6. Quản lý cửa hàng (chi nhánh)
+- CRUD danh sách chi nhánh
+- Thông tin chi nhánh: tên, địa chỉ, số điện thoại, bản đồ Google Maps embed
+- Tìm kiếm chi nhánh gần nhất (giả lập bằng dropdown chọn tỉnh/thành phố)
+
+### 7. Quản lý khách hàng (dành cho admin/nhân viên)
+- Xem danh sách khách hàng
+- Phân loại khách hàng: Thân thiết, VIP, Mới, Không hoạt động
+- Tìm kiếm khách hàng theo tên, email, số điện thoại
+- Xem lịch sử mua hàng của từng khách
+
+### 8. Thống kê và báo cáo (Dashboard Admin)
+- Báo cáo doanh thu theo ngày/tháng/năm (biểu đồ cột + đường)
+- Báo cáo chi phí nhập hàng
+- Báo cáo tồn kho toàn hệ thống và theo chi nhánh
+- Top 10 sản phẩm bán chạy
+- Báo cáo khách hàng mới và khách hàng thân thiết
+- Xuất báo cáo ra Excel (sử dụng exceljs)
+
+### Yêu cầu kỹ thuật bắt buộc
+- Sử dụng React Query (TanStack Query) cho data fetching
+- Responsive 100% (desktop first)
+- Viết bằng tiếng Việt toàn bộ giao diện (label, button, thông báo)
+- Có trang chủ khách hàng đẹp với slider, danh mục nổi bật, sản phẩm mới, khuyến mãi
+- Admin dashboard sử dụng Recharts hoặc Chart.js
+- Bảo mật: hash password (bcrypt), JWT trong httpOnly cookie, rate limit login, validate input bằng Joi hoặc express-validator
+- Seed dữ liệu mẫu (ít nhất 5 danh mục, 5 thương hiệu, 30 sản phẩm, 3 chi nhánh, 5 nhân viên, 20 khách hàng)
+- Có file Script để tôi chạy MySQL
+
+
+### Hướng dẫn cách set-up Clerk
+- .env VITE_CLERK_PUBLISHABLE_KEY=pk_test_ZXBpYy1ncmFja2xlLTIwLmNsZXJrLmFjY291bnRzLmRldiQ
+- npm install @clerk/clerk-react
+- src/main.tsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+
+// Import your Publishable Key
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error('Missing Publishable Key')
+}
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+- src/main.tsx
+import { StrictMode } from 'react'
+  import { createRoot } from 'react-dom/client'
+  import './index.css'
+  import App from './App.tsx'
+  import { ClerkProvider } from '@clerk/clerk-react'
+
+  // Import your Publishable Key
+  const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+  if (!PUBLISHABLE_KEY) {
+    throw new Error('Add your Clerk Publishable Key to the .env file')
+  }
+
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+        <App />
+      </ClerkProvider>
+    </StrictMode>,
+  )
+- src/App.tsx
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+
+export default function App() {
+  return (
+    <header>
+      <SignedOut>
+        <SignInButton />
+      </SignedOut>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+    </header>
+  );
+}
+Bắt đầu ngay lập tức và xuất toàn bộ code từng file một cách rõ ràng.
+
+
