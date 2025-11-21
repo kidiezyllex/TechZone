@@ -1,36 +1,32 @@
-// Change to MySQL
-// import mongoose from 'mongoose';
-// import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-// dotenv.config();
+dotenv.config();
 
-// export const mongoURI = process.env.MONGODB_URI;
+export const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/techzone';
 
-// export const jwtSecret = process.env.JWT_SECRET;
-// export const jwtExpiresIn = process.env.JWT_EXPIRES_IN;
+export const jwtSecret = process.env.JWT_SECRET || 'default-jwt-secret-change-in-production';
+export const jwtExpiresIn = process.env.JWT_EXPIRES_IN || '7d';
 
-// /**
-//  * Connect to MongoDB
-//  */
-// export const connectDB = async () => {
-//   try {
-//     const conn = await mongoose.connect(mongoURI);
-//     console.log(`MongoDB Connected: ${conn.connection.host}`);
-//   } catch (error) {
-//     process.exit(1);
-//   }
-// };
+export const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(mongoURI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error connecting to MongoDB: ${error.message}`);
+    process.exit(1);
+  }
+};
 
-// export const disconnectDB = async () => {
-//   try {
-//     await mongoose.disconnect();
-//     console.log('MongoDB Disconnected');
-//   } catch (error) {
-//     console.error(`Error disconnecting from MongoDB: ${error.message}`);
-//   }
-// };
+export const disconnectDB = async () => {
+  try {
+    await mongoose.disconnect();
+    console.log('MongoDB Disconnected');
+  } catch (error) {
+    console.error(`Error disconnecting from MongoDB: ${error.message}`);
+  }
+};
 
-// mongoose.set('strictQuery', true);
+mongoose.set('strictQuery', true);
 
-// // Export mongoose instance
-// export default mongoose; 
+export default mongoose;
