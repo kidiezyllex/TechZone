@@ -1,321 +1,274 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/user.model.js';
-import VerificationToken from '../models/verificationToken.model.js';
-import { jwtSecret, jwtExpiresIn } from '../config/database.js';
-import VerificationCode from '../models/verificationCode.model.js';
-import { sendVerificationCode } from '../services/email.service.js';
+import { query, transaction } from '../config/database.config.js';
+import { successResponse, errorResponse } from '../utils/response.js';
+import { hashPassword, comparePassword } from '../utils/bcrypt.js';
+import { generateToken, generateRefreshToken } from '../utils/jwt.js';
+import { generateOTP, saveOTP, verifyOTP } from '../services/otp.service.js';
+import { sendOTPEmail, sendWelcomeEmail } from '../services/email.service.js';
 
-const generateVerificationCode = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+// ============================================
+// ĐĂNG KÝ TÀI KHOẢN (Bước 1: Gửi OTP)
+// ============================================
+export const requestRegisterOTP = async (req, res, next) => {
+  try {
+    const { email, full_name } = req.body;
+    
+    // Kiểm tra email đã tồn tại chưa
+    const [existingUser] = await query(
+      'SELECT id FROM users WHERE email = ?',
+      [email]
+    );
+    
+    if (existingUser) {
+      return errorResponse(res, 'Email đã được đăng ký', 409);
+    }
+    
+    // Generate và lưu OTP
+    const otpCode = generateOTP();
+    await saveOTP(email, otpCode, 'register');
+    
+    // Gửi OTP qua email
+    await sendOTPEmail(email, full_name, otpCode, 'register');
+    
+    return successResponse(
+      res,
+      { email },
+      'Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.',
+      200
+    );
+  } catch (error) {
+    next(error);
+  }
 };
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, jwtSecret, {
-    expiresIn: jwtExpiresIn
-  });
+// ============================================
+// ĐĂNG KÝ TÀI KHOẢN (Bước 2: Verify OTP & Tạo tài khoản)
+// ============================================
+export const register = async (req, res, next) => {
+  try {
+    const { email, password, full_name, phone, code } = req.body;
+    
+    // Verify OTP
+    const isValidOTP = await verifyOTP(email, code, 'register');
+    if (!isValidOTP) {
+      return errorResponse(res, 'Mã OTP không hợp lệ hoặc đã hết hạn', 400);
+    }
+    
+    // Hash password
+    const hashedPassword = await hashPassword(password);
+    
+    // Lấy role customer (id = 3)
+    const [customerRole] = await query(
+      'SELECT id FROM roles WHERE name = ?',
+      ['customer']
+    );
+    
+    // Tạo user mới
+    const result = await query(
+      `INSERT INTO users (email, password_hash, full_name, phone, role_id, is_verified) 
+       VALUES (?, ?, ?, ?, ?, TRUE)`,
+      [email, hashedPassword, full_name, phone || null, customerRole.id]
+    );
+    
+    const userId = result.insertId;
+    
+    // Tạo customer record
+    await query(
+      'INSERT INTO customers (user_id, classification) VALUES (?, ?)',
+      [userId, 'new']
+    );
+    
+    // Tạo giỏ hàng cho user
+    await query(
+      'INSERT INTO carts (user_id) VALUES (?)',
+      [userId]
+    );
+    
+    // Gửi email chào mừng
+    sendWelcomeEmail(email, full_name).catch(err => console.error(err));
+    
+    // Generate tokens
+    const token = generateToken({ userId, email, role: 'customer' });
+    const refreshToken = generateRefreshToken({ userId });
+    
+    // Lấy thông tin user
+    const [user] = await query(
+      `SELECT u.id, u.email, u.full_name, u.phone, u.avatar_url, 
+              r.name as role, u.created_at
+       FROM users u
+       JOIN roles r ON u.role_id = r.id
+       WHERE u.id = ?`,
+      [userId]
+    );
+    
+    return successResponse(
+      res,
+      {
+        user,
+        token,
+        refreshToken
+      },
+      'Đăng ký tài khoản thành công',
+      201
+    );
+  } catch (error) {
+    next(error);
+  }
 };
 
-/**
- * @desc    Login user & get token
- * @route   POST /api/auth/login
- * @access  Public
- */
-export const login = async (req, res) => {
+// ĐĂNG NHẬP, GET PROFILE, UPDATE PROFILE, RESET PASSWORD...
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email and password are required'
-      });
-    }
-
-    const user = await User.findOne({ email: email.toLowerCase() }).populate('department', 'name code');
-
+    
+    const [user] = await query(
+      `SELECT u.id, u.email, u.password_hash, u.full_name, u.phone, 
+              u.avatar_url, u.is_active, u.is_verified, u.store_id,
+              r.name as role
+       FROM users u
+       JOIN roles r ON u.role_id = r.id
+       WHERE u.email = ?`,
+      [email]
+    );
+    
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
+      return errorResponse(res, 'Email hoặc mật khẩu không đúng', 401);
     }
-
-    const isPasswordValid = await user.matchPassword(password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
+    
+    if (!user.is_active) {
+      return errorResponse(res, 'Tài khoản đã bị khóa', 403);
     }
-
-    if (!user.active) {
-      return res.status(401).json({
-        success: false,
-        message: 'Account is deactivated'
-      });
+    
+    const isValidPassword = await comparePassword(password, user.password_hash);
+    if (!isValidPassword) {
+      return errorResponse(res, 'Email hoặc mật khẩu không đúng', 401);
     }
-
-    user.lastLogin = new Date();
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Login successful',
-      data: {
-        _id: user._id,
-        name: user.name,
-        fullName: user.fullName,
-        email: user.email,
-        studentId: user.studentId,
-        role: user.role,
-        department: user.department,
-        avatar: user.avatar,
-        token: generateToken(user._id)
-      }
-    });
+    
+    await query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
+    
+    const ip = req.ip || req.connection.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+    await query(
+      'INSERT INTO user_login_logs (user_id, ip_address, user_agent) VALUES (?, ?, ?)',
+      [user.id, ip, userAgent]
+    );
+    
+    const token = generateToken({ userId: user.id, email: user.email, role: user.role });
+    const refreshToken = generateRefreshToken({ userId: user.id });
+    
+    delete user.password_hash;
+    
+    return successResponse(res, { user, token, refreshToken }, 'Đăng nhập thành công');
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    next(error);
   }
 };
 
-/**
- * @desc    Register a new user
- * @route   POST /api/auth/register
- * @access  Public
- */
-export const register = async (req, res) => {
+export const getProfile = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
-
-    const userExists = await User.findOne({ email });
-
-    if (userExists) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'User already exists' 
-      });
+    const [user] = await query(
+      `SELECT u.id, u.email, u.full_name, u.phone, u.avatar_url,
+              r.name as role, u.is_verified, u.created_at, u.last_login
+       FROM users u
+       JOIN roles r ON u.role_id = r.id
+       WHERE u.id = ?`,
+      [req.user.id]
+    );
+    
+    if (user.role === 'customer') {
+      const [customerInfo] = await query(
+        'SELECT classification, total_orders, total_spent FROM customers WHERE user_id = ?',
+        [req.user.id]
+      );
+      user.customer_info = customerInfo || null;
     }
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Name, email, and password are required'
-      });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: 'Password must be at least 6 characters long'
-      });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid email format'
-      });
-    }
-
-    if (role && !['student', 'coordinator', 'admin'].includes(role)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid role specified'
-      });
-    }
-
-    const userData = {
-      name,
-      email,
-      password,
-      emailVerified: true,
-      emailVerifiedAt: new Date(),
-      role: role || 'student'
-    };
-
-    const user = await User.create(userData);
-
-    if (user) {
-      await user.populate('department', 'name code');
-      
-      res.status(200).json({
-        success: true,
-        message: 'Registration successful',
-        data: {
-          _id: user._id,
-          name: user.name,
-          fullName: user.fullName,
-          email: user.email,
-          studentId: user.studentId,
-          role: user.role,
-          department: user.department,
-          avatar: user.avatar,
-          emailVerified: user.emailVerified,
-          token: generateToken(user._id)
-        }
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid user data'
-      });
-    }
-
+    
+    return successResponse(res, user, 'Lấy thông tin thành công');
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Failed to process registration request' 
-    });
+    next(error);
   }
 };
 
-/**
- * @desc    Complete registration with verification token
- * @route   POST /api/auth/complete-registration
- * @access  Public
- */
-export const completeRegistration = async (req, res) => {
+export const updateProfile = async (req, res, next) => {
   try {
-    const { name, email, password, verificationToken, role } = req.body;
-
-    // Validate input
-    if (!name || !email || !password || !verificationToken) {
-      return res.status(400).json({
-        success: false,
-        message: 'Name, email, password, and verification token are required'
-      });
+    const { full_name, phone, avatar_url } = req.body;
+    const updates = [];
+    const values = [];
+    
+    if (full_name) { updates.push('full_name = ?'); values.push(full_name); }
+    if (phone) { updates.push('phone = ?'); values.push(phone); }
+    if (avatar_url) { updates.push('avatar_url = ?'); values.push(avatar_url); }
+    
+    if (updates.length === 0) {
+      return errorResponse(res, 'Không có thông tin cần cập nhật', 400);
     }
-
-    // Validate password length
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: 'Password must be at least 6 characters long'
-      });
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid email format'
-      });
-    }
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'User already exists'
-      });
-    }
-
-    // Find and validate verification token
-    const tokenRecord = await VerificationToken.findOne({ 
-      token: verificationToken,
-      email: email.toLowerCase()
-    });
-
-    if (!tokenRecord) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid verification token'
-      });
-    }
-
-    // Check if token is expired
-    if (new Date() > tokenRecord.expiresAt) {
-      await VerificationToken.deleteOne({ _id: tokenRecord._id });
-      return res.status(400).json({
-        success: false,
-        message: 'Verification token has expired'
-      });
-    }
-
-    // Validate role if provided
-    if (role && !['student', 'coordinator', 'admin'].includes(role)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid role specified'
-      });
-    }
-
-    // Create user with email verified
-    const userData = {
-      name,
-      email,
-      password,
-      emailVerified: true,
-      emailVerifiedAt: new Date(),
-      role: role || 'student'
-    };
-
-    const user = await User.create(userData);
-
-    if (user) {
-      // Delete the verification token as it's no longer needed
-      await VerificationToken.deleteOne({ _id: tokenRecord._id });
-
-      // Populate department info
-      await user.populate('department', 'name code');
-      
-      res.status(200).json({
-        success: true,
-        message: 'Registration completed successfully',
-        data: {
-          user: {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            emailVerified: user.emailVerified
-          }
-        }
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid user data'
-      });
-    }
+    
+    values.push(req.user.id);
+    await query(`UPDATE users SET ${updates.join(', ')}, updated_at = NOW() WHERE id = ?`, values);
+    
+    const [updatedUser] = await query(
+      'SELECT id, email, full_name, phone, avatar_url FROM users WHERE id = ?',
+      [req.user.id]
+    );
+    
+    return successResponse(res, updatedUser, 'Cập nhật thành công');
   } catch (error) {
-    console.error('Complete registration error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to complete registration'
-    });
+    next(error);
   }
 };
 
-/**
- * @desc    Get user profile
- * @route   GET /api/auth/profile
- * @access  Private
- */
-export const getProfile = async (req, res) => {
+export const requestPasswordReset = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id)
-      .populate('department', 'name code description')
-      .populate('savedNotifications')
-      .select('-password');
-
-    if (user) {
-      res.json({
-        message: 'User profile retrieved successfully',
-        data: user
-      });
-    } else {
-      res.status(404).json({ message: 'User not found' });
+    const { email } = req.body;
+    const [user] = await query('SELECT id, full_name FROM users WHERE email = ?', [email]);
+    
+    if (!user) {
+      return successResponse(res, { email }, 'Nếu email tồn tại, mã OTP đã được gửi');
     }
+    
+    const otpCode = generateOTP();
+    await saveOTP(email, otpCode, 'reset_password');
+    await sendOTPEmail(email, user.full_name, otpCode, 'reset_password');
+    
+    return successResponse(res, { email }, 'Mã OTP đã được gửi');
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
-}; 
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, code, new_password } = req.body;
+    
+    const isValidOTP = await verifyOTP(email, code, 'reset_password');
+    if (!isValidOTP) {
+      return errorResponse(res, 'Mã OTP không hợp lệ', 400);
+    }
+    
+    const hashedPassword = await hashPassword(new_password);
+    await query('UPDATE users SET password_hash = ? WHERE email = ?', [hashedPassword, email]);
+    
+    return successResponse(res, null, 'Đặt lại mật khẩu thành công');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePassword = async (req, res, next) => {
+  try {
+    const { current_password, new_password } = req.body;
+    
+    const [user] = await query('SELECT password_hash FROM users WHERE id = ?', [req.user.id]);
+    const isValid = await comparePassword(current_password, user.password_hash);
+    
+    if (!isValid) {
+      return errorResponse(res, 'Mật khẩu hiện tại không đúng', 400);
+    }
+    
+    const hashedPassword = await hashPassword(new_password);
+    await query('UPDATE users SET password_hash = ? WHERE id = ?', [hashedPassword, req.user.id]);
+    
+    return successResponse(res, null, 'Đổi mật khẩu thành công');
+  } catch (error) {
+    next(error);
+  }
+};
