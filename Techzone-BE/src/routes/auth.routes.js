@@ -7,7 +7,8 @@ import {
   updateProfile,
   requestPasswordReset,
   resetPassword,
-  changePassword
+  changePassword,
+  refreshToken
 } from '../controllers/auth.controller.js';
 import {
   registerValidator,
@@ -34,5 +35,6 @@ router.post('/reset-password', resetPasswordValidator, validate, resetPassword);
 router.get('/profile', authenticate, getProfile);
 router.put('/profile', authenticate, updateProfileValidator, validate, updateProfile);
 router.post('/change-password', authenticate, changePassword);
+router.post('/refresh-token', refreshToken);
 
 export default router;

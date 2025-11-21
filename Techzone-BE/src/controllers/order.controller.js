@@ -1,5 +1,6 @@
 import { query, transaction } from '../config/database.config.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
+import { ValidationError, NotFoundError } from '../utils/errors.js';
 
 // TẠO ĐƠN HÀNG (Checkout)
 export const createOrder = async (req, res, next) => {
@@ -7,12 +8,29 @@ export const createOrder = async (req, res, next) => {
     const userId = req.user.id;
     const { store_id, shipping_address, shipping_city, shipping_district, phone, payment_method, notes } = req.body;
     
+    // Pre-validate before transaction
+    const [storeCheck] = await query('SELECT id, name FROM stores WHERE id = ? AND is_active = TRUE', [store_id]);
+    if (!storeCheck) {
+      return errorResponse(res, 'Chi nhánh không tồn tại hoặc không còn hoạt động', 404);
+    }
+    
+    const [customerCheck] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
+    if (!customerCheck) {
+      return errorResponse(res, 'Không tìm thấy thông tin khách hàng', 404);
+    }
+    
+    const [cartCheck] = await query('SELECT id FROM carts WHERE user_id = ?', [userId]);
+    if (!cartCheck) {
+      return errorResponse(res, 'Giỏ hàng trống', 400);
+    }
+    
     const result = await transaction(async (conn) => {
       // Lấy cart items
-      const [cart] = await conn.execute('SELECT id FROM carts WHERE user_id = ?', [userId]);
+      const [cartRows] = await conn.execute('SELECT id FROM carts WHERE user_id = ?', [userId]);
+      const cart = cartRows[0];
       
       if (!cart) {
-        throw new Error('Giỏ hàng trống');
+        throw new ValidationError('Giỏ hàng trống');
       }
       
       const [items] = await conn.execute(
@@ -25,7 +43,7 @@ export const createOrder = async (req, res, next) => {
       );
       
       if (items.length === 0) {
-        throw new Error('Giỏ hàng trống');
+        throw new ValidationError('Giỏ hàng trống');
       }
       
       // Tính tổng tiền
@@ -34,13 +52,14 @@ export const createOrder = async (req, res, next) => {
         totalAmount += item.unit_price * item.quantity;
         
         // Kiểm tra và trừ tồn kho
-        const [inventory] = await conn.execute(
+        const [inventoryRows] = await conn.execute(
           'SELECT id, quantity FROM inventory WHERE product_id = ? AND store_id = ? LIMIT 1',
           [item.product_id, store_id]
         );
+        const inventory = inventoryRows[0];
         
         if (!inventory || inventory.quantity < item.quantity) {
-          throw new Error(`Sản phẩm "${item.name}" không đủ hàng tại chi nhánh này`);
+          throw new ValidationError(`Sản phẩm "${item.name}" không đủ hàng tại chi nhánh này`);
         }
         
         await conn.execute(
@@ -89,6 +108,10 @@ export const createOrder = async (req, res, next) => {
     
     return successResponse(res, order, 'Đặt hàng thành công', 201);
   } catch (error) {
+    // Handle custom validation errors
+    if (error instanceof ValidationError || error instanceof NotFoundError) {
+      return errorResponse(res, error.message, error.statusCode);
+    }
     next(error);
   }
 };

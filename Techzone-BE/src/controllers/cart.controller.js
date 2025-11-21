@@ -7,7 +7,7 @@ export const getCart = async (req, res, next) => {
     const userId = req.user.id;
     
     // Lấy cart
-    const [cart] = await query('SELECT * FROM carts WHERE user_id = ?', [userId]);
+    let [cart] = await query('SELECT * FROM carts WHERE user_id = ?', [userId]);
     
     if (!cart) {
       const result = await query('INSERT INTO carts (user_id) VALUES (?)', [userId]);
@@ -50,12 +50,13 @@ export const addToCart = async (req, res, next) => {
     }
     
     // Kiểm tra tồn kho
-    const [{ total_stock }] = await query(
-      'SELECT SUM(quantity) as total_stock FROM inventory WHERE product_id = ?',
+    const inventoryResult = await query(
+      'SELECT COALESCE(SUM(quantity), 0) as total_stock FROM inventory WHERE product_id = ?',
       [product_id]
     );
+    const total_stock = inventoryResult[0]?.total_stock || 0;
     
-    if (!total_stock || total_stock < quantity) {
+    if (total_stock < quantity) {
       return errorResponse(res, 'Sản phẩm hết hàng hoặc không đủ số lượng', 400);
     }
     
@@ -118,10 +119,11 @@ export const updateCartItem = async (req, res, next) => {
     }
     
     // Kiểm tra tồn kho
-    const [{ total_stock }] = await query(
-      'SELECT SUM(quantity) as total_stock FROM inventory WHERE product_id = ?',
+    const inventoryResult = await query(
+      'SELECT COALESCE(SUM(quantity), 0) as total_stock FROM inventory WHERE product_id = ?',
       [item.product_id]
     );
+    const total_stock = inventoryResult[0]?.total_stock || 0;
     
     if (total_stock < quantity) {
       return errorResponse(res, 'Không đủ hàng trong kho', 400);

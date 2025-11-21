@@ -1,7 +1,7 @@
 import { query, transaction } from '../config/database.config.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 import { hashPassword, comparePassword } from '../utils/bcrypt.js';
-import { generateToken, generateRefreshToken } from '../utils/jwt.js';
+import { generateToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { generateOTP, saveOTP, verifyOTP } from '../services/otp.service.js';
 import { sendOTPEmail, sendWelcomeEmail } from '../services/email.service.js';
 
@@ -270,5 +270,51 @@ export const changePassword = async (req, res, next) => {
     return successResponse(res, null, 'Đổi mật khẩu thành công');
   } catch (error) {
     next(error);
+  }
+};
+
+// REFRESH TOKEN
+export const refreshToken = async (req, res, next) => {
+  const { refresh_token } = req.body;
+  
+  if (!refresh_token) {
+    return errorResponse(res, 'Refresh token không được để trống', 400);
+  }
+  
+  // Verify refresh token với refresh secret
+  let decoded;
+  try {
+    decoded = verifyRefreshToken(refresh_token);
+  } catch (error) {
+    return errorResponse(res, 'Refresh token không hợp lệ hoặc đã hết hạn', 401);
+  }
+  
+  try {
+    
+    // Lấy thông tin user
+    const [user] = await query(
+      `SELECT u.id, u.email, r.name as role 
+       FROM users u 
+       JOIN roles r ON u.role_id = r.id 
+       WHERE u.id = ? AND u.is_active = TRUE`,
+      [decoded.userId]
+    );
+    
+    if (!user) {
+      return errorResponse(res, 'Người dùng không tồn tại hoặc đã bị khóa', 401);
+    }
+    
+    // Generate new tokens
+    const newToken = generateToken({ userId: user.id, email: user.email, role: user.role });
+    const newRefreshToken = generateRefreshToken({ userId: user.id });
+    
+    return successResponse(
+      res,
+      { token: newToken, refreshToken: newRefreshToken },
+      'Làm mới token thành công'
+    );
+  } catch (error) {
+    console.error('Refresh token error:', error);
+    return errorResponse(res, 'Đã xảy ra lỗi khi làm mới token', 500);
   }
 };
