@@ -7,27 +7,109 @@ import {
   clearCart
 } from '../controllers/cart.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { body } from 'express-validator';
-import { validate } from '../middleware/validation.middleware.js';
 
 const router = express.Router();
 
-// Tất cả routes cần authentication
-router.use(authenticate);
+/**
+ * @swagger
+ * /api/cart:
+ *   get:
+ *     summary: Lấy thông tin giỏ hàng của người dùng
+ *     tags: [3. Cart & Orders - Quản lý Giỏ Hàng]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Giỏ hàng của người dùng
+ */
+router.get('/', authenticate, getCart);
 
-const addToCartValidator = [
-  body('product_id').isInt().withMessage('Product ID không hợp lệ'),
-  body('quantity').isInt({ min: 1 }).withMessage('Số lượng phải lớn hơn 0')
-];
+/**
+ * @swagger
+ * /api/cart/add:
+ *   post:
+ *     summary: Thêm sản phẩm vào giỏ hàng
+ *     tags: [3. Cart & Orders - Quản lý Giỏ Hàng]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               product_id:
+ *                 type: integer
+ *               quantity:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Sản phẩm thêm vào giỏ thành công
+ */
+router.post('/add', authenticate, addToCart);
 
-const updateCartValidator = [
-  body('quantity').isInt({ min: 1 }).withMessage('Số lượng phải lớn hơn 0')
-];
+/**
+ * @swagger
+ * /api/cart/items/{item_id}:
+ *   put:
+ *     summary: Cập nhật số lượng sản phẩm trong giỏ
+ *     tags: [3. Cart & Orders - Quản lý Giỏ Hàng]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: item_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               quantity:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Cập nhật số lượng thành công
+ */
+router.put('/items/:item_id', authenticate, updateCartItem);
 
-router.get('/', getCart);
-router.post('/add', addToCartValidator, validate, addToCart);
-router.put('/items/:item_id', updateCartValidator, validate, updateCartItem);
-router.delete('/items/:item_id', removeFromCart);
-router.delete('/clear', clearCart);
+/**
+ * @swagger
+ * /api/cart/items/{item_id}:
+ *   delete:
+ *     summary: Xóa sản phẩm khỏi giỏ hàng
+ *     tags: [3. Cart & Orders - Quản lý Giỏ Hàng]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: item_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Xóa sản phẩm thành công
+ */
+router.delete('/items/:item_id', authenticate, removeFromCart);
+
+/**
+ * @swagger
+ * /api/cart/clear:
+ *   delete:
+ *     summary: Xóa toàn bộ giỏ hàng
+ *     tags: [3. Cart & Orders - Quản lý Giỏ Hàng]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Giỏ hàng được xóa
+ */
+router.delete('/clear', authenticate, clearCart);
 
 export default router;
