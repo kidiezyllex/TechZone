@@ -17,6 +17,7 @@ import { useUser } from "@/context/useUserContext"
 import { motion } from "framer-motion"
 import { useRegister } from "@/hooks/authentication"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { ClerkSignUpGoogleButton } from "@/components/auth/ClerkSignInButton"
 
 const registerSchema = z.object({
   username: z.string().min(4, "Tên đăng nhập phải có ít nhất 4 ký tự"),
@@ -224,6 +225,20 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
             Đã có tài khoản? Đăng nhập
           </a>
         </div>
+
+        <div className="my-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">hoặc</span>
+            </div>
+          </div>
+        </div>
+
+        <ClerkSignUpGoogleButton variant="outline" />
+
         <div className="flex justify-center flex-1 h-full items-end mt-4">
           <Button
             type="submit"

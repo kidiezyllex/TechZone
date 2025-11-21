@@ -4,6 +4,7 @@ import { hashPassword, comparePassword } from '../utils/bcrypt.js';
 import { generateToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { generateOTP, saveOTP, verifyOTP } from '../services/otp.service.js';
 import { sendOTPEmail, sendWelcomeEmail } from '../services/email.service.js';
+import { verifyClerkToken, findOrCreateUserFromClerk } from '../services/clerk.service.js';
 
 // ============================================
 // ĐĂNG KÝ TÀI KHOẢN (Bước 1: Gửi OTP)
@@ -41,73 +42,112 @@ export const requestRegisterOTP = async (req, res, next) => {
 };
 
 // ============================================
-// ĐĂNG KÝ TÀI KHOẢN (Bước 2: Verify OTP & Tạo tài khoản)
+// ĐĂNG KÝ TÀI KHOẢN (Bước 2: Verify OTP & Tạo tài khoản hoặc Clerk OAuth)
 // ============================================
 export const register = async (req, res, next) => {
   try {
-    const { email, password, full_name, phone, code } = req.body;
-    
-    // Verify OTP
-    const isValidOTP = await verifyOTP(email, code, 'register');
-    if (!isValidOTP) {
-      return errorResponse(res, 'Mã OTP không hợp lệ hoặc đã hết hạn', 400);
+    const { email, password, full_name, phone, code, clerk_token, via_oauth } = req.body;
+    let user = null;
+    let userId = null;
+
+    // Kiểm tra email đã tồn tại
+    const [existingUser] = await query(
+      'SELECT id FROM users WHERE email = ?',
+      [email]
+    );
+
+    if (existingUser) {
+      return errorResponse(res, 'Email đã được đăng ký', 409);
     }
-    
-    // Hash password
-    const hashedPassword = await hashPassword(password);
-    
-    // Lấy role customer (id = 3)
-    const [customerRole] = await query(
-      'SELECT id FROM roles WHERE name = ?',
-      ['customer']
-    );
-    
-    // Tạo user mới
-    const result = await query(
-      `INSERT INTO users (email, password_hash, full_name, phone, role_id, is_verified) 
-       VALUES (?, ?, ?, ?, ?, TRUE)`,
-      [email, hashedPassword, full_name, phone || null, customerRole.id]
-    );
-    
-    const userId = result.insertId;
-    
-    // Tạo customer record
-    await query(
-      'INSERT INTO customers (user_id, classification) VALUES (?, ?)',
-      [userId, 'new']
-    );
-    
-    // Tạo giỏ hàng cho user
-    await query(
-      'INSERT INTO carts (user_id) VALUES (?)',
-      [userId]
-    );
-    
-    // Gửi email chào mừng
-    sendWelcomeEmail(email, full_name).catch(err => console.error(err));
-    
+
+    // Nếu là Clerk OAuth registration
+    if (via_oauth && clerk_token) {
+      try {
+        const clerkData = verifyClerkToken(clerk_token);
+        if (!clerkData) {
+          return errorResponse(res, 'Clerk token không hợp lệ', 401);
+        }
+
+        user = await findOrCreateUserFromClerk(clerkData, query);
+        userId = user.id;
+      } catch (clerkError) {
+        console.error('Clerk register error:', clerkError);
+        return errorResponse(res, 'Lỗi tạo tài khoản qua Clerk', 500);
+      }
+    } else {
+      // Traditional OTP-based registration
+      // Verify OTP
+      const isValidOTP = await verifyOTP(email, code, 'register');
+      if (!isValidOTP) {
+        return errorResponse(res, 'Mã OTP không hợp lệ hoặc đã hết hạn', 400);
+      }
+
+      if (!full_name || !password) {
+        return errorResponse(res, 'Thông tin cần thiết không đủ', 400);
+      }
+
+      // Hash password
+      const hashedPassword = await hashPassword(password);
+
+      // Lấy role customer
+      const [customerRole] = await query(
+        'SELECT id FROM roles WHERE name = ?',
+        ['customer']
+      );
+
+      if (!customerRole) {
+        return errorResponse(res, 'Không tìm thấy role customer', 500);
+      }
+
+      // Tạo user mới
+      const result = await query(
+        `INSERT INTO users (email, password_hash, full_name, phone, role_id, is_verified) 
+         VALUES (?, ?, ?, ?, ?, TRUE)`,
+        [email, hashedPassword, full_name, phone || null, customerRole.id]
+      );
+
+      userId = result.insertId;
+
+      // Tạo customer record
+      await query(
+        'INSERT INTO customers (user_id, classification) VALUES (?, ?)',
+        [userId, 'new']
+      );
+
+      // Tạo giỏ hàng cho user
+      await query(
+        'INSERT INTO carts (user_id) VALUES (?)',
+        [userId]
+      );
+
+      // Gửi email chào mừng
+      sendWelcomeEmail(email, full_name).catch(err => console.error(err));
+
+      // Lấy thông tin user
+      const [userData] = await query(
+        `SELECT u.id, u.email, u.full_name, u.phone, u.avatar_url, 
+                r.name as role, u.created_at
+         FROM users u
+         JOIN roles r ON u.role_id = r.id
+         WHERE u.id = ?`,
+        [userId]
+      );
+
+      user = userData;
+    }
+
     // Generate tokens
-    const token = generateToken({ userId, email, role: 'customer' });
+    const token = generateToken({ userId, email: user.email, role: user.role });
     const refreshToken = generateRefreshToken({ userId });
-    
-    // Lấy thông tin user
-    const [user] = await query(
-      `SELECT u.id, u.email, u.full_name, u.phone, u.avatar_url, 
-              r.name as role, u.created_at
-       FROM users u
-       JOIN roles r ON u.role_id = r.id
-       WHERE u.id = ?`,
-      [userId]
-    );
-    
+
     return successResponse(
       res,
       {
-        user,
+        account: user,
         token,
         refreshToken
       },
-      'Đăng ký tài khoản thành công',
+      via_oauth ? 'Đăng ký tài khoản thành công qua Google' : 'Đăng ký tài khoản thành công',
       201
     );
   } catch (error) {
@@ -115,49 +155,79 @@ export const register = async (req, res, next) => {
   }
 };
 
-// ĐĂNG NHẬP, GET PROFILE, UPDATE PROFILE, RESET PASSWORD...
+// ĐĂNG NHẬP (hỗ trợ email/password + Clerk OAuth)
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    
-    const [user] = await query(
-      `SELECT u.id, u.email, u.password_hash, u.full_name, u.phone, 
-              u.avatar_url, u.is_active, u.is_verified, u.store_id,
-              r.name as role
-       FROM users u
-       JOIN roles r ON u.role_id = r.id
-       WHERE u.email = ?`,
-      [email]
-    );
-    
+    const { email, password, clerk_token } = req.body;
+    let user = null;
+
+    // Nếu có Clerk token, ưu tiên xử lý Clerk login
+    if (clerk_token) {
+      try {
+        const clerkData = verifyClerkToken(clerk_token);
+        if (!clerkData) {
+          return errorResponse(res, 'Clerk token không hợp lệ', 401);
+        }
+
+        // Tìm hoặc tạo user từ Clerk
+        user = await findOrCreateUserFromClerk(clerkData, query);
+      } catch (clerkError) {
+        console.error('Clerk login error:', clerkError);
+        return errorResponse(res, 'Lỗi xác thực Clerk', 500);
+      }
+    } else {
+      // Traditional email/password login
+      if (!email || !password) {
+        return errorResponse(res, 'Email và password là bắt buộc', 400);
+      }
+
+      const [userData] = await query(
+        `SELECT u.id, u.email, u.password_hash, u.full_name, u.phone, 
+                u.avatar_url, u.is_active, u.is_verified, u.store_id,
+                r.name as role
+         FROM users u
+         JOIN roles r ON u.role_id = r.id
+         WHERE u.email = ?`,
+        [email]
+      );
+
+      if (!userData) {
+        return errorResponse(res, 'Email hoặc mật khẩu không đúng', 401);
+      }
+
+      if (!userData.is_active) {
+        return errorResponse(res, 'Tài khoản đã bị khóa', 403);
+      }
+
+      const isValidPassword = await comparePassword(password, userData.password_hash);
+      if (!isValidPassword) {
+        return errorResponse(res, 'Email hoặc mật khẩu không đúng', 401);
+      }
+
+      user = userData;
+    }
+
     if (!user) {
-      return errorResponse(res, 'Email hoặc mật khẩu không đúng', 401);
+      return errorResponse(res, 'Không thể xác thực người dùng', 500);
     }
-    
-    if (!user.is_active) {
-      return errorResponse(res, 'Tài khoản đã bị khóa', 403);
-    }
-    
-    const isValidPassword = await comparePassword(password, user.password_hash);
-    if (!isValidPassword) {
-      return errorResponse(res, 'Email hoặc mật khẩu không đúng', 401);
-    }
-    
+
+    // Update last login
     await query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
-    
+
+    // Log login activity
     const ip = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
     await query(
       'INSERT INTO user_login_logs (user_id, ip_address, user_agent) VALUES (?, ?, ?)',
       [user.id, ip, userAgent]
     );
-    
+
     const token = generateToken({ userId: user.id, email: user.email, role: user.role });
     const refreshToken = generateRefreshToken({ userId: user.id });
-    
+
     delete user.password_hash;
-    
-    return successResponse(res, { user, token, refreshToken }, 'Đăng nhập thành công');
+
+    return successResponse(res, { account: user, token, refreshToken }, 'Đăng nhập thành công');
   } catch (error) {
     next(error);
   }
