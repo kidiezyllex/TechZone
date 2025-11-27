@@ -85,7 +85,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Start server
-const PORT = parseInt(process.env.PORT || '3001');
+const PORT = parseInt(process.env.PORT || '8000');
 
 const startServer = async () => {
   try {
