@@ -55,7 +55,7 @@ export const HotDeals = () => {
           animate={isInView ? "visible" : "hidden"}
           className="flex flex-col md:flex-row gap-4 items-center"
         >
-          {/* Left Column - Image */}
+          {}
           <motion.div 
             className="w-full md:w-1/2 flex justify-center"
           >
@@ -82,7 +82,7 @@ export const HotDeals = () => {
             </div>
           </motion.div>
           
-          {/* Right Column - Content */}
+          {}
           <motion.div
             className="w-full md:w-1/2 flex flex-col space-y-4"
           >

@@ -159,7 +159,7 @@ export const CartCheckout: React.FC<CartCheckoutProps> = ({ onClose }) => {
             />
           </div>
 
-          {/* Add province, district, ward selectors here */}
+          {}
         </div>
 
         <div className="mt-6">

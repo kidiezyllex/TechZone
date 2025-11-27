@@ -40,7 +40,7 @@ export const useOrderDetail = (orderId: string): UseQueryResult<IOrderResponse, 
   return useQuery<IOrderResponse, Error>({
     queryKey: ["order", orderId],
     queryFn: () => getOrderById(orderId),
-    enabled: !!orderId, // Chỉ fetch khi có orderId
+    enabled: !!orderId, 
     refetchInterval: 4000,
     refetchIntervalInBackground: true,
   });

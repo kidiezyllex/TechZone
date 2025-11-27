@@ -42,9 +42,6 @@ export const useLogin = (): UseMutationResult<
   });
 };
 
-/**
- * Hook đăng ký
- */
 export const useRegister = (): UseMutationResult<
   IAuthResponse,
   Error,
@@ -64,9 +61,6 @@ export const useRegister = (): UseMutationResult<
   });
 };
 
-/**
- * Hook đăng xuất
- */
 export const useLogout = (): UseMutationResult<
   {success: boolean; message: string},
   Error,
@@ -85,9 +79,6 @@ export const useLogout = (): UseMutationResult<
   });
 };
 
-/**
- * Hook lấy thông tin người dùng hiện tại
- */
 export const useCurrentUser = () => {
   const {
     data: userData,
@@ -108,9 +99,6 @@ export const useCurrentUser = () => {
   };
 };
 
-/**
- * Hook làm mới token
- */
 export const useRefreshToken = (): UseMutationResult<
   {success: boolean; data: {token: string; refreshToken: string}},
   Error,
@@ -131,5 +119,4 @@ export const useRefreshToken = (): UseMutationResult<
   });
 };
 
-// Re-export hooks from account
 export { useChangePassword, useUpdateUserProfile as useUpdateProfile };

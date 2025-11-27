@@ -47,15 +47,15 @@ const QrCodeScanner = ({ onQrCodeDetected }: QrCodeScannerProps) => {
   };
 
   useEffect(() => {
-    // Khởi động scanner khi dialog mở
+    
     if (isOpen) {
-      // Đặt timeout để đảm bảo DOM đã render xong
+      
       const timer = setTimeout(() => {
         startScanner();
       }, 500);
       return () => clearTimeout(timer);
     } else {
-      // Dừng scanner khi dialog đóng
+      
       stopScanner();
     }
   }, [isOpen]);

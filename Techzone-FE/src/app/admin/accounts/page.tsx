@@ -112,13 +112,13 @@ export default function AccountsPage() {
     setFilters({ ...filters, page: newPage });
   };
 
-  // Format date
+  
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Chưa xác định';
     return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: vi });
   };
 
-  // Get role badge
+  
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'ADMIN':
@@ -132,7 +132,7 @@ export default function AccountsPage() {
     }
   };
 
-  // Get status badge
+  
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -144,7 +144,7 @@ export default function AccountsPage() {
     }
   };
 
-  // Get initials for avatar fallback
+  
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -155,7 +155,7 @@ export default function AccountsPage() {
   };
 
   const getRandomAvatar = () => {
-    const avatarCount = 4; // Assuming you have dfavatar1.png to dfavatar4.png
+    const avatarCount = 4; 
     const randomIndex = Math.floor(Math.random() * avatarCount) + 1;
     return `/images/dfavatar${randomIndex}.png`;
   };
@@ -467,7 +467,7 @@ export default function AccountsPage() {
         </CardContent>
       </Card>
 
-      {/* Delete Account Dialog */}
+      {}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -507,7 +507,7 @@ export default function AccountsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Update Status Dialog */}
+      {}
       <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
         <DialogContent>
           <DialogHeader>

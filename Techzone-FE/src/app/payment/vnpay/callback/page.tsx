@@ -38,10 +38,10 @@ function VNPayCallbackContent() {
           throw new Error(response.message || 'Không thể cập nhật trạng thái thanh toán');
         }
 
-        // Xóa orderId khỏi localStorage
+        
         localStorage.removeItem('pendingOrderId');
 
-        // Kiểm tra kết quả thanh toán
+        
         if (vnp_ResponseCode === '00' && vnp_TransactionStatus === '00') {
           showToast({
             title: "Thành công",

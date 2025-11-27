@@ -76,7 +76,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
 
   const convertToVND = () => {
     const dollarAmount = variant.price || 0;
-    const vndAmount = Math.round(dollarAmount * 25912.04 / 1000) * 1000; // Làm tròn đến hàng nghìn
+    const vndAmount = Math.round(dollarAmount * 25912.04 / 1000) * 1000; 
     onChange({
       ...variant,
       price: vndAmount

@@ -127,14 +127,14 @@ export default function CreateOrderPage() {
     setIsSubmitting(true);
     
     try {
-      // In a real implementation, you would first create/get the customer ID
-      // For simplicity, we're using a placeholder
-      const customerID = "64f720fb93a46d138d413045"; // This would be obtained from API
+      
+      
+      const customerID = "64f720fb93a46d138d413045"; 
       
       const orderData = {
         customer: customerID,
         items: selectedProducts,
-        voucher: voucherCode || '', // In a real app, this would be validated
+        voucher: voucherCode || '', 
         subTotal,
         discount,
         total,
@@ -229,7 +229,7 @@ export default function CreateOrderPage() {
                         {selectedProducts.map((item, index) => (
                           <TableRow key={index}>
                             <TableCell>
-                              {/* In a real implementation, you would display product name by fetching product details */}
+                              {}
                               Product {index + 1} ({item.product})
                             </TableCell>
                             <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
@@ -381,7 +381,7 @@ export default function CreateOrderPage() {
                         <SelectValue placeholder="Chọn Tỉnh/Thành phố" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* In a real app, these would be populated from API */}
+                        {}
                         <SelectItem value="01">Hà Nội</SelectItem>
                         <SelectItem value="02">Hồ Chí Minh</SelectItem>
                         <SelectItem value="03">Đà Nẵng</SelectItem>
@@ -400,7 +400,7 @@ export default function CreateOrderPage() {
                         <SelectValue placeholder="Chọn Quận/Huyện" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* These would be filtered based on province */}
+                        {}
                         <SelectItem value="001">Quận 1</SelectItem>
                         <SelectItem value="002">Quận 2</SelectItem>
                       </SelectContent>
@@ -418,7 +418,7 @@ export default function CreateOrderPage() {
                         <SelectValue placeholder="Chọn Phường/Xã" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* These would be filtered based on district */}
+                        {}
                         <SelectItem value="00001">Phường 1</SelectItem>
                         <SelectItem value="00002">Phường 2</SelectItem>
                       </SelectContent>

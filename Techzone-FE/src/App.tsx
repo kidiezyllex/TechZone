@@ -5,21 +5,21 @@ import { UserProvider } from '@/context/useUserContext'
 import { ToastContainer } from 'react-toastify'
 import { LazyComponentLoader } from '@/components/Common/LazyComponentLoader'
 
-// Layout components
+
 import RootLayout from '@/layouts/RootLayout'
 import AdminLayout from '@/layouts/AdminLayout'
 
-// Lazy load page components with route-based code splitting
+
 const HomePage = React.lazy(() => import('@/pages/HomePage'))
 const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'))
 const AboutUsPage = React.lazy(() => import('@/pages/AboutUsPage'))
 const AccountPage = React.lazy(() => import('@/pages/AccountPage'))
 
-// Auth pages
+
 const LoginPage = React.lazy(() => import('@/pages/auth/LoginPage'))
 const RegisterPage = React.lazy(() => import('@/pages/auth/RegisterPage'))
 
-// Public pages
+
 const ProductsPage = React.lazy(() => import('@/pages/ProductsPage'))
 const ProductDetailPage = React.lazy(() => import('@/pages/ProductDetailPage'))
 const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'))
@@ -30,16 +30,16 @@ const CheckoutShippingPage = React.lazy(() => import('@/pages/CheckoutShippingPa
 const CheckoutSuccessPage = React.lazy(() => import('@/pages/CheckoutSuccessPage'))
 const PaymentResultPage = React.lazy(() => import('@/pages/PaymentResultPage'))
 
-// Admin pages - grouped by functionality for better code splitting
+
 const AdminDashboardPage = React.lazy(() => import('@/pages/admin/AdminDashboardPage'))
 const AdminStatisticsPage = React.lazy(() => import('@/pages/admin/AdminStatisticsPage'))
 
-// Admin Account Management
+
 const AdminAccountsPage = React.lazy(() => import('@/pages/admin/AdminAccountsPage'))
 const AdminAccountCreatePage = React.lazy(() => import('@/pages/admin/AdminAccountCreatePage'))
 const AdminAccountEditPage = React.lazy(() => import('@/pages/admin/AdminAccountEditPage'))
 
-// Admin Discounts Management
+
 const AdminDiscountsPage = React.lazy(() => import('@/pages/admin/AdminDiscountsPage'))
 const AdminPromotionsPage = React.lazy(() => import('@/pages/admin/AdminPromotionsPage'))
 const AdminPromotionCreatePage = React.lazy(() => import('@/pages/admin/AdminPromotionCreatePage'))
@@ -48,16 +48,16 @@ const AdminVouchersPage = React.lazy(() => import('@/pages/admin/AdminVouchersPa
 const AdminVoucherCreatePage = React.lazy(() => import('@/pages/admin/AdminVoucherCreatePage'))
 const AdminVoucherEditPage = React.lazy(() => import('@/pages/admin/AdminVoucherEditPage'))
 
-// Admin Orders Management
+
 const AdminOrdersPage = React.lazy(() => import('@/pages/admin/AdminOrdersPage'))
 const AdminOrderDetailPage = React.lazy(() => import('@/pages/admin/AdminOrderDetailPage'))
 const AdminOrderCreatePage = React.lazy(() => import('@/pages/admin/AdminOrderCreatePage'))
 const AdminOrderEditPage = React.lazy(() => import('@/pages/admin/AdminOrderEditPage'))
 
-// Admin POS
+
 const AdminPosPage = React.lazy(() => import('@/pages/admin/AdminPosPage'))
 
-// Admin Products Management
+
 const AdminProductsPage = React.lazy(() => import('@/pages/admin/AdminProductsPage'))
 const AdminProductBrandsPage = React.lazy(() => import('@/pages/admin/AdminProductBrandsPage'))
 const AdminProductCategoriesPage = React.lazy(() => import('@/pages/admin/AdminProductCategoriesPage'))
@@ -67,12 +67,12 @@ const AdminProductEditPage = React.lazy(() => import('@/pages/admin/AdminProduct
 const AdminProductMaterialsPage = React.lazy(() => import('@/pages/admin/AdminProductMaterialsPage'))
 const AdminProductSizesPage = React.lazy(() => import('@/pages/admin/AdminProductSizesPage'))
 
-// Admin Returns Management
+
 const AdminReturnsPage = React.lazy(() => import('@/pages/admin/AdminReturnsPage'))
 const AdminReturnCreatePage = React.lazy(() => import('@/pages/admin/AdminReturnCreatePage'))
 const AdminReturnEditPage = React.lazy(() => import('@/pages/admin/AdminReturnEditPage'))
 
-// Optimized loading component with better UX
+
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[400px]">
     <div className="flex flex-col items-center space-y-4">
@@ -101,7 +101,7 @@ function App() {
             limit={3}
           />
           <Routes>
-            {/* Public routes with main layout */}
+            {}
             <Route path="/" element={<RootLayout />}>
               <Route index element={
                 <LazyComponentLoader fallback={<PageLoader />}>
@@ -165,7 +165,7 @@ function App() {
               } />
             </Route>
 
-            {/* Auth routes (no layout) */}
+            {}
             <Route path="auth/login" element={
               <LazyComponentLoader fallback={<PageLoader />}>
                 <LoginPage />
@@ -177,7 +177,7 @@ function App() {
               </LazyComponentLoader>
             } />
 
-            {/* Admin routes with admin layout */}
+            {}
             <Route path="admin" element={<AdminLayout />}>
               <Route index element={
                 <LazyComponentLoader fallback={<PageLoader />}>
@@ -190,7 +190,7 @@ function App() {
                 </LazyComponentLoader>
               } />
               
-              {/* Accounts */}
+              {}
               <Route path="accounts" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminAccountsPage />
@@ -207,7 +207,7 @@ function App() {
                 </LazyComponentLoader>
               } />
               
-              {/* Discounts */}
+              {}
               <Route path="discounts" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminDiscountsPage />
@@ -244,7 +244,7 @@ function App() {
                 </LazyComponentLoader>
               } />
               
-              {/* Orders */}
+              {}
               <Route path="orders" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminOrdersPage />
@@ -266,14 +266,14 @@ function App() {
                 </LazyComponentLoader>
               } />
               
-              {/* POS */}
+              {}
               <Route path="pos" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminPosPage />
                 </LazyComponentLoader>
               } />
               
-              {/* Products */}
+              {}
               <Route path="products" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminProductsPage />
@@ -315,7 +315,7 @@ function App() {
                 </LazyComponentLoader>
               } />
               
-              {/* Returns */}
+              {}
               <Route path="returns" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminReturnsPage />
@@ -333,7 +333,7 @@ function App() {
               } />
             </Route>
 
-            {/* 404 page */}
+            {}
             <Route path="*" element={
               <LazyComponentLoader fallback={<PageLoader />}>
                 <NotFoundPage />

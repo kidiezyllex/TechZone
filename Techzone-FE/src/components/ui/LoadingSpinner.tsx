@@ -15,7 +15,7 @@ export default function LoadingSpinner({ size = 'md', className = '' }: LoadingS
   return (
     <div className={`flex items-center justify-center ${className}`}>
       <div className="relative">
-        {/* Outer spinning circle */}
+        {}
         <div 
           className={`${sizeClasses[size]} border-4 border-gray-200 rounded-full animate-spin`}
           style={{
@@ -27,7 +27,7 @@ export default function LoadingSpinner({ size = 'md', className = '' }: LoadingS
           }}
         />
         
-        {/* Inner pulsing dot */}
+        {}
         <div 
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full animate-pulse"
           style={{
@@ -40,7 +40,7 @@ export default function LoadingSpinner({ size = 'md', className = '' }: LoadingS
   );
 }
 
-// Component với text loading
+
 export function LoadingSpinnerWithText({ 
   text = 'Đang tải...', 
   size = 'md',

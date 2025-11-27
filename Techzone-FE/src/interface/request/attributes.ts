@@ -1,4 +1,4 @@
-// Brand interfaces
+
 export interface IBrandFilter {
   status?: 'ACTIVE' | 'INACTIVE';
 }
@@ -13,7 +13,7 @@ export interface IBrandUpdate {
   status?: 'ACTIVE' | 'INACTIVE';
 }
 
-// Category interfaces
+
 export interface ICategoryFilter {
   status?: 'ACTIVE' | 'INACTIVE';
 }
@@ -28,7 +28,7 @@ export interface ICategoryUpdate {
   status?: 'ACTIVE' | 'INACTIVE';
 }
 
-// Material interfaces
+
 export interface IMaterialFilter {
   status?: 'ACTIVE' | 'INACTIVE';
 }
@@ -43,7 +43,7 @@ export interface IMaterialUpdate {
   status?: 'ACTIVE' | 'INACTIVE';
 }
 
-// Color interfaces
+
 export interface IColorFilter {
   status?: 'ACTIVE' | 'INACTIVE';
 }
@@ -60,7 +60,7 @@ export interface IColorUpdate {
   status?: 'ACTIVE' | 'INACTIVE';
 }
 
-// Size interfaces
+
 export interface ISizeFilter {
   status?: 'ACTIVE' | 'INACTIVE';
 }

@@ -2,10 +2,7 @@ import React from 'react'
 import { ToastContainer as ReactToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-/**
- * Global Toast Container Component
- * Add this component to your root layout (main.tsx or app layout)
- */
+
 export function ToastContainer() {
   return (
     <ReactToastContainer

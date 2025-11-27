@@ -142,7 +142,7 @@ export default function EditProductPage() {
 
   const handleRemoveImage = async (variantId: string, imageIndex: number) => {
     try {
-      // Xác định biến thể cần cập nhật ảnh
+      
       const variant = productData?.data.variants.find(v => v.id === variantId);
       if (!variant) {
         toast.error('Không tìm thấy biến thể');

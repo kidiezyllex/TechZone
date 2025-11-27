@@ -383,7 +383,7 @@ export default function PromotionsPage() {
               </Button>
               {[...Array(data.data.pagination.totalPages)].map((_, index) => {
                 const page = index + 1;
-                // Hiển thị trang hiện tại, 2 trang trước và 2 trang sau
+                
                 if (
                   page === 1 ||
                   page === data.data.pagination.totalPages ||
@@ -431,7 +431,7 @@ export default function PromotionsPage() {
         </div>
       )}
 
-      {/* Xác nhận xóa dialog */}
+      {}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>

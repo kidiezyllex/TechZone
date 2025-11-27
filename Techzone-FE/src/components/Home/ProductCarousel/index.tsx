@@ -62,7 +62,7 @@ export function ProductCarousel({ products, showNavigation = true }: ProductCaro
         ))}
       </Swiper>
 
-      {/* Navigation */}
+      {}
       {showNavigation && (
         <>
           <button

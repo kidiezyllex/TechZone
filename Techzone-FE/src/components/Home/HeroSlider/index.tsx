@@ -58,7 +58,7 @@ export function HeroSlider({ banners }: HeroSliderProps) {
                 alt={banner.title}
                 className="w-full h-full object-cover"
               />
-              {/* Overlay */}
+              {}
               <div className="absolute inset-0 bg-black/30 flex items-center justify-start p-8">
                 <div className="max-w-md">
                   {banner.badge && (
@@ -78,7 +78,7 @@ export function HeroSlider({ banners }: HeroSliderProps) {
         ))}
       </Swiper>
 
-      {/* Navigation Buttons */}
+      {}
       <button
         ref={prevRef}
         className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
@@ -92,7 +92,7 @@ export function HeroSlider({ banners }: HeroSliderProps) {
         <ChevronRight size={24} />
       </button>
 
-      {/* Dots */}
+      {}
       <div className="swiper-pagination absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex justify-center gap-2">
       </div>
     </div>

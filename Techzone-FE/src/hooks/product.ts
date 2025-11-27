@@ -37,8 +37,8 @@ export const useProducts = (params: IProductFilter = {}): UseQueryResult<IProduc
   return useQuery<IProductsResponse, Error>({
     queryKey: ["products", params],
     queryFn: () => getAllProducts(params),
-    staleTime: 30000, // 30 seconds
-    gcTime: 300000, // 5 minutes
+    staleTime: 30000,
+    gcTime: 300000,
     refetchInterval: 4000,
     refetchIntervalInBackground: true,
   });
@@ -49,8 +49,8 @@ export const useProductDetail = (productId: string): UseQueryResult<IProductResp
     queryKey: ["product", productId],
     queryFn: () => getProductById(productId),
     enabled: !!productId, 
-    staleTime: 30000, // 30 seconds
-    gcTime: 300000, // 5 minutes
+    staleTime: 30000,
+    gcTime: 300000,
     refetchInterval: 4000,
     refetchIntervalInBackground: true,
   });
@@ -119,8 +119,8 @@ export const useSearchProducts = (params: IProductSearchParams): UseQueryResult<
              !!params.size || 
              !!params.minPrice || 
              !!params.maxPrice,
-    staleTime: 30000, // 30 seconds
-    gcTime: 300000, // 5 minutes
+    staleTime: 30000,
+    gcTime: 300000,
     refetchInterval: 4000,
     refetchIntervalInBackground: true,
   });
@@ -157,5 +157,4 @@ export const useUpdateSole = () => {
   };
 };
 
-// Re-export hooks from options.ts
 export { useBrands, useCategories, useColors, useMaterials, useSizes }; 

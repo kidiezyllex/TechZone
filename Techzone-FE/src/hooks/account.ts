@@ -36,9 +36,6 @@ import {
   useQueryClient
 } from "@tanstack/react-query";
 
-/**
- * Hook lấy danh sách tài khoản
- */
 export const useAccounts = (
   params: IAccountFilter = {}
 ): UseQueryResult<IAccountsResponse, Error> => {
@@ -48,9 +45,6 @@ export const useAccounts = (
   });
 };
 
-/**
- * Hook lấy chi tiết tài khoản
- */
 export const useAccount = (
   accountId: string
 ): UseQueryResult<IAccountResponse, Error> => {
@@ -61,9 +55,6 @@ export const useAccount = (
   });
 };
 
-/**
- * Hook tạo tài khoản
- */
 export const useCreateAccount = (): UseMutationResult<
   IAccountResponse,
   Error,
@@ -74,9 +65,6 @@ export const useCreateAccount = (): UseMutationResult<
   });
 };
 
-/**
- * Hook cập nhật tài khoản
- */
 export const useUpdateAccount = (
   accountId: string
 ): UseMutationResult<IAccountResponse, Error, IAccountUpdate> => {
@@ -85,9 +73,6 @@ export const useUpdateAccount = (
   });
 };
 
-/**
- * Hook cập nhật trạng thái tài khoản
- */
 export const useUpdateAccountStatus = (
   accountId: string
 ): UseMutationResult<IAccountResponse, Error, IAccountStatusUpdate> => {
@@ -96,9 +81,6 @@ export const useUpdateAccountStatus = (
   });
 };
 
-/**
- * Hook xóa tài khoản
- */
 export const useDeleteAccount = (): UseMutationResult<
   IActionResponse,
   Error,
@@ -109,19 +91,16 @@ export const useDeleteAccount = (): UseMutationResult<
   });
 };
 
-/**
- * Hook lấy hồ sơ người dùng
- */
-export const useUserProfile = (): UseQueryResult<IProfileResponse, Error> => {
+export const useUserProfile = (enabled: boolean = true): UseQueryResult<IProfileResponse, Error> => {
   return useQuery<IProfileResponse, Error>({
     queryKey: ["userProfile"],
-    queryFn: () => getProfile()
+    queryFn: () => getProfile(),
+    enabled: enabled,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 };
 
-/**
- * Hook cập nhật hồ sơ người dùng
- */
 export const useUpdateUserProfile = (): UseMutationResult<
   IProfileResponse,
   Error,
@@ -136,9 +115,6 @@ export const useUpdateUserProfile = (): UseMutationResult<
   });
 };
 
-/**
- * Hook đổi mật khẩu
- */
 export const useChangePassword = (): UseMutationResult<
   IActionResponse,
   Error,
@@ -149,9 +125,6 @@ export const useChangePassword = (): UseMutationResult<
   });
 };
 
-/**
- * Hook thêm địa chỉ mới
- */
 export const useAddAddress = (): UseMutationResult<
   IProfileResponse,
   Error,
@@ -162,9 +135,6 @@ export const useAddAddress = (): UseMutationResult<
   });
 };
 
-/**
- * Hook cập nhật địa chỉ
- */
 export const useUpdateAddress = (): UseMutationResult<
   IProfileResponse,
   Error,
@@ -179,9 +149,6 @@ export const useUpdateAddress = (): UseMutationResult<
   });
 };
 
-/**
- * Hook xóa địa chỉ
- */
 export const useDeleteAddress = (): UseMutationResult<
   IProfileResponse,
   Error,
@@ -190,4 +157,4 @@ export const useDeleteAddress = (): UseMutationResult<
   return useMutation<IProfileResponse, Error, string>({
     mutationFn: (addressId: string) => deleteAddress(addressId)
   });
-}; 
+};

@@ -306,7 +306,7 @@ export default function BrandsPage() {
     );
 }
 
-// Edit Brand Dialog Component
+
 interface EditBrandDialogProps {
     brandId: string;
     isOpen: boolean;
@@ -340,7 +340,7 @@ function EditBrandDialog({ brandId, isOpen, onClose }: EditBrandDialogProps) {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
 
-        // Clear error when user types
+        
         if (errors[name as keyof typeof errors]) {
             setErrors((prev) => ({ ...prev, [name]: '' }));
         }
@@ -483,7 +483,7 @@ function EditBrandDialog({ brandId, isOpen, onClose }: EditBrandDialogProps) {
     );
 }
 
-// Create Brand Dialog Component
+
 interface CreateBrandDialogProps {
     isOpen: boolean;
     onClose: () => void;
@@ -506,7 +506,7 @@ function CreateBrandDialog({ isOpen, onClose }: CreateBrandDialogProps) {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
 
-        // Clear error when user types
+        
         if (errors[name as keyof typeof errors]) {
             setErrors((prev) => ({ ...prev, [name]: '' }));
         }
@@ -541,7 +541,7 @@ function CreateBrandDialog({ isOpen, onClose }: CreateBrandDialogProps) {
                     onSuccess: () => {
                         toast.success('Thêm thương hiệu thành công');
                         queryClient.invalidateQueries({ queryKey: ['brands'] });
-                        // Reset form
+                        
                         setFormData({
                             name: '',
                             status: 'ACTIVE'

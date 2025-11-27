@@ -62,12 +62,12 @@ const SidebarLayout = memo(function SidebarLayout({ children }: SidebarLayoutPro
     setHoverMenu(null);
   });
 
-  // Memoize menu items to prevent unnecessary re-renders
+  
   const memoizedMenuItems = useMemo(() => menuItems, []);
 
   return (
     <div className="flex flex-row min-h-screen w-screen">
-      {/* Sidebar */}
+      {}
       <div
         className={cn(
           "bg-white shadow-md min-h-screen transition-all duration-300",
@@ -215,7 +215,7 @@ const SidebarLayout = memo(function SidebarLayout({ children }: SidebarLayoutPro
           </nav>
         </div>
       </div>
-      {/* Main content */}
+      {}
       <div className="w-full flex-1 flex flex-col bg-[#1C2B38]">
         <AdminHeader />
         <main className="p-4 min-h-[calc(100vh-66px)]">

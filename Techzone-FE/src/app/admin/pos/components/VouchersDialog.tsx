@@ -62,14 +62,14 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
     return isVoucherExpired(voucher.endDate) || isVoucherOutOfStock(voucher);
   };
 
-  // Map API fields to component expected fields
+  
   const mapVoucherData = (voucher: any) => {
     return {
       ...voucher,
-      discountType: voucher.type, // Map 'type' to 'discountType'
-      discountValue: parseFloat(voucher.value), // Convert string to number
-      maxValue: voucher.maxDiscount ? parseFloat(voucher.maxDiscount) : null, // Convert string to number
-      minOrderValue: parseFloat(voucher.minOrderValue) // Convert string to number
+      discountType: voucher.type, 
+      discountValue: parseFloat(voucher.value), 
+      maxValue: voucher.maxDiscount ? parseFloat(voucher.maxDiscount) : null, 
+      minOrderValue: parseFloat(voucher.minOrderValue) 
     };
   };
 
@@ -138,7 +138,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
             </div>
           ) : (
             <div className="py-0">
-              {/* Header Stats */}
+              {}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-6">
                   <div className="text-sm text-maintext">
@@ -157,7 +157,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                 </div>
               </div>
 
-              {/* Enhanced Table with shadcn/ui components */}
+              {}
               <div className="border border-border rounded-xl overflow-hidden shadow-sm bg-white">
                 <ScrollArea className="max-h-[50vh]">
                   <Table>
@@ -192,7 +192,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               isDisabled && "bg-gray-50/30 opacity-75"
                             )}
                           >
-                            {/* Voucher Code */}
+                            {}
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <div className={cn(
@@ -213,7 +213,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               </div>
                             </TableCell>
 
-                            {/* Program Name */}
+                            {}
                             <TableCell>
                               <div className={cn(
                                 "font-medium text-sm leading-tight",
@@ -226,7 +226,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               </div>
                             </TableCell>
 
-                            {/* Type */}
+                            {}
                             <TableCell className="text-center">
                               <Badge
                                 variant={voucher.discountType === 'PERCENTAGE' ? 'default' : 'secondary'}
@@ -241,7 +241,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               </Badge>
                             </TableCell>
 
-                            {/* Value */}
+                            {}
                             <TableCell className="text-right">
                               <div className={cn(
                                 "font-bold text-sm",
@@ -256,14 +256,14 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               )}
                             </TableCell>
 
-                            {/* Min Order */}
+                            {}
                             <TableCell className="text-right">
                               <div className="font-semibold text-sm text-maintext">
                                 {formatCurrency(voucher.minOrderValue)}
                               </div>
                             </TableCell>
 
-                            {/* Remaining */}
+                            {}
                             <TableCell className="text-center">
                               <Badge
                                 variant={remainingQuantity <= 5 ? 'destructive' : remainingQuantity <= 20 ? 'outline' : 'secondary'}
@@ -280,7 +280,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               </Badge>
                             </TableCell>
 
-                            {/* Expiry */}
+                            {}
                             <TableCell className="text-center">
                               <div className={cn(
                                 "text-xs font-medium",
@@ -295,7 +295,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               )}
                             </TableCell>
 
-                            {/* Actions */}
+                            {}
                             <TableCell className="text-center">
                               <motion.div
                                 whileHover={!isDisabled ? { scale: 1.05 } : {}}
@@ -331,7 +331,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                 </ScrollArea>
               </div>
 
-              {/* Footer Info */}
+              {}
               <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-border">
                 <div className="flex items-center justify-between text-sm text-maintext">
                   <div className="flex items-center gap-4">

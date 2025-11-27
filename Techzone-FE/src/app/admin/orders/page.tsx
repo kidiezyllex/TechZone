@@ -231,8 +231,8 @@ export default function OrdersPage() {
       "Số điện thoại": order.customer?.phoneNumber || order.shippingPhoneNumber || "N/A",
       "Ngày tạo": formatDate(order.createdAt),
       "Tổng tiền": formatCurrency(order.total),
-      "Trạng thái đơn hàng": order.orderStatus, // Consider mapping to readable status like in Badge
-      "Trạng thái thanh toán": order.paymentStatus, // Consider mapping to readable status
+      "Trạng thái đơn hàng": order.orderStatus, 
+      "Trạng thái thanh toán": order.paymentStatus, 
     }))
 
     const worksheet = XLSX.utils.json_to_sheet(formattedOrders)
@@ -330,8 +330,8 @@ export default function OrdersPage() {
         halign: "left",
       },
       columnStyles: {
-        3: { halign: "right" }, // Align price column to right
-        4: { halign: "center" }, // Center status columns
+        3: { halign: "right" }, 
+        4: { halign: "center" }, 
         5: { halign: "center" },
       },
     })
@@ -1040,7 +1040,7 @@ const OrderDetailDialog = ({
                 </div>
               </div>
 
-              {/* Action buttons */}
+              {}
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <Button

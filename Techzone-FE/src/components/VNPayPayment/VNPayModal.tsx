@@ -66,16 +66,16 @@ export default function VNPayModal({
   const [currentStep, setCurrentStep] = useState<PaymentStep>('bank-selection');
   const [paymentResult, setPaymentResult] = useState<any>(null);
   
-  // Account input fields
+  
   const [accountNumber, setAccountNumber] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
   
-  // OTP fields
+  
   const [otpCode, setOtpCode] = useState('');
   const [otpTimer, setOtpTimer] = useState(60);
   const [canResendOtp, setCanResendOtp] = useState(false);
 
-  // Filter banks based on search term
+  
   const filteredBanks = useMemo(() => {
     if (!searchTerm) return banks;
     
@@ -87,14 +87,14 @@ export default function VNPayModal({
     );
   }, [banks, searchTerm]);
 
-  // Fetch banks from VietQR API
+  
   useEffect(() => {
     if (isOpen) {
       fetchBanks();
     }
   }, [isOpen]);
 
-  // OTP timer effect
+  
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
@@ -120,7 +120,7 @@ export default function VNPayModal({
       const result = await response.json();
       
       if (result.code === '00' && result.data) {
-        // Filter banks that support transfer
+        
         const supportedBanks = result.data.filter((bank: Bank) => bank.transferSupported === 1);
         setBanks(supportedBanks);
       } else {
@@ -129,7 +129,7 @@ export default function VNPayModal({
     } catch (error) {
       console.error('Error fetching banks:', error);
       toast.error('Không thể tải danh sách ngân hàng');
-      // Fallback to some popular banks
+      
       setBanks([
         {
           id: 1,
@@ -190,10 +190,10 @@ export default function VNPayModal({
       return;
     }
 
-    // Simulate account verification
+    
     setIsProcessing(true);
     setTimeout(() => {
-      setAccountHolder('NGUYEN VAN A'); // Simulated account holder name
+      setAccountHolder('NGUYEN VAN A'); 
       setCurrentStep('otp-verification');
       setOtpTimer(60);
       setCanResendOtp(false);
@@ -221,10 +221,10 @@ export default function VNPayModal({
       setIsProcessing(true);
       setCurrentStep('processing');
 
-      // Simulate payment processing
+      
       await new Promise(resolve => setTimeout(resolve, 3000));
 
-      // Simulate random success/failure (95% success rate)
+      
       const isSuccess = Math.random() > 0.05;
 
       if (isSuccess) {
@@ -242,7 +242,7 @@ export default function VNPayModal({
         setPaymentResult(paymentData);
         setCurrentStep('success');
         
-        // Call success callback after a short delay
+        
         setTimeout(() => {
           onPaymentSuccess(paymentData);
         }, 2000);

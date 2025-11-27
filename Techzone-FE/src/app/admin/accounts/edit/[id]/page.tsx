@@ -39,7 +39,7 @@ export default function EditAccountPage() {
     status: 'ACTIVE'
   });
 
-  const [displayGender, setDisplayGender] = useState<string>('Khác'); // Default display value
+  const [displayGender, setDisplayGender] = useState<string>('Khác'); 
 
   useEffect(() => {
     if (accountData?.data) {
@@ -263,7 +263,7 @@ export default function EditAccountPage() {
                       value={displayGender}
                       onValueChange={(value) => {
                         setDisplayGender(value);
-                        // Map display gender string to boolean/undefined for formData
+                        
                         const apiGender = value === 'Nam' ? true : value === 'Nữ' ? false : undefined;
                         setFormData((prev) => ({ ...prev, gender: apiGender }));
                       }}

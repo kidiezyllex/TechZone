@@ -41,7 +41,7 @@ export function FlashSale({ endTime }: FlashSaleProps) {
           </div>
         </div>
 
-        {/* Countdown Timer */}
+        {}
         <div className="flex gap-4 text-center">
           <div className="bg-white border-2 border-accent rounded-lg px-4 py-3">
             <div className="text-2xl font-bold text-accent">{String(timeLeft.hours).padStart(2, '0')}</div>

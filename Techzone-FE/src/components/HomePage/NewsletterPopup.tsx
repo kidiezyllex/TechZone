@@ -9,7 +9,7 @@ export const NewsletterPopup = () => {
   const [email, setEmail] = useState('');
   const [success, setSuccess] = useState(false);
 
-  //                                                                                                                     Hiển thị popup sau 5 giây vào trang
+  
   useEffect(() => {
     const hasSeenPopup = localStorage.getItem('hasSeenNewsletterPopup');
     
@@ -24,17 +24,17 @@ export const NewsletterPopup = () => {
 
   const handleClose = () => {
     setIsOpen(false);
-    //                                                                                                                     Đánh dấu đã hiện popup
+    
     localStorage.setItem('hasSeenNewsletterPopup', 'true');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    //                                                                                                                     Xử lý logic đăng ký thực tế
+    
     setSuccess(true);
     setTimeout(() => {
       handleClose();
-      //                                                                                                                     Reset trạng thái để lần sau hiển thị lại form
+      
       setTimeout(() => setSuccess(false), 500);
     }, 3000);
   };
@@ -43,7 +43,7 @@ export const NewsletterPopup = () => {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Overlay */}
+          {}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -52,7 +52,7 @@ export const NewsletterPopup = () => {
             onClick={handleClose}
           />
           
-          {/* Popup */}
+          {}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -61,7 +61,7 @@ export const NewsletterPopup = () => {
             className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-4xl w-full bg-white rounded-[6px] shadow-2xl z-50 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Nút đóng */}
+            {}
             <button 
               className="absolute top-3 right-3 z-10 text-maintext hover:text-maintext"
               onClick={handleClose}
@@ -70,14 +70,14 @@ export const NewsletterPopup = () => {
             </button>
             
             <div className="grid md:grid-cols-5">
-              {/* Phần màu */}
+              {}
               <div className="hidden md:block md:col-span-2 bg-gradient-to-br from-primary to-extra">
                 <div className="h-full flex items-center justify-center p-4">
                   <Icon path={mdiGiftOutline} size={4} className="text-white/80" />
                 </div>
               </div>
               
-              {/* Phần nội dung */}
+              {}
               <div className="p-4 md:p-8 md:col-span-3">
                 <div className="text-center md:text-left">
                   <h3 className="text-xl md:text-2xl font-bold text-maintext mb-2">

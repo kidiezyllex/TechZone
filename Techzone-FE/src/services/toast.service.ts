@@ -1,10 +1,5 @@
 import { toast, ToastOptions } from 'react-toastify'
 
-/**
- * Centralized Toast Service for all notifications
- * Usage: toastService.success('Thành công!'), toastService.error('Lỗi!')
- */
-
 const defaultOptions: ToastOptions = {
   position: 'top-right',
   autoClose: 3000,
@@ -15,58 +10,34 @@ const defaultOptions: ToastOptions = {
 }
 
 export const toastService = {
-  /**
-   * Success notification
-   */
   success: (message: string, options?: ToastOptions) => {
     toast.success(message, { ...defaultOptions, ...options })
   },
 
-  /**
-   * Error notification
-   */
   error: (message: string, options?: ToastOptions) => {
     toast.error(message, { ...defaultOptions, ...options })
   },
 
-  /**
-   * Warning notification
-   */
   warning: (message: string, options?: ToastOptions) => {
     toast.warning(message, { ...defaultOptions, ...options })
   },
 
-  /**
-   * Info notification
-   */
   info: (message: string, options?: ToastOptions) => {
     toast.info(message, { ...defaultOptions, ...options })
   },
 
-  /**
-   * Loading notification (returns ID for update)
-   */
   loading: (message: string, options?: ToastOptions) => {
     return toast.loading(message, { ...defaultOptions, ...options })
   },
 
-  /**
-   * Update existing toast
-   */
   update: (toastId: string | number, options: ToastOptions) => {
     toast.update(toastId, options)
   },
 
-  /**
-   * Dismiss notification
-   */
   dismiss: (toastId?: string | number) => {
     toast.dismiss(toastId)
   },
 
-  /**
-   * API Response handler - automatically shows appropriate toast
-   */
   handleResponse: (response: any, successMessage?: string) => {
     if (response?.success) {
       toastService.success(successMessage || response?.message || 'Thành công!')
@@ -77,17 +48,11 @@ export const toastService = {
     }
   },
 
-  /**
-   * API Error handler - automatically shows error toast
-   */
   handleError: (error: any, errorMessage?: string) => {
     const message = errorMessage || error?.response?.data?.message || error?.message || 'Có lỗi xảy ra!'
     toastService.error(message)
   },
 
-  /**
-   * Promise handler - shows loading, then success/error
-   */
   async promise<T>(
     promise: Promise<T>,
     messages: {

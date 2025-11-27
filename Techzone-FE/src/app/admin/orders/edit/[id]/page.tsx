@@ -69,7 +69,7 @@ export default function EditOrderPage() {
     setIsSubmitting(true);
     
     try {
-      // Update order information
+      
       if (Object.keys(formData).length > 0) {
         await updateOrder.mutateAsync({
           orderId: id as string,
@@ -77,7 +77,7 @@ export default function EditOrderPage() {
         });
       }
       
-      // Update order status if changed
+      
       if (orderStatus && orderStatus !== orderData?.data.orderStatus) {
         await updateOrderStatus.mutateAsync({
           orderId: id as string,
@@ -208,7 +208,7 @@ export default function EditOrderPage() {
                         <SelectValue placeholder="Chọn Tỉnh/Thành phố" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Render province options dynamically */}
+                        {}
                         <SelectItem value={order.shippingAddress?.provinceId || ''}>
                           {order.shippingAddress?.provinceName || 'Không có dữ liệu'}
                         </SelectItem>
@@ -226,7 +226,7 @@ export default function EditOrderPage() {
                         <SelectValue placeholder="Chọn Quận/Huyện" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Render district options dynamically */}
+                        {}
                         <SelectItem value={order.shippingAddress?.districtId || ''}>
                           {order.shippingAddress?.districtName || 'Không có dữ liệu'}
                         </SelectItem>
@@ -244,7 +244,7 @@ export default function EditOrderPage() {
                         <SelectValue placeholder="Chọn Phường/Xã" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Render ward options dynamically */}
+                        {}
                         <SelectItem value={order.shippingAddress?.wardId || ''}>
                           {order.shippingAddress?.wardName || 'Không có dữ liệu'}
                         </SelectItem>

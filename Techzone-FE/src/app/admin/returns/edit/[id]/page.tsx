@@ -57,7 +57,7 @@ export default function EditReturnPage({ params }: EditReturnPageProps) {
         quantity: item.quantity,
         price: item.price,
         reason: item.reason || '',
-        maxQuantity: item.quantity + 5, // Mock max quantity
+        maxQuantity: item.quantity + 5, 
         productName: typeof item.product === 'string' ? 'Sản phẩm' : item.product.name,
         productCode: typeof item.product === 'string' ? item.product : item.product.code,
         productImage: typeof item.product === 'string' ? '/placeholder.jpg' : (item.product.images?.[0] || '/placeholder.jpg'),
@@ -166,7 +166,7 @@ export default function EditReturnPage({ params }: EditReturnPageProps) {
     ? { code: returnInfo.originalOrder }
     : returnInfo.originalOrder;
 
-  // Only allow editing if status is CHO_XU_LY
+  
   const canEdit = returnInfo.status === 'CHO_XU_LY';
 
   return (
@@ -208,7 +208,7 @@ export default function EditReturnPage({ params }: EditReturnPageProps) {
         </Card>
       )}
 
-      {/* Return Information */}
+      {}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -261,7 +261,7 @@ export default function EditReturnPage({ params }: EditReturnPageProps) {
         </CardContent>
       </Card>
 
-      {/* Editable Items */}
+      {}
       <Card>
         <CardHeader>
           <CardTitle>Sản phẩm trả hàng</CardTitle>
@@ -361,7 +361,7 @@ export default function EditReturnPage({ params }: EditReturnPageProps) {
         </CardContent>
       </Card>
 
-      {/* Summary */}
+      {}
       <Card>
         <CardHeader>
           <CardTitle>Tóm tắt</CardTitle>
@@ -408,7 +408,7 @@ export default function EditReturnPage({ params }: EditReturnPageProps) {
         </CardContent>
       </Card>
 
-      {/* Actions */}
+      {}
       {canEdit && (
         <div className="flex justify-end gap-4">
           <a href="/admin/returns">

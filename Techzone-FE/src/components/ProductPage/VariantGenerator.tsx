@@ -37,11 +37,11 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
   const { data: sizesData } = useSizes();
   const [generatedVariants, setGeneratedVariants] = useState<GeneratedVariant[]>([]);
 
-  // Công thức tính giá theo size (size càng lớn giá càng cao)
+  
   const calculatePriceBySize = (basePrice: number, sizeValue: number): number => {
-    const baseSizeValue = 38; // Size cơ sở
-    const priceMultiplier = 1 + ((sizeValue - baseSizeValue) * 0.02); // Mỗi size tăng 2%
-    return Math.round(basePrice * priceMultiplier / 1000) * 1000; // Làm tròn đến hàng nghìn
+    const baseSizeValue = 38; 
+    const priceMultiplier = 1 + ((sizeValue - baseSizeValue) * 0.02); 
+    return Math.round(basePrice * priceMultiplier / 1000) * 1000; 
   };
 
   useEffect(() => {
@@ -56,9 +56,9 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
             colorId: color.id,
             sizeId: size.id,
             price: calculatedPrice,
-            stock: 10, // Tạm thời set tất cả là 10, sẽ điều chỉnh sau khi sắp xếp
-            images: baseVariant.images ? [...baseVariant.images] : [], // tất cả dùng chung images với biến thể #1
-            selected: true, // Mặc định chọn tất cả
+            stock: 10, 
+            images: baseVariant.images ? [...baseVariant.images] : [], 
+            selected: true, 
             colorName: color.name,
             sizeName: getSizeLabel(size.value),
             sizeValue: size.value
@@ -66,7 +66,7 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
         });
       });
 
-      // Sắp xếp theo size tăng dần, sau đó theo màu
+      
       variants.sort((a, b) => {
         if (a.sizeValue !== b.sizeValue) {
           return a.sizeValue - b.sizeValue;
@@ -74,7 +74,7 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
         return a.colorName.localeCompare(b.colorName);
       });
 
-      // Sau khi sắp xếp, set stock cho biến thể đầu tiên (index 0) là stock ban đầu
+      
       if (variants.length > 0) {
         variants[0].stock = baseVariant.stock ?? 0;
       }

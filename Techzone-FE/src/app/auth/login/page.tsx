@@ -157,7 +157,7 @@ export default function AuthPage() {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-4 overflow-hidden bg-gradient-to-br from-green-50 via-green-100 to-green-50 dark:from-gray-900 dark:to-gray-800">
-      {/* Hiệu ứng bong bóng trang trí */}
+      {}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute h-20 w-20 rounded-full bg-primary/70 top-12 left-[10%]"></div>
         <div className="absolute h-24 w-24 rounded-full bg-secondary/80 top-36 right-[15%]"></div>
@@ -172,7 +172,7 @@ export default function AuthPage() {
       </div>
 
       <div className="w-full flex justify-center items-center relative z-10">
-        {/* Form đăng nhập bên phải */}
+        {}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}

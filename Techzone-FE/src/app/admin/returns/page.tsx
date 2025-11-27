@@ -544,7 +544,7 @@ export default function ReturnsPage() {
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Dialog */}
+      {}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-4xl">
           <DialogHeader>
@@ -568,7 +568,7 @@ export default function ReturnsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Return Detail Dialog */}
+      {}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="sm:max-w-[90%] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -583,7 +583,7 @@ export default function ReturnsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Status Update Modal */}
+      {}
       <StatusUpdateModal
         isOpen={statusUpdateModal.isOpen}
         onClose={() => setStatusUpdateModal({ isOpen: false, returnId: '', currentStatus: '' })}
@@ -593,7 +593,7 @@ export default function ReturnsPage() {
         isLoading={updateStatus.isPending}
       />
 
-      {/* Search Modal */}
+      {}
       <SearchReturnModal
         isOpen={searchModal}
         onClose={() => setSearchModal(false)}

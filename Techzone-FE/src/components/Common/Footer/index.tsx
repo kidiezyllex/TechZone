@@ -6,43 +6,43 @@ import { motion } from 'framer-motion';
 
 export const Footer = () => {
   const socialLinks = [
-    { 
-      name: 'linkedin', 
-      href: 'https://www.linkedin.com/company/clothess/', 
-      src: '/images/linkedin.png', 
-      width: 60, 
+    {
+      name: 'linkedin',
+      href: 'https://www.linkedin.com/company/TechZones/',
+      src: '/images/linkedin.png',
+      width: 60,
       height: 60,
       hoverColor: 'hover:bg-blue-600'
     },
-    { 
-      name: 'google-play', 
-      href: 'https://play.google.com/store/apps/dev?id=8799588644277179294&hl', 
-      src: '/images/google-play.png', 
-      width: 60, 
+    {
+      name: 'google-play',
+      href: 'https://play.google.com/store/apps/dev?id=8799588644277179294&hl',
+      src: '/images/google-play.png',
+      width: 60,
       height: 60,
       hoverColor: 'hover:bg-green-600'
     },
-    { 
-      name: 'app-store', 
-      href: 'https://apps.apple.com/us/developer/commandoo-joint-stock-company/id1561328863', 
-      src: '/images/app-store.png', 
-      width: 60, 
+    {
+      name: 'app-store',
+      href: 'https://apps.apple.com/us/developer/commandoo-joint-stock-company/id1561328863',
+      src: '/images/app-store.png',
+      width: 60,
       height: 60,
       hoverColor: 'hover:bg-gray-800'
     },
-    { 
-      name: 'facebook', 
-      href: 'https://www.facebook.com/clothess', 
-      src: '/images/facebook.png', 
-      width: 60, 
+    {
+      name: 'facebook',
+      href: 'https://www.facebook.com/TechZones',
+      src: '/images/facebook.png',
+      width: 60,
       height: 60,
       hoverColor: 'hover:bg-blue-500'
     },
-    { 
-      name: 'tiktok', 
-      href: 'https://www.tiktok.com/@clothess', 
-      src: '/images/tiktok.png', 
-      width: 60, 
+    {
+      name: 'tiktok',
+      href: 'https://www.tiktok.com/@TechZones',
+      src: '/images/tiktok.png',
+      width: 60,
       height: 60,
       hoverColor: 'hover:bg-black'
     },
@@ -64,31 +64,31 @@ export const Footer = () => {
 
   return (
     <>
-      {/* Enhanced main footer */}
+      {}
       <footer className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 text-white">
-        {/* Animated background elements */}
+        {}
         <div className="absolute inset-0 overflow-hidden">
-          <motion.div 
+          <motion.div
             className="absolute -top-20 -left-20 w-60 h-60 bg-gradient-to-br from-primary/20 to-blue-400/20 rounded-full blur-3xl"
-            animate={{ 
+            animate={{
               x: [0, 50, 0],
               y: [0, -30, 0],
               scale: [1, 1.1, 1]
             }}
-            transition={{ 
+            transition={{
               duration: 20,
               repeat: Infinity,
               ease: "easeInOut"
             }}
           />
-          <motion.div 
+          <motion.div
             className="absolute top-1/2 -right-32 w-80 h-80 bg-gradient-to-br from-purple-400/15 to-pink-400/15 rounded-full blur-3xl"
-            animate={{ 
+            animate={{
               x: [0, -40, 0],
               y: [0, 40, 0],
               scale: [1, 0.9, 1]
             }}
-            transition={{ 
+            transition={{
               duration: 25,
               repeat: Infinity,
               ease: "easeInOut"
@@ -98,7 +98,7 @@ export const Footer = () => {
 
         <div className="relative z-10 pt-16 pb-8">
           <div className="container mx-auto px-6">
-            {/* Mobile view - Enhanced */}
+            {}
             <div className="flex flex-col justify-center items-center sm:hidden">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -119,7 +119,7 @@ export const Footer = () => {
                 </div>
               </motion.div>
 
-              <motion.div 
+              <motion.div
                 className="space-y-4 mb-8 w-full max-w-sm"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -129,7 +129,7 @@ export const Footer = () => {
                   <Icon path={mdiMapMarker} size={1.2} className="text-primary mt-1 flex-shrink-0" />
                   <p className="text-gray-300 text-sm">D29, Pham Van Bach Street, Cau Giay District, Ha Noi, Vietnam</p>
                 </div>
-                
+
                 <div className="flex items-center gap-3 p-3 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
                   <Icon path={mdiEmail} size={1.2} className="text-primary flex-shrink-0" />
                   <p className="text-gray-300 text-sm">streetstore@gmail.com</p>
@@ -147,11 +147,11 @@ export const Footer = () => {
               </motion.div>
             </div>
 
-            {/* Desktop view - Enhanced */}
+            {}
             <div className="hidden sm:block">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                {/* Company Logo */}
-                <motion.div 
+                {}
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
@@ -168,12 +168,12 @@ export const Footer = () => {
                     />
                   </div>
                   <p className="text-gray-400 leading-relaxed">
-                    Điểm đến tin cậy cho những tín đồ thời trang. Chúng tôi mang đến những sản phẩm chất lượng cao 
+                    Điểm đến tin cậy cho những tín đồ thời trang. Chúng tôi mang đến những sản phẩm chất lượng cao
                     với thiết kế độc đáo và phong cách hiện đại.
                   </p>
                 </motion.div>
 
-                {/* Contact Info */}
+                {}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -200,7 +200,7 @@ export const Footer = () => {
                   </div>
                 </motion.div>
 
-                {/* Quick Links */}
+                {}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -210,8 +210,8 @@ export const Footer = () => {
                   <ul className="space-y-3">
                     {quickLinks.map((link, index) => (
                       <li key={index}>
-                        <a 
-                          href={link.href} 
+                        <a
+                          href={link.href}
                           className="text-gray-400 hover:text-primary transition-colors duration-300 flex items-center gap-2 group"
                         >
                           <span className="w-1 h-1 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -222,7 +222,7 @@ export const Footer = () => {
                   </ul>
                 </motion.div>
 
-                {/* Support Links */}
+                {}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -232,8 +232,8 @@ export const Footer = () => {
                   <ul className="space-y-3">
                     {supportLinks.map((link, index) => (
                       <li key={index}>
-                        <a 
-                          href={link.href} 
+                        <a
+                          href={link.href}
                           className="text-gray-400 hover:text-primary transition-colors duration-300 flex items-center gap-2 group"
                         >
                           <span className="w-1 h-1 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -245,8 +245,8 @@ export const Footer = () => {
                 </motion.div>
               </div>
 
-              {/* Social Links - Desktop */}
-              <motion.div 
+              {}
+              <motion.div
                 className="flex justify-center items-center gap-4 mb-8"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -254,10 +254,10 @@ export const Footer = () => {
               >
                 <span className="text-gray-400 mr-4">Theo dõi chúng tôi:</span>
                 {socialLinks.map((link, index) => (
-                  <motion.a 
-                    key={index} 
-                    href={link.href} 
-                    target="_blank" 
+                  <motion.a
+                    key={index}
+                    href={link.href}
+                    target="_blank"
                     rel="noreferrer"
                     className={`p-3 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 transition-all duration-300 ${link.hoverColor} hover:scale-110 hover:border-white/40 group`}
                     whileHover={{ y: -2 }}
@@ -274,8 +274,8 @@ export const Footer = () => {
                 ))}
               </motion.div>
 
-              {/* Footer Bottom */}
-              <motion.div 
+              {}
+              <motion.div
                 className="border-t border-white/20 pt-8"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -284,16 +284,16 @@ export const Footer = () => {
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                   <div className="flex flex-wrap justify-center md:justify-start gap-6">
                     {['Điều khoản sử dụng', 'Chính sách bảo mật', 'Bản quyền', 'Cộng đồng'].map((item, index) => (
-                      <a 
+                      <a
                         key={index}
-                        href="#" 
+                        href="#"
                         className="text-gray-400 hover:text-primary transition-colors duration-300 text-sm"
                       >
                         {item}
                       </a>
                     ))}
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-gray-400 text-sm">
                     <span>©2024 Shop Quần Áo. Made with</span>
                     <Icon path={mdiHeart} size={0.8} className="text-red-500" />
@@ -303,18 +303,18 @@ export const Footer = () => {
               </motion.div>
             </div>
 
-            {/* Social links - Mobile */}
-            <motion.div 
+            {}
+            <motion.div
               className="flex justify-center items-center gap-3 sm:hidden"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
               {socialLinks.map((link, index) => (
-                <motion.a 
-                  key={index} 
-                  href={link.href} 
-                  target="_blank" 
+                <motion.a
+                  key={index}
+                  href={link.href}
+                  target="_blank"
                   rel="noreferrer"
                   className="p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 transition-all duration-300 hover:bg-white/20 hover:scale-110"
                   whileHover={{ y: -2 }}
@@ -331,8 +331,8 @@ export const Footer = () => {
               ))}
             </motion.div>
 
-            {/* Mobile footer bottom */}
-            <motion.div 
+            {}
+            <motion.div
               className="sm:hidden mt-8 pt-6 border-t border-white/20 text-center"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}

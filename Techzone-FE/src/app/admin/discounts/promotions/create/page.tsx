@@ -167,7 +167,7 @@ export default function CreatePromotionPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Thông tin cơ bản */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Tên chiến dịch *</Label>
@@ -206,7 +206,7 @@ export default function CreatePromotionPage() {
                 />
               </div>
 
-              {/* Thời gian */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="startDate">Thời gian bắt đầu *</Label>
@@ -233,7 +233,7 @@ export default function CreatePromotionPage() {
                 </div>
               </div>
 
-              {/* Áp dụng sản phẩm */}
+              {}
               <div className="space-y-4">
                 <Label className="text-base font-semibold">Áp dụng cho sản phẩm</Label>
                 
@@ -299,7 +299,7 @@ export default function CreatePromotionPage() {
                 )}
               </div>
 
-              {/* Thông tin tóm tắt */}
+              {}
               <Card className="bg-blue-50 border-blue-200">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
@@ -317,7 +317,7 @@ export default function CreatePromotionPage() {
                 </CardContent>
               </Card>
 
-              {/* Buttons */}
+              {}
               <div className="flex justify-end space-x-4 pt-6">
                 <Button
                   type="button"

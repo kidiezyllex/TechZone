@@ -19,7 +19,7 @@ export const HeroBanner = () => {
         <div className="absolute h-36 w-36 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 -bottom-16 left-[30%] blur-sm"></div>
         <div className="absolute h-40 w-40 rounded-full bg-gradient-to-r from-secondary/20 to-primary/20 -top-20 right-[20%] blur-sm"></div>
       </div>
-            {/* Background light effect */}
+            {}
             <div className="absolute top-0 left-1/4 w-56 h-56 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
             <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-extra/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse delay-1000"></div>
 
@@ -32,7 +32,7 @@ export const HeroBanner = () => {
                             transition={{ duration: 0.5 }}
                             className="space-y-4"
                         >
-                            {/* Badge */}
+                            {}
                             <motion.div 
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -51,7 +51,7 @@ export const HeroBanner = () => {
                                 Đăng ký ngay bây giờ để nhận giảm giá 20% cho đơn hàng đầu tiên của bạn!
                             </p>
 
-                            {/* Features */}
+                            {}
                             <motion.div 
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -72,7 +72,7 @@ export const HeroBanner = () => {
                                 </div>
                             </motion.div>
 
-                            {/* Customer Reviews Preview */}
+                            {}
                             <motion.div 
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -117,7 +117,7 @@ export const HeroBanner = () => {
                                 </Button>
                             </div>
 
-                            {/* Limited Time Offer */}
+                            {}
                             <motion.div 
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}

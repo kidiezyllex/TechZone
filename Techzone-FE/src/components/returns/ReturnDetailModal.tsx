@@ -139,7 +139,7 @@ export default function ReturnDetailModal({ returnItem }: ReturnDetailModalProps
         </div>
       ) : (
         <div className="space-y-4">
-          {/* Return Information */}
+          {}
           <Card>
             <CardHeader>
               <CardTitle>Thông tin yêu cầu trả hàng</CardTitle>
@@ -170,7 +170,7 @@ export default function ReturnDetailModal({ returnItem }: ReturnDetailModalProps
             </CardContent>
           </Card>
 
-          {/* Status Timeline */}
+          {}
           <Card>
             <CardHeader>
               <CardTitle>Trạng thái xử lý</CardTitle>
@@ -180,7 +180,7 @@ export default function ReturnDetailModal({ returnItem }: ReturnDetailModalProps
             </CardContent>
           </Card>
 
-          {/* Return Items */}
+          {}
           <Card>
             <CardHeader>
               <CardTitle>Sản phẩm trả hàng</CardTitle>

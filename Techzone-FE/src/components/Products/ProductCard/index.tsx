@@ -32,7 +32,7 @@ export function ProductCard({
 
   return (
     <Card hover className="group">
-      {/* Image Container */}
+      {}
       <div className="relative overflow-hidden bg-gray-100 h-48">
         <img
           src={image}
@@ -50,7 +50,7 @@ export function ProductCard({
           </div>
         )}
 
-        {/* Overlay Actions */}
+        {}
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
           {onViewDetails && (
             <button
@@ -71,13 +71,13 @@ export function ProductCard({
         </div>
       </div>
 
-      {/* Content */}
+      {}
       <div className="p-4">
         <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2 group-hover:text-primary transition-colors">
           {name}
         </h3>
 
-        {/* Rating */}
+        {}
         <div className="flex items-center gap-2 mb-3">
           <div className="flex items-center">
             {[...Array(5)].map((_, i) => (
@@ -91,7 +91,7 @@ export function ProductCard({
           <span className="text-xs text-gray-600">({reviews})</span>
         </div>
 
-        {/* Price */}
+        {}
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold text-primary">{price.toLocaleString()}đ</span>
           {originalPrice && <span className="text-sm text-gray-500 line-through">{originalPrice.toLocaleString()}đ</span>}

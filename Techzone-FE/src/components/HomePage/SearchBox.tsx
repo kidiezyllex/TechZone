@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@mdi/react';
 import { Button } from '@/components/ui/button';
 
-//                                                                                                                     Dữ liệu mẫu cho kết quả tìm kiếm
+
 const searchResults = [
   { id: 1, name: 'Prada Air Max 270', price: 3200000, category: 'Giày thể thao' },
   { id: 2, name: 'Uniqlo Ultraboost 21', price: 4500000, category: 'Giày chạy bộ' },
@@ -13,7 +13,7 @@ const searchResults = [
   { id: 5, name: 'Chanel Chuck 70', price: 1800000, category: 'Giày thời trang' },
 ];
 
-//                                                                                                                     Format giá tiền theo VND
+
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -42,7 +42,7 @@ export const SearchBox = () => {
 
   return (
     <div className="relative z-50">
-      {/* Nút tìm kiếm */}
+      {}
       <Button 
         variant="ghost" 
         size="icon" 
@@ -52,7 +52,7 @@ export const SearchBox = () => {
         <Icon path={mdiMagnify} size={1} />
       </Button>
 
-      {/* Overlay tìm kiếm */}
+      {}
       <AnimatePresence>
         {isOpen && (
           <motion.div 
@@ -66,7 +66,7 @@ export const SearchBox = () => {
         )}
       </AnimatePresence>
 
-      {/* Hộp tìm kiếm */}
+      {}
       <AnimatePresence>
         {isOpen && (
           <motion.div 

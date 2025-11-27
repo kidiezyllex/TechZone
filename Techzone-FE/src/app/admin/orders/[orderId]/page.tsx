@@ -99,7 +99,7 @@ interface OrderData {
 interface OrderStep {
     status: string;
     label: string;
-    icon: string; // MDI path
+    icon: string; 
     colors: {
         bgClass: string;
         textClass: string;
@@ -180,7 +180,7 @@ const OrderStepper = ({ currentStatus }: { currentStatus: string }) => {
                             </div>
                         );
                     })}
-                    {/* Progress lines container */}
+                    {}
                     <div className="absolute top-7 left-0 right-0 flex items-center -z-0 px-4 sm:px-8 md:px-12">
                         {orderSteps.map((step, index) => {
                             if (index === orderSteps.length - 1) return null;
@@ -240,9 +240,9 @@ const PaymentStatusBadge = ({ status }: { status: string }) => {
     return <Badge className={config.className}>{config.label}</Badge>
 }
 
-// Helper function to get product info from the new data structure
+
 const getProductInfo = (item: OrderItem): ProductInfo => {
-    // Handle the new data structure from the API response
+    
     if (item.productVariant?.product) {
         return {
             name: item.productVariant.product.name || "Tên sản phẩm chưa cập nhật",
@@ -254,8 +254,8 @@ const getProductInfo = (item: OrderItem): ProductInfo => {
             images: item.productVariant.images || []
         };
     }
+
     
-    // Fallback for older data structure
     return {
         name: item.product?.name || "Tên sản phẩm chưa cập nhật",
         code: item.product?.code || "N/A",
@@ -267,11 +267,11 @@ const getProductInfo = (item: OrderItem): ProductInfo => {
     };
 };
 
-// Helper function to get variant image for both online and POS orders  
+
 const getVariantImage = (item: OrderItem): string => {
     const productInfo = getProductInfo(item);
+
     
-    // If we have images from the product variant, use the first one
     if (productInfo.images && productInfo.images.length > 0) {
         const firstImage = productInfo.images[0];
         if (typeof firstImage === 'string') {
@@ -282,25 +282,25 @@ const getVariantImage = (item: OrderItem): string => {
             return firstImage.url;
         }
     }
+
     
-    // For POS orders: item has variant field with colorId and sizeId
     if (item.variant && item.variant.colorId && item.variant.sizeId) {
-        const matchingVariant = item.product?.variants?.find((v: any) => 
+        const matchingVariant = item.product?.variants?.find((v: any) =>
             v.colorId === item.variant.colorId && v.sizeId === item.variant.sizeId
         );
         return matchingVariant?.images?.[0] || '/images/white-image.png';
     }
+
     
-    // For online orders: item doesn't have variant field, use first variant with image
     if (item.product?.variants) {
         const variantWithImage = item.product.variants.find((v: any) => v.images && v.images.length > 0);
         return variantWithImage?.images?.[0] || '/images/white-image.png';
     }
-    
+
     return '/images/white-image.png';
 };
 
-// Helper function to format phone number display
+
 const formatPhoneDisplay = (phone: string | undefined | null): string => {
     if (!phone || phone === "0000000000") {
         return "Chưa có SĐT";
@@ -308,7 +308,7 @@ const formatPhoneDisplay = (phone: string | undefined | null): string => {
     return phone;
 };
 
-// Helper function to format email display
+
 const formatEmailDisplay = (email: string | undefined | null): string => {
     if (!email || email === "guest@pos.local") {
         return "Chưa có email";
@@ -316,7 +316,7 @@ const formatEmailDisplay = (email: string | undefined | null): string => {
     return email;
 };
 
-// Helper function to generate invoice code
+
 const generateInvoiceCode = (orderCode: string) => {
     return `HD-${orderCode}`;
 };
@@ -337,21 +337,21 @@ export default function OrderDetailPage() {
     const queryClient = useQueryClient();
     const invoiceRef = useRef<HTMLDivElement>(null);
 
-    // Helper function to get available order statuses based on current status
+    
     const getAvailableOrderStatuses = (currentStatus: string) => {
         const statusOrder = ["CHO_XAC_NHAN", "CHO_GIAO_HANG", "DANG_VAN_CHUYEN", "DA_GIAO_HANG", "HOAN_THANH"];
         const currentIndex = statusOrder.indexOf(currentStatus);
 
-        if (currentIndex === -1) return statusOrder; // If status not found, show all
+        if (currentIndex === -1) return statusOrder; 
 
-        // Return statuses from current position onwards
+        
         return statusOrder.slice(currentIndex);
     };
 
     const handleStatusUpdate = async () => {
         if (!statusToUpdate) return;
 
-        // Validation: Check if trying to complete order with pending payment
+        
         if (statusToUpdate === "HOAN_THANH" && paymentStatusToUpdate === "PENDING") {
             toast.error("Không thể hoàn thành đơn hàng khi chưa thanh toán");
             return;
@@ -395,7 +395,7 @@ export default function OrderDetailPage() {
         }
     };
 
-    // Print invoice functionality
+    
     const handlePrintInvoice = async () => {
         if (!orderDetail?.data) {
             toast.error("Không có dữ liệu đơn hàng để in");
@@ -428,7 +428,7 @@ export default function OrderDetailPage() {
 
             pdf.addImage(canvas, 'PNG', 0, 0, pageWidth, imgHeight);
             pdf.save(`HoaDon_${generateInvoiceCode((orderDetail.data as any).code).replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
-            
+
             toast.success("Đã lưu hoá đơn PDF thành công!");
         } catch (error) {
             toast.error("Lỗi khi in hoá đơn PDF.");
@@ -477,7 +477,7 @@ export default function OrderDetailPage() {
     if (isLoading) {
         return (
             <div className="space-y-4">
-                {/* Header skeleton */}
+                {}
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                     <div className="mb-0 md:mb-0">
                         <Breadcrumb>
@@ -503,7 +503,7 @@ export default function OrderDetailPage() {
                     </div>
                 </div>
 
-                {/* Order stepper skeleton */}
+                {}
                 <Card className="mb-4 overflow-hidden">
                     <CardContent className="p-4">
                         <div className="flex justify-between items-start relative">
@@ -518,11 +518,11 @@ export default function OrderDetailPage() {
                     </CardContent>
                 </Card>
 
-                {/* Main content skeleton */}
+                {}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Left Column */}
+                    {}
                     <div className="space-y-4">
-                        {/* Order info card skeleton */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Thông tin đơn hàng</CardTitle>
@@ -539,7 +539,7 @@ export default function OrderDetailPage() {
                             </CardContent>
                         </Card>
 
-                        {/* Customer info card skeleton */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Thông tin khách hàng</CardTitle>
@@ -556,7 +556,7 @@ export default function OrderDetailPage() {
                             </CardContent>
                         </Card>
 
-                        {/* Shipping address card skeleton */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Địa chỉ giao hàng</CardTitle>
@@ -571,9 +571,9 @@ export default function OrderDetailPage() {
                         </Card>
                     </div>
 
-                    {/* Right Column */}
+                    {}
                     <div className="space-y-4">
-                        {/* Products card skeleton */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Sản phẩm đã đặt</CardTitle>
@@ -616,7 +616,7 @@ export default function OrderDetailPage() {
                             </CardContent>
                         </Card>
 
-                        {/* Order summary card skeleton */}
+                        {}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Tổng quan đơn hàng</CardTitle>
@@ -769,7 +769,7 @@ export default function OrderDetailPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Staff Information (Optional) */}
+                    {}
                     {order.staff && (
                         <Card>
                             <CardHeader>
@@ -786,7 +786,7 @@ export default function OrderDetailPage() {
                         </Card>
                     )}
 
-                    {/* Shipping Address */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Địa chỉ giao hàng</CardTitle>
@@ -810,7 +810,7 @@ export default function OrderDetailPage() {
                     </Card>
                 </div>
 
-                {/* Right Column */}
+                {}
                 <div className="space-y-4">
                     <Card>
                         <CardHeader>
@@ -830,7 +830,7 @@ export default function OrderDetailPage() {
                                     {order.items.map((item: any, index: number) => {
                                         const variantImage = getVariantImage(item);
                                         const productInfo = getProductInfo(item);
-                                        
+
                                         return (
                                             <TableRow key={index}>
                                                 <TableCell>
@@ -872,7 +872,7 @@ export default function OrderDetailPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Order Summary */}
+                    {}
                     <Card>
                         <CardHeader>
                             <CardTitle>Tổng quan đơn hàng</CardTitle>
@@ -902,7 +902,7 @@ export default function OrderDetailPage() {
                 </div>
             </div>
 
-            {/* Status Update Dialog */}
+            {}
             <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -951,7 +951,7 @@ export default function OrderDetailPage() {
                 </DialogContent>
             </Dialog>
 
-            {/* Confirm Cancel Dialog */}
+            {}
             <Dialog open={isConfirmCancelDialogOpen} onOpenChange={setIsConfirmCancelDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -971,7 +971,7 @@ export default function OrderDetailPage() {
                 </DialogContent>
             </Dialog>
 
-            {/* Invoice Dialog */}
+            {}
             <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
@@ -1046,7 +1046,7 @@ export default function OrderDetailPage() {
                                     {order.items.map((item: any, index: number) => {
                                         const variantImage = getVariantImage(item);
                                         const productInfo = getProductInfo(item);
-                                        
+
                                         return (
                                             <TableRow key={index}>
                                                 <TableCell>
@@ -1107,7 +1107,7 @@ export default function OrderDetailPage() {
                             </div>
 
                             <div className="mt-8 text-center text-sm text-maintext">
-                                <p>Cảm ơn quý khách đã mua hàng tại Clothes Shop</p>
+                                <p>Cảm ơn quý khách đã mua hàng tại TechZone</p>
                                 <p>Hotline: 1900 1234</p>
                             </div>
                         </div>

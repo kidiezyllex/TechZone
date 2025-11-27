@@ -119,7 +119,7 @@ export default function CreateReturnRequestModal({ order }: CreateReturnRequestM
       queryClient.invalidateQueries({ queryKey: ['myReturns'] });
       queryClient.invalidateQueries({ queryKey: ['returnableOrders'] });
       
-      // Reset form
+      
       setSelectedItems([]);
       setReason('');
     } catch (error) {
@@ -138,7 +138,7 @@ export default function CreateReturnRequestModal({ order }: CreateReturnRequestM
       </DialogHeader>
 
       <div className="space-y-4">
-        {/* Order Information */}
+        {}
         <Card>
           <CardContent className="p-4">
             <h3 className="font-semibold mb-2">Thông tin đơn hàng</h3>
@@ -163,7 +163,7 @@ export default function CreateReturnRequestModal({ order }: CreateReturnRequestM
           </CardContent>
         </Card>
 
-        {/* Product Selection */}
+        {}
         <Card>
           <CardContent className="p-4">
             <h3 className="font-semibold mb-4">Chọn sản phẩm cần trả</h3>
@@ -258,7 +258,7 @@ export default function CreateReturnRequestModal({ order }: CreateReturnRequestM
           </CardContent>
         </Card>
 
-        {/* Reason */}
+        {}
         <Card>
           <CardContent className="p-4">
             <h3 className="font-semibold mb-2">Lý do trả hàng *</h3>
@@ -272,7 +272,7 @@ export default function CreateReturnRequestModal({ order }: CreateReturnRequestM
           </CardContent>
         </Card>
 
-        {/* Summary */}
+        {}
         {selectedItems.length > 0 && (
           <Card>
             <CardContent className="p-4">

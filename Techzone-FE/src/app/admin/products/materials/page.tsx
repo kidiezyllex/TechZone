@@ -310,7 +310,7 @@ export default function MaterialsPage() {
   );
 }
 
-// Edit Material Dialog Component
+
 interface EditMaterialDialogProps {
   materialId: string;
   isOpen: boolean;
@@ -344,7 +344,7 @@ function EditMaterialDialog({ materialId, isOpen, onClose }: EditMaterialDialogP
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when user types
+    
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -488,7 +488,7 @@ function EditMaterialDialog({ materialId, isOpen, onClose }: EditMaterialDialogP
   );
 }
 
-// Create Material Dialog Component
+
 interface CreateMaterialDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -511,7 +511,7 @@ function CreateMaterialDialog({ isOpen, onClose }: CreateMaterialDialogProps) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when user types
+    
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }

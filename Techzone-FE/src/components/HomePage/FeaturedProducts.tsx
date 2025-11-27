@@ -39,7 +39,7 @@ const featuredProducts = [
   },
 ];
 
-//                                                                                                                     Format giá tiền theo VND
+
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -47,7 +47,7 @@ const formatPrice = (price: number) => {
   }).format(price);
 };
 
-//                                                                                                                     Component thẻ sản phẩm
+
 const ProductCard = ({ product, index }: { product: typeof featuredProducts[0], index: number }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });

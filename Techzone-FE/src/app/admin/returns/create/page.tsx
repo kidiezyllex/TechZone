@@ -110,7 +110,7 @@ export default function CreateReturnPage() {
   ];
 
   useEffect(() => {
-    // Mock customer search
+    
     if (customerSearch.trim()) {
       const filtered = mockCustomers.filter(customer =>
         customer.fullName.toLowerCase().includes(customerSearch.toLowerCase()) ||
@@ -124,7 +124,7 @@ export default function CreateReturnPage() {
   }, [customerSearch]);
 
   useEffect(() => {
-    // Mock order loading
+    
     if (selectedCustomer) {
       setOrders(mockOrders);
     } else {
@@ -265,7 +265,7 @@ export default function CreateReturnPage() {
         </a>
       </div>
 
-      {/* Customer Selection */}
+      {}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -315,7 +315,7 @@ export default function CreateReturnPage() {
         </CardContent>
       </Card>
 
-      {/* Order Selection */}
+      {}
       {selectedCustomer && (
         <Card>
           <CardHeader>
@@ -368,7 +368,7 @@ export default function CreateReturnPage() {
         </Card>
       )}
 
-      {/* Product Selection */}
+      {}
       {selectedOrder && (
         <Card>
           <CardHeader>
@@ -496,7 +496,7 @@ export default function CreateReturnPage() {
         </Card>
       )}
 
-      {/* Summary */}
+      {}
       {selectedItems.length > 0 && (
         <Card>
           <CardHeader>
@@ -549,7 +549,7 @@ export default function CreateReturnPage() {
         </Card>
       )}
 
-      {/* Actions */}
+      {}
       <div className="flex justify-end gap-4">
         <a href="/admin/returns">
           <Button variant="outline" disabled={isSubmitting}>

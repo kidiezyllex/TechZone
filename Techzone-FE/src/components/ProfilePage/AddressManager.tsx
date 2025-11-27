@@ -332,7 +332,7 @@ export default function AddressManager() {
                               <SelectItem value="Đà Nẵng">Đà Nẵng</SelectItem>
                               <SelectItem value="Hải Phòng">Hải Phòng</SelectItem>
                               <SelectItem value="Cần Thơ">Cần Thơ</SelectItem>
-                              {/* Thêm các tỉnh/thành phố khác tại đây */}
+                              {}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -448,7 +448,7 @@ export default function AddressManager() {
         </DialogContent>
       </Dialog>
 
-      {/* Confirm Delete Dialog */}
+      {}
       <Dialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>

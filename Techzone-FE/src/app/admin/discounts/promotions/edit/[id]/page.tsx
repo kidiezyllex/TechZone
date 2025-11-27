@@ -44,7 +44,7 @@ export default function EditPromotionPage() {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [applyToAllProducts, setApplyToAllProducts] = useState(true);
 
-  // Load promotion data when available
+  
   useEffect(() => {
     if (promotionData?.data) {
       const promotion = promotionData.data;
@@ -61,7 +61,7 @@ export default function EditPromotionPage() {
         status: promotion.status as any,
       });
 
-      // Set product selection state
+      
       if (Array.isArray(promotion.products) && promotion.products.length > 0) {
         setApplyToAllProducts(false);
         setSelectedProducts(promotion.products.map((p: any) => typeof p === 'string' ? p : p.id));
@@ -117,7 +117,7 @@ export default function EditPromotionPage() {
     const endDate = new Date(formData.endDate);
     const originalStartDate = new Date((promotionData as any).data.startDate);
 
-    // Nếu thay đổi thời gian bắt đầu, phải sau thời điểm hiện tại
+    
     if (startDate.getTime() !== originalStartDate.getTime()) {
       if (startDate <= now) {
         toast.error('Thời gian bắt đầu mới phải sau thời điểm hiện tại');
@@ -125,7 +125,7 @@ export default function EditPromotionPage() {
       }
     }
 
-    // Thời gian kết thúc luôn phải sau thời điểm hiện tại
+    
     if (endDate <= now) {
       toast.error('Thời gian kết thúc phải sau thời điểm hiện tại');
       return;
@@ -244,7 +244,7 @@ export default function EditPromotionPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Thông tin cơ bản */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Tên chiến dịch *</Label>
@@ -283,7 +283,7 @@ export default function EditPromotionPage() {
                 />
               </div>
 
-              {/* Thời gian */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="startDate">Thời gian bắt đầu *</Label>
@@ -310,7 +310,7 @@ export default function EditPromotionPage() {
                 </div>
               </div>
 
-              {/* Trạng thái */}
+              {}
               <div className="space-y-2">
                 <Label htmlFor="status">Trạng thái</Label>
                 <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
@@ -324,7 +324,7 @@ export default function EditPromotionPage() {
                 </Select>
               </div>
 
-              {/* Áp dụng sản phẩm */}
+              {}
               <div className="space-y-4">
                 <Label className="text-base font-semibold">Áp dụng cho sản phẩm</Label>
                 
@@ -390,7 +390,7 @@ export default function EditPromotionPage() {
                 )}
               </div>
 
-              {/* Thông tin tóm tắt */}
+              {}
               <Card className="bg-blue-50 border-blue-200">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
@@ -410,7 +410,7 @@ export default function EditPromotionPage() {
                 </CardContent>
               </Card>
 
-              {/* Buttons */}
+              {}
               <div className="flex justify-end space-x-4 pt-6">
                 <Button
                   type="button"

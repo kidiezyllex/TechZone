@@ -9,7 +9,7 @@ export const RippleDemo: React.FC = () => {
     <div className="p-8 space-y-4 bg-gray-50 rounded-lg">
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">Ripple Effect Demo</h2>
       
-      {/* Button with Ripple */}
+      {}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-700">Buttons with Ripple Effect</h3>
         <div className="flex gap-4 flex-wrap">
@@ -25,7 +25,7 @@ export const RippleDemo: React.FC = () => {
         </div>
       </div>
 
-      {/* Custom Ripple Cards */}
+      {}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-700">Custom Ripple Cards</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -67,7 +67,7 @@ export const RippleDemo: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation-like Items */}
+      {}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-700">Navigation Items</h3>
         <div className="bg-gray-800 rounded-lg p-4 space-y-2">

@@ -29,7 +29,7 @@ export const Newsletter = () => {
 
   return (
     <section className="py-20 relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/30">
-      {/* Animated background elements */}
+      {}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div 
           className="absolute -top-10 -left-10 w-40 h-40 bg-gradient-to-br from-primary/30 to-blue-400/30 rounded-full blur-xl"
@@ -102,7 +102,7 @@ export const Newsletter = () => {
               <span className="font-semibold text-purple-600"> xu hướng thời trang</span> từ các nhà thiết kế hàng đầu.
             </motion.p>
 
-            {/* Benefits section */}
+            {}
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 max-w-4xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
@@ -124,7 +124,7 @@ export const Newsletter = () => {
               ))}
             </motion.div>
             
-            {/* Enhanced form */}
+            {}
             <motion.div
               className="relative max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}

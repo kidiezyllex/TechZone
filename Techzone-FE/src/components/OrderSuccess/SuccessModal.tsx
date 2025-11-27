@@ -32,7 +32,7 @@ export default function SuccessModal({ isOpen, onClose, orderId, orderCode }: Su
         <DialogHeader>
           <DialogTitle className="sr-only">Đặt hàng thành công</DialogTitle>
         </DialogHeader>
-        
+
         <Card className="border-0 shadow-none">
           <CardHeader className="text-center pb-4">
             <div className="flex justify-center mb-4">
@@ -40,9 +40,9 @@ export default function SuccessModal({ isOpen, onClose, orderId, orderCode }: Su
             </div>
             <h2 className="text-2xl font-bold text-primary">Đặt hàng thành công!</h2>
           </CardHeader>
-          
+
           <CardContent className="space-y-4 text-center">
-            <p className="text-maintext">Cảm ơn bạn đã đặt hàng tại Clothes Shop</p>
+            <p className="text-maintext">Cảm ơn bạn đã đặt hàng tại TechZone</p>
             <div className="bg-gray-50 rounded-lg p-4">
               <p className="text-sm text-maintext mb-1">Mã đơn hàng của bạn là:</p>
               <p className="font-bold text-lg text-maintext">{orderCode || orderId}</p>
@@ -51,17 +51,17 @@ export default function SuccessModal({ isOpen, onClose, orderId, orderCode }: Su
               Chúng tôi sẽ sớm liên hệ với bạn để xác nhận đơn hàng
             </p>
           </CardContent>
-          
+
           <CardFooter className="flex flex-col space-y-4 pt-6">
-            <Button 
-              onClick={handleViewOrder} 
+            <Button
+              onClick={handleViewOrder}
               className="w-full"
               variant="default"
             >
               Xem đơn hàng
             </Button>
-            <Button 
-              onClick={handleContinueShopping} 
+            <Button
+              onClick={handleContinueShopping}
               className="w-full"
               variant="outline"
             >

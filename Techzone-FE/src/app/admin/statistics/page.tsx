@@ -66,7 +66,7 @@ export default function StatisticsPage() {
 
   const queryClient = useQueryClient();
   
-  // Filter riêng cho overview (lấy dữ liệu tháng hiện tại)
+  
   const overviewFilters: IStatisticsFilter = {
     type: 'MONTHLY',
     startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
@@ -74,7 +74,7 @@ export default function StatisticsPage() {
     limit: 1
   };
   
-  // Sử dụng các hooks thực
+  
   const { data: statisticsData, isLoading: statisticsLoading, isError: statisticsError } = useStatistics(statisticsFilters);
   const { data: overviewStatistics, isLoading: overviewLoading, isError: overviewError } = useStatistics(overviewFilters);
   const { data: revenueData, isLoading: revenueLoading, isError: revenueError } = useRevenueReport(revenueFilters);
@@ -147,7 +147,7 @@ export default function StatisticsPage() {
     change: number;
   }
 
-  // Overview dashboard stats
+  
   const StatCard = ({ title, value, icon, iconColor, bgColor, change }: StatCardProps) => {
     return (
       <Card className="h-full">
@@ -178,13 +178,13 @@ export default function StatisticsPage() {
     );
   };
 
-  // Sử dụng statisticsData thay vì overviewStatistics để hiển thị đúng dữ liệu
+  
   const currentMonthData = statisticsData?.data?.statistics?.[0] || { totalOrders: 0, totalRevenue: 0, totalProfit: 0 };
 
-  // Tính tổng doanh thu từ revenue data hoặc từ statistics data
+  
   const totalRevenue = revenueData?.data?.reduce((sum: number, item: any) => sum + item.totalRevenue, 0) || currentMonthData.totalRevenue || 0;
 
-  // Tính số khách hàng mới trong tháng hiện tại
+  
   const newCustomersCount = accountsData?.data?.accounts?.filter(account => {
     const accountDate = new Date(account.createdAt);
     const currentDate = new Date();
@@ -193,14 +193,14 @@ export default function StatisticsPage() {
     return accountDate.getMonth() === currentMonth && accountDate.getFullYear() === currentYear;
   }).length || 0;
 
-  // Tạo mock data cho revenue chart nếu không có dữ liệu thực
+  
   const mockRevenueData = revenueData?.data?.length ? revenueData.data : [
     { date: '2024-01', totalRevenue: currentMonthData.totalRevenue, totalOrders: currentMonthData.totalOrders },
     { date: '2024-02', totalRevenue: 0, totalOrders: 0 },
     { date: '2024-03', totalRevenue: 0, totalOrders: 0 },
   ];
 
-  // Tạo mock data cho top products nếu không có dữ liệu thực
+  
   const mockTopProductsData = topProductsData?.data?.length ? topProductsData.data : [
     { 
       product: { id: '1', name: 'Sản phẩm mẫu 1', brand: { id: '1', name: 'Uniqlo' } }, 
@@ -292,7 +292,7 @@ export default function StatisticsPage() {
           <TabsTrigger value="statistics">Lịch sử</TabsTrigger>
         </TabsList>
 
-        {/* Tổng quan */}
+        {}
         <TabsContent value="overview" className="space-y-4">
           {statisticsLoading || revenueLoading || overviewLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
@@ -431,7 +431,7 @@ export default function StatisticsPage() {
           </div>
         </TabsContent>
 
-        {/* Tab Doanh thu */}
+        {}
         <TabsContent value="revenue" className="space-y-4">
           <Card className="mb-4">
             <CardHeader>
@@ -537,7 +537,7 @@ export default function StatisticsPage() {
           </Card>
         </TabsContent>
 
-        {/* Tab Sản phẩm bán chạy */}
+        {}
         <TabsContent value="products" className="space-y-4 text-maintext">
           <Card className="mb-4">
             <CardHeader>
@@ -671,7 +671,7 @@ export default function StatisticsPage() {
           </Card>
         </TabsContent>
 
-        {/* Tab Lịch sử thống kê */}
+        {}
         <TabsContent value="statistics" className="space-y-4 text-maintext">
           <Card className="mb-4">
             <CardHeader>
@@ -786,7 +786,7 @@ export default function StatisticsPage() {
                     </Table>
                   </div>
 
-                  {/* Pagination */}
+                  {}
                   {statisticsData && statisticsData.data.pagination.totalPages > 1 && (
                     <div className="flex justify-center items-center gap-2 mt-4">
                       <Button
@@ -817,7 +817,7 @@ export default function StatisticsPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Statistics Detail Modal */}
+      {}
       <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>

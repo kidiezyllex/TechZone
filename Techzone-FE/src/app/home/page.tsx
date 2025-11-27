@@ -14,7 +14,7 @@ import { BrandGrid } from '@/components/Home/BrandGrid'
 import { BlogGrid } from '@/components/Home/BlogGrid'
 import { Monitor, Cpu, Zap, Headphones, Keyboard, Mouse, Truck, CreditCard, Shield } from 'lucide-react'
 
-// Mock data
+
 const heroBanners = [
   {
     id: 1,
@@ -161,38 +161,38 @@ const blogs = [
 export default function HomePage() {
   return (
     <>
-      {/* Hero Slider */}
+      {}
       <Container className="mb-12">
         <HeroSlider banners={heroBanners} />
       </Container>
 
       <Container>
-        {/* Featured Categories */}
+        {}
         <Section title="Danh mục nổi bật" subtitle="Khám phá các sản phẩm chính">
           <CategoryGrid categories={categories} />
         </Section>
 
-        {/* Flash Sale */}
+        {}
         <Section title="" className="mb-12">
           <FlashSale endTime={new Date(Date.now() + 8 * 60 * 60 * 1000)} />
         </Section>
 
-        {/* Latest Products - Carousel */}
+        {}
         <Section title="Sản phẩm mới nhất" subtitle="Hàng vừa cập nhật">
           <ProductCarousel products={latestProducts} />
         </Section>
 
-        {/* Top Selling Products - Carousel */}
+        {}
         <Section title="Sản phẩm bán chạy (Top 10)" subtitle="Những sản phẩm yêu thích nhất của khách hàng" className="mt-12">
           <ProductCarousel products={topProducts} />
         </Section>
 
-        {/* Featured Brands */}
+        {}
         <Section title="Thương hiệu nổi bật" subtitle="Các hãng uy tín hàng đầu thế giới" className="mt-12">
           <BrandGrid brands={brands} />
         </Section>
 
-        {/* Mid Banner - Promotions */}
+        {}
         <Section className="mt-12 mb-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
@@ -219,7 +219,7 @@ export default function HomePage() {
           </div>
         </Section>
 
-        {/* Category Recommendations */}
+        {}
         <Section title="Gợi ý theo danh mục" subtitle="Những sản phẩm nổi bật nhất" className="mb-12">
           <div className="space-y-8">
             {[
@@ -237,7 +237,7 @@ export default function HomePage() {
           </div>
         </Section>
 
-        {/* Blog Section */}
+        {}
         <Section title="Tin tức / Blog nổi bật" subtitle="Cập nhật kiến thức công nghệ mỗi ngày" className="mb-12">
           <BlogGrid posts={blogs} />
         </Section>

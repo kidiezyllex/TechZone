@@ -310,7 +310,7 @@ export default function CategoriesPage() {
   );
 }
 
-// Edit Category Dialog Component
+
 interface EditCategoryDialogProps {
   categoryId: string;
   isOpen: boolean;
@@ -344,7 +344,7 @@ function EditCategoryDialog({ categoryId, isOpen, onClose }: EditCategoryDialogP
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when user types
+    
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -488,7 +488,7 @@ function EditCategoryDialog({ categoryId, isOpen, onClose }: EditCategoryDialogP
   );
 }
 
-// Create Category Dialog Component
+
 interface CreateCategoryDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -511,7 +511,7 @@ function CreateCategoryDialog({ isOpen, onClose }: CreateCategoryDialogProps) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when user types
+    
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }

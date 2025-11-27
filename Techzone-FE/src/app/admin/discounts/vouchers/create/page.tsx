@@ -61,7 +61,7 @@ export default function CreateVoucherPage() {
   const handleDateChange = (name: string, value: string) => {
     setVoucher({ ...voucher, [name]: value });
     
-    // Clear error for the field being edited
+    
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }

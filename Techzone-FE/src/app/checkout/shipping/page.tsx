@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
- 
+
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,11 +81,11 @@ interface Ward {
 export default function ShippingPage() {
   const navigate = useNavigate();
   const { user } = useUser()
-  const { 
-    items, 
-    clearCart, 
-    appliedVoucher, 
-    voucherDiscount, 
+  const {
+    items,
+    clearCart,
+    appliedVoucher,
+    voucherDiscount,
     removeVoucher,
     subtotal: storeSubtotal,
     tax: storeTax,
@@ -98,23 +98,23 @@ export default function ShippingPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderResult, setOrderResult] = useState<any>(null);
   const [vnpayOrderData, setVnpayOrderData] = useState<any>(null);
+
   
-  // Location data states
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loadingProvinces, setLoadingProvinces] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [loadingWards, setLoadingWards] = useState(false);
-  
+
   const [selectedProvinceName, setSelectedProvinceName] = useState('');
   const [selectedDistrictName, setSelectedDistrictName] = useState('');
   const [selectedWardName, setSelectedWardName] = useState('');
-  
+
   const createOrderMutation = useCreateOrder();
   const createNotificationMutation = useCreateNotification();
   const { data: userProfile, isLoading: isLoadingProfile } = useUserProfile();
-  
+
   const form = useForm<ShippingFormValues>({
     resolver: zodResolver(shippingFormSchema),
     defaultValues: {
@@ -129,19 +129,19 @@ export default function ShippingPage() {
     },
   });
 
-  // Use values from store (which already include voucher calculations)
+  
   const subtotal = storeSubtotal;
   const tax = storeTax;
   const shipping = storeShipping;
   const total = storeTotal;
 
-  // Watch province and district changes to load dependent data
+  
   const selectedProvince = form.watch("province");
   const selectedDistrict = form.watch("district");
   const selectedPaymentMethod = form.watch("paymentMethod");
   const selectedWard = form.watch("ward");
 
-  // Fetch provinces on component mount
+  
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
@@ -159,7 +159,7 @@ export default function ShippingPage() {
     fetchProvinces();
   }, []);
 
-  // Fetch districts when province changes
+  
   useEffect(() => {
     if (selectedProvince) {
       const fetchDistricts = async () => {
@@ -168,7 +168,7 @@ export default function ShippingPage() {
           const response = await fetch(`https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`);
           const data = await response.json();
           setDistricts(data.districts || []);
-          // Reset district and ward when province changes
+          
           form.setValue("district", "");
           form.setValue("ward", "");
           setWards([]);
@@ -188,7 +188,7 @@ export default function ShippingPage() {
     }
   }, [selectedProvince, form]);
 
-  // Fetch wards when district changes
+  
   useEffect(() => {
     if (selectedDistrict) {
       const fetchWards = async () => {
@@ -197,7 +197,7 @@ export default function ShippingPage() {
           const response = await fetch(`https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`);
           const data = await response.json();
           setWards(data.wards || []);
-          // Reset ward when district changes
+          
           form.setValue("ward", "");
         } catch (error) {
           toast.error('Không thể tải danh sách phường/xã');
@@ -213,7 +213,7 @@ export default function ShippingPage() {
     }
   }, [selectedDistrict, form]);
 
-  // Update form with user profile data when available
+  
   useEffect(() => {
     if (userProfile?.data) {
       const profile = userProfile.data;
@@ -262,7 +262,7 @@ export default function ShippingPage() {
     }
   }, [selectedPaymentMethod]);
 
-  // Cập nhật selectedProvinceName khi selectedProvince thay đổi
+  
   useEffect(() => {
     if (selectedProvince) {
       const found = provinces.find(p => p.code.toString() === selectedProvince);
@@ -272,7 +272,7 @@ export default function ShippingPage() {
     }
   }, [selectedProvince, provinces]);
 
-  // Cập nhật selectedDistrictName khi selectedDistrict thay đổi
+  
   useEffect(() => {
     if (selectedDistrict) {
       const found = districts.find(d => d.code.toString() === selectedDistrict);
@@ -282,7 +282,7 @@ export default function ShippingPage() {
     }
   }, [selectedDistrict, districts]);
 
-  // Cập nhật selectedWardName khi selectedWard thay đổi
+  
   useEffect(() => {
     if (selectedWard) {
       const found = wards.find(w => w.code.toString() === selectedWard);
@@ -294,7 +294,7 @@ export default function ShippingPage() {
 
   const sendOrderConfirmationEmail = async (orderId: string, orderData: any, userEmail: string) => {
     try {
-      const itemsList = items.map(item => 
+      const itemsList = items.map(item =>
         `<tr>
           <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name} (${item.size || 'N/A'})</td>
           <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.quantity}</td>
@@ -306,7 +306,7 @@ export default function ShippingPage() {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px;">
           <h2 style="color: #333; text-align: center;">Xác nhận đơn hàng</h2>
           <p>Xin chào <strong>${orderData.shippingAddress.name}</strong>,</p>
-          <p>Cảm ơn bạn đã đặt hàng tại Clothes Shop. Dưới đây là chi tiết đơn hàng của bạn:</p>
+          <p>Cảm ơn bạn đã đặt hàng tại TechZone. Dưới đây là chi tiết đơn hàng của bạn:</p>
           
           <div style="background-color: #f9f9f9; padding: 15px; margin: 20px 0;">
             <p><strong>Mã đơn hàng:</strong> ${orderData.code || orderId}</p>
@@ -361,17 +361,17 @@ export default function ShippingPage() {
           
           <div style="margin-top: 30px; text-align: center; color: #777;">
             <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email hoặc hotline.</p>
-            <p>© 2023 Clothes Shop. Tất cả các quyền được bảo lưu.</p>
+            <p>© 2023 TechZone. Tất cả các quyền được bảo lưu.</p>
           </div>
         </div>
       `;
 
-      // Tạo thông báo email
+      
       await createNotificationMutation.mutateAsync({
         type: 'EMAIL',
         title: `Xác nhận đơn hàng ${orderData.code || orderId}`,
         content: emailContent,
-        recipients: [userEmail, 'buitranthienan1111@gmail.com'], // Email của người dùng và email test
+        recipients: [userEmail, 'buitranthienan1111@gmail.com'], 
         relatedTo: 'ORDER',
         relatedId: orderId
       });
@@ -391,18 +391,18 @@ export default function ShippingPage() {
           orderInfo: `Thanh toán đơn hàng`,
           orderCode: `ORD${Date.now()}`
         };
-        
+
         setVnpayOrderData(demoOrderData);
         setShowVNPayModal(true);
         setIsProcessing(false);
         return;
       }
-      
+
       const orderData = {
         orderId: `DH${new Date().getFullYear()}${Date.now().toString().slice(-6)}`,
         customerId: user?.id || '000000000000000000000000',
         items: items.map(item => ({
-          product: item.productId +"" || item.id +"",
+          product: item.productId + "" || item.id + "",
           variant: {
             colorId: item.colorId,
             sizeId: item.sizeId
@@ -424,7 +424,7 @@ export default function ShippingPage() {
         },
         paymentMethod: values.paymentMethod
       };
-      
+
       const response = await createOrderMutation.mutateAsync(orderData as any);
       if (response && response.success && response.data) {
         clearCart();
@@ -432,9 +432,9 @@ export default function ShippingPage() {
           removeVoucher();
         }
         toast.success('Đặt hàng thành công!');
-        
+
         await sendOrderConfirmationEmail(response.data.id, response.data, values.email);
-        
+
         setOrderResult(response.data);
         setShowSuccessModal(true);
       } else {
@@ -451,14 +451,14 @@ export default function ShippingPage() {
     try {
       setShowVNPayModal(false);
       setIsProcessing(true);
-      
+
       const formValues = form.getValues();
-      
+
       const orderData = {
         orderId: `DH${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`,
         customerId: user?.id || '000000000000000000000000',
         items: items.map(item => ({
-          product: item.productId || item.id, // Use productId if available, fallback to id
+          product: item.productId || item.id, 
           variant: {
             colorId: item.colorId,
             sizeId: item.sizeId
@@ -481,7 +481,7 @@ export default function ShippingPage() {
         paymentMethod: 'BANK_TRANSFER',
         paymentInfo: paymentData
       };
-      
+
       const response = await createOrderMutation.mutateAsync(orderData as any);
       if (response && response.success && response.data) {
         clearCart();
@@ -511,11 +511,11 @@ export default function ShippingPage() {
     navigate('/products');
   };
 
-  // Helper function to check if field should be disabled
+  
   const isFieldDisabled = (fieldName: keyof ShippingFormValues) => {
     if (!userProfile?.data) return false;
     const profile = userProfile.data;
-    
+
     switch (fieldName) {
       case 'fullName':
         return !!profile.fullName;
@@ -577,9 +577,9 @@ export default function ShippingPage() {
                       <FormItem>
                         <FormLabel className="text-maintext font-semibold">Họ tên</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Nguyễn Văn A" 
-                            {...field} 
+                          <Input
+                            placeholder="Nguyễn Văn A"
+                            {...field}
                             disabled={isFieldDisabled('fullName')}
                           />
                         </FormControl>
@@ -595,8 +595,8 @@ export default function ShippingPage() {
                       <FormItem>
                         <FormLabel className="text-maintext font-semibold">Số điện thoại</FormLabel>
                         <FormControl>
-                          <Input 
-                            {...field} 
+                          <Input
+                            {...field}
                             disabled={isFieldDisabled('phoneNumber')}
                           />
                         </FormControl>
@@ -612,9 +612,9 @@ export default function ShippingPage() {
                       <FormItem>
                         <FormLabel className="text-maintext font-semibold">Email</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Ví dụ: example@gmail.com" 
-                            {...field} 
+                          <Input
+                            placeholder="Ví dụ: example@gmail.com"
+                            {...field}
                             disabled={isFieldDisabled('email')}
                           />
                         </FormControl>
@@ -666,10 +666,10 @@ export default function ShippingPage() {
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder={
-                                !selectedProvince 
-                                  ? "Vui lòng chọn tỉnh/thành phố trước" 
-                                  : loadingDistricts 
-                                    ? "Đang tải..." 
+                                !selectedProvince
+                                  ? "Vui lòng chọn tỉnh/thành phố trước"
+                                  : loadingDistricts
+                                    ? "Đang tải..."
                                     : "Chọn quận/huyện"
                               } />
                             </SelectTrigger>
@@ -701,10 +701,10 @@ export default function ShippingPage() {
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder={
-                                !selectedDistrict 
-                                  ? "Vui lòng chọn quận/huyện trước" 
-                                  : loadingWards 
-                                    ? "Đang tải..." 
+                                !selectedDistrict
+                                  ? "Vui lòng chọn quận/huyện trước"
+                                  : loadingWards
+                                    ? "Đang tải..."
                                     : "Chọn phường/xã"
                               } />
                             </SelectTrigger>
@@ -729,9 +729,9 @@ export default function ShippingPage() {
                       <FormItem>
                         <FormLabel className="text-maintext font-semibold">Địa chỉ cụ thể</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Số nhà, tên đường..." 
-                            {...field} 
+                          <Input
+                            placeholder="Số nhà, tên đường..."
+                            {...field}
                             disabled={isFieldDisabled('address')}
                           />
                         </FormControl>
@@ -767,10 +767,10 @@ export default function ShippingPage() {
                   />
 
                   <div className="flex gap-4">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      className="flex-1" 
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1"
                       onClick={handleContinueShopping}
                       disabled={isProcessing}
                     >
@@ -822,15 +822,15 @@ export default function ShippingPage() {
                 <span className="text-muted-foreground font-semibold text-sm">Tạm tính</span>
                 <span className='text-maintext'>{formatPrice(subtotal + voucherDiscount)}</span>
               </div>
-              
-              {/* Hiển thị giảm giá từ voucher */}
+
+              {}
               {appliedVoucher && voucherDiscount > 0 && (
                 <div className="flex justify-between w-full text-green-600">
                   <span className="text-sm font-semibold">Giảm giá voucher ({appliedVoucher.code})</span>
                   <span>-{formatPrice(voucherDiscount)}</span>
                 </div>
               )}
-              
+
               <div className="flex justify-between w-full">
                 <span className="text-muted-foreground font-semibold text-sm">Thuế</span>
                 <span className='text-maintext'>{formatPrice(tax)}</span>
@@ -848,7 +848,7 @@ export default function ShippingPage() {
         </div>
       </div>
 
-      {/* VNPay Payment Modal */}
+      {}
       <VNPayModal
         isOpen={showVNPayModal}
         onClose={() => setShowVNPayModal(false)}
@@ -862,7 +862,7 @@ export default function ShippingPage() {
         onPaymentError={handleVNPayError}
       />
 
-      {/* Success Modal */}
+      {}
       {orderResult && (
         <SuccessModal
           isOpen={showSuccessModal}

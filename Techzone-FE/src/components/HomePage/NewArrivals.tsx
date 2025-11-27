@@ -5,7 +5,7 @@ import { Icon } from '@mdi/react';
 import { mdiCartOutline, mdiHeartOutline, mdiStar, mdiEye, mdiArrowRight } from '@mdi/js';
 import { InteractiveHoverButton } from '../Common/InteractiveHoverButton';
 
-//                                                                                                                     Dữ liệu sản phẩm mới
+
 const newArrivalsData = [
   {
     id: 1,
@@ -65,7 +65,7 @@ const newArrivalsData = [
   }
 ];
 
-//                                                                                                                     Fallback images nếu không tải được từ path
+
 const fallbackImages = [
   "https://bizweb.dktcdn.net/thumb/large/100/287/440/products/ao-thun-nam-nu-form-rong-davies-hoa-tiet-phoi-chu-mau-tuong-phan-phong-cach-hiphop-mau-den-1-f31adeaa-9e80-4c3f-a483-0b0b0719dc6d.jpg?v=1748593325673",
   "https://bizweb.dktcdn.net/thumb/large/100/287/440/products/ao-khoac-bomber-co-mu-phoi-long-vu-local-brand-davies-6.jpg?v=1748075564577",
@@ -90,7 +90,7 @@ const RatingStars = ({ rating }: { rating: number }) => {
   );
 };
 
-//                                                                                                                     Component thẻ giảm giá
+
 const DiscountBadge = ({ discount }: { discount: number }) => {
   if (!discount) return null;
   
@@ -101,7 +101,7 @@ const DiscountBadge = ({ discount }: { discount: number }) => {
   );
 };
 
-//                                                                                                                     Component thẻ best seller
+
 const BestSellerBadge = ({ isBestSeller }: { isBestSeller: boolean }) => {
   if (!isBestSeller) return null;
   
@@ -112,7 +112,7 @@ const BestSellerBadge = ({ isBestSeller }: { isBestSeller: boolean }) => {
   );
 };
 
-//                                                                                                                     Component hiển thị màu sắc
+
 const ColorOptions = ({ colors }: { colors: string[] }) => {
   return (
     <div className="flex gap-1 items-center">
@@ -139,12 +139,12 @@ const ColorOptions = ({ colors }: { colors: string[] }) => {
   );
 };
 
-//                                                                                                                     Component card sản phẩm
+
 const ProductCard = ({ product, index }: { product: typeof newArrivalsData[0], index: number }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
 
-  //                                                                                                                     Format giá tiền sang VND
+  
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', { 
       style: 'currency', 
@@ -176,7 +176,7 @@ const ProductCard = ({ product, index }: { product: typeof newArrivalsData[0], i
             draggable="false"
           />
         </div>
-        {/* Quick action buttons */}
+        {}
         <div className="absolute bottom-0 left-0 right-0 p-3 flex justify-center items-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-20">
           <Button 
             size="sm" 
@@ -269,7 +269,7 @@ export const NewArrivals = () => {
     }}
     className="py-20 pt-12 bg-gradient-to-b from-white to-[#F8FBF6] dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto">
-        {/* Header Section */}
+        {}
         <motion.div
           ref={headerRef}
           initial="hidden"
@@ -291,7 +291,7 @@ export const NewArrivals = () => {
           </p>
         </motion.div>
         
-        {/* Products Grid */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {newArrivalsData.map((product, index) => (
             <ProductCard key={product.id} product={product} index={index} />

@@ -68,14 +68,14 @@ export default function EditVoucherPage() {
     const { name, value, type } = e.target;
     let parsedValue: string | number = value;
     
-    // Handle numeric fields
+    
     if (type === 'number') {
       parsedValue = value === '' ? 0 : parseFloat(value);
     }
     
     setVoucher({ ...voucher, [name]: parsedValue });
     
-    // Clear error for the field being edited
+    
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -84,7 +84,7 @@ export default function EditVoucherPage() {
   const handleSelectChange = (name: string, value: string) => {
     setVoucher({ ...voucher, [name]: value });
     
-    // Clear error for the field being edited
+    
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -93,7 +93,7 @@ export default function EditVoucherPage() {
   const handleDateChange = (name: string, value: string) => {
     setVoucher({ ...voucher, [name]: value });
     
-    // Clear error for the field being edited
+    
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }

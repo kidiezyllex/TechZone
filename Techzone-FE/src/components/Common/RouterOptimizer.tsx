@@ -7,11 +7,11 @@ interface RouterOptimizerProps {
   enablePrefetch?: boolean;
 }
 
-// Cache for preloaded routes
+
 const routeCache = new Map<string, Promise<any>>();
 const preloadedRoutes = new Set<string>();
 
-// Route mapping for dynamic imports
+
 const routeImports: Record<string, () => Promise<any>> = {
   '/': () => import('@/pages/HomePage'),
   '/about-us': () => import('@/pages/AboutUsPage'),
@@ -29,7 +29,7 @@ const routeImports: Record<string, () => Promise<any>> = {
   '/admin/statistics': () => import('@/pages/admin/AdminStatisticsPage'),
 };
 
-// Preload a specific route
+
 const preloadRoute = async (routePath: string): Promise<void> => {
   if (preloadedRoutes.has(routePath)) {
     return;
@@ -53,7 +53,7 @@ const preloadRoute = async (routePath: string): Promise<void> => {
   }
 };
 
-// Preload multiple routes with priority
+
 const preloadRoutes = async (routes: string[], priority: 'high' | 'medium' | 'low' = 'medium'): Promise<void> => {
   const delay = priority === 'high' ? 0 : priority === 'medium' ? 100 : 500;
   
@@ -63,14 +63,14 @@ const preloadRoutes = async (routes: string[], priority: 'high' | 'medium' | 'lo
   }
 };
 
-// Intelligent route preloading based on user behavior
+
 const useIntelligentPreloading = () => {
   const location = useLocation();
   
   useEffect(() => {
     const currentPath = location.pathname;
     
-    // Preload related routes based on current page
+    
     const getRelatedRoutes = (path: string): string[] => {
       if (path === '/') {
         return ['/products', '/about-us', '/auth/login'];
@@ -89,7 +89,7 @@ const useIntelligentPreloading = () => {
 
     const relatedRoutes = getRelatedRoutes(currentPath);
     if (relatedRoutes.length > 0) {
-      // Delay preloading to not interfere with current page load
+      
       setTimeout(() => {
         preloadRoutes(relatedRoutes, 'low');
       }, 1000);
@@ -97,7 +97,7 @@ const useIntelligentPreloading = () => {
   }, [location.pathname]);
 };
 
-// Intersection Observer for link preloading
+
 const useLinkPreloading = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -119,7 +119,7 @@ const useLinkPreloading = () => {
       }
     );
 
-    // Observe all internal links
+    
     const links = document.querySelectorAll('a[href^="/"]');
     links.forEach((link) => observer.observe(link));
 
@@ -132,17 +132,17 @@ export const RouterOptimizer: React.FC<RouterOptimizerProps> = ({
   preloadRoutes: initialPreloadRoutes = [],
   enablePrefetch = true,
 }) => {
-  // Initialize preloading
+  
   useEffect(() => {
     if (initialPreloadRoutes.length > 0) {
       preloadRoutes(initialPreloadRoutes, 'high');
     }
   }, []);
 
-  // Enable intelligent preloading
+  
   useIntelligentPreloading();
   
-  // Enable link preloading if enabled
+  
   if (enablePrefetch) {
     useLinkPreloading();
   }
@@ -150,7 +150,7 @@ export const RouterOptimizer: React.FC<RouterOptimizerProps> = ({
   return <>{children}</>;
 };
 
-// Hook for manual route preloading
+
 export const useRoutePreloader = () => {
   const preload = useCallback((routes: string | string[]) => {
     const routesToPreload = Array.isArray(routes) ? routes : [routes];
@@ -164,7 +164,7 @@ export const useRoutePreloader = () => {
   return { preload, isPreloaded };
 };
 
-// HOC for route optimization
+
 export const withRouteOptimization = <P extends object>(
   Component: React.ComponentType<P>,
   relatedRoutes: string[] = []
@@ -182,7 +182,7 @@ export const withRouteOptimization = <P extends object>(
   });
 };
 
-// Custom Link component with preloading
+
 export const OptimizedLink: React.FC<{
   to: string;
   children: React.ReactNode;
@@ -217,7 +217,7 @@ export const OptimizedLink: React.FC<{
   );
 };
 
-// Performance metrics
+
 export const getRouteMetrics = () => {
   return {
     preloadedRoutes: Array.from(preloadedRoutes),

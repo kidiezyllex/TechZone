@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
- 
+
 import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -296,7 +296,7 @@ export default function AuthPage() {
                 </span>
               </CardTitle>
               <CardDescription className="text-maintext dark:text-maintext pt-3">
-                Đăng ký để khám phá Clothes Shop!
+                Đăng ký để khám phá TechZone!
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">

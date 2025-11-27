@@ -31,7 +31,7 @@ export default function SizesPage() {
         const numericQuery = Number(query);
         return data.data.filter(size => {
             const sizeLabel = getSizeLabel(size.value);
-            // Search by both numeric value and size label
+            
             return (
                 !isNaN(numericQuery) ? size.value === numericQuery : String(size.value).includes(query)
             ) || sizeLabel.toLowerCase().includes(query);
@@ -358,7 +358,7 @@ function CreateSizeDialog({ isOpen, onClose }: CreateSizeDialogProps) {
         }
     };
 
-    // Get the currently selected size label
+    
     const getCurrentSizeLabel = () => {
         if (formData.value > 0) {
             return getSizeLabel(formData.value);

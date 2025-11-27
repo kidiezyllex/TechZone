@@ -1,5 +1,5 @@
 const fs = require('fs'); 
-// Import module 'fs' để thao tác với file hệ thống (read/write file)
+
 
 const filePath = './src/utils/index.ts'; 
 
@@ -20,7 +20,6 @@ const fixedFunction = `export const camelizeConvert = (obj: any) => {
   return _.transform(obj, (acc: any, value, key: any, target) => {
     const camelKey = _.isArray(target) ? key : _.camelCase(key);
     
-    // Nếu value là array thì đệ quy từng phần tử trong array
     if (_.isArray(value)) {
       acc[camelKey] = value.map(item => _.isObject(item) ? camelizeConvert(item) : item);
     } 

@@ -59,7 +59,7 @@ export const NavigationBar = () => {
     return (
         <header className="sticky top-0 z-50 bg-white shadow-sm py-4">
             <div className="container mx-auto flex items-center justify-between">
-                {/* Logo */}
+                {}
                 <a href="/" className="flex items-center">
                 <img
                 draggable="false"
@@ -71,7 +71,7 @@ export const NavigationBar = () => {
               />
                 </a>
 
-                {/* Navigation */}
+                {}
                 <div className="hidden md:flex items-center space-x-1">
                     {tabs.map((tab) => (
                         <a key={tab.text} href={tab.href}>
@@ -83,7 +83,7 @@ export const NavigationBar = () => {
                         </a>
                     ))}
                 </div>
-                {/* User Actions */}
+                {}
                 <div className="flex items-center gap-2">
                     {!isAuthenticated ? (
                         <div className="hidden md:flex items-center gap-2">

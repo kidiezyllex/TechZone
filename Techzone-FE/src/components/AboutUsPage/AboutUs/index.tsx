@@ -4,12 +4,12 @@ import { Icon } from '@mdi/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay, Navigation } from 'swiper/modules';
 
-//                                                                                                                     Import Swiper styles
+
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-//                                                                                                                     Component cho các tính năng
+
 const FeatureCard = ({ icon, title, description }: { icon: string; title: string; description: string }) => (
     <motion.div
         className="bg-white backdrop-blur-md p-8 rounded-[6px] transition-all duration-300 border border-white/20"
@@ -29,7 +29,7 @@ const FeatureCard = ({ icon, title, description }: { icon: string; title: string
     </motion.div>
 );
 
-//                                                                                                                     Component cho thành viên nhóm
+
 const TeamMember = ({ name, id, role }: { name: string; id: string; role: string }) => (
     <motion.div
         className=" bg-gradient-to-r from-[#2C8B3D80] to-[#88C14080] flex flex-col items-center justify-center gap-2 p-4 px-2 rounded-[6px] relative overflow-hidden cursor-pointer"
@@ -52,7 +52,7 @@ const TeamMember = ({ name, id, role }: { name: string; id: string; role: string
     </motion.div>
 );
 
-//                                                                                                                     Component cho đánh giá khách hàng
+
 const TestimonialCard = ({ rating, title, description, image, name, role }: {
     rating: number;
     title: string;
@@ -87,7 +87,7 @@ const TestimonialCard = ({ rating, title, description, image, name, role }: {
     </motion.div>
 );
 
-//                                                                                                                     Dữ liệu testimonial mở rộng
+
 const testimonialData = [
     {
         rating: 5,
@@ -142,7 +142,7 @@ const testimonialData = [
 export const AboutUs = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-            {/* Hero Section */}
+            {}
             <section className="relative h-[80vh] flex items-center overflow-hidden">
                 <div className="absolute inset-0">
                     <img
@@ -201,7 +201,7 @@ export const AboutUs = () => {
                 </div>
             </section>
 
-            {/* About Section */}
+            {}
             <section className="py-24">
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -263,7 +263,7 @@ export const AboutUs = () => {
                 </div>
             </section>
 
-            {/* Features Section */}
+            {}
             <section className="py-24 bg-gradient-to-br from-[#2C8B3D]/10 to-[#F2A024]/10">
                 <div className="container mx-auto px-4">
                     <motion.div
@@ -303,7 +303,7 @@ export const AboutUs = () => {
                 </div>
             </section>
 
-            {/* Team Section */}
+            {}
             <section id="team" className="py-24">
                 <div className="container mx-auto px-4">
                     <motion.div
@@ -328,7 +328,7 @@ export const AboutUs = () => {
                 </div>
             </section>
 
-            {/* Testimonials Section */}
+            {}
             <section className="py-24 bg-gradient-to-r from-[#2C8B3D] to-[#88C140]">
                 <div className="container mx-auto px-4">
                     <motion.div
@@ -384,7 +384,7 @@ export const AboutUs = () => {
                 </div>
             </section>
 
-            {/* CTA Section */}
+            {}
             <section className="py-24">
                 <div className="container mx-auto px-4">
                     <motion.div

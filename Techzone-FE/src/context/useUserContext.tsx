@@ -8,6 +8,12 @@ import { useUserProfile } from "@/hooks/account"
 import { IAccountResponse } from "@/interface/response/account"
 import cookies from "js-cookie"
 
+const hasAccessToken = (): boolean => {
+  if (typeof window === "undefined") return false
+  const token = cookies.get("accessToken") || localStorage.getItem("accessToken")
+  return !!token
+}
+
 type UserContextType = {
   user: null | Record<string, any>
   profile: IAccountResponse | null
@@ -23,7 +29,8 @@ const UserContext = createContext<UserContextType | null>(null)
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
-  const { data: profileData, refetch: refetchProfile, isLoading: isProfileLoading } = useUserProfile()
+  const hasToken = hasAccessToken()
+  const { data: profileData, refetch: refetchProfile, isLoading: isProfileLoading } = useUserProfile(hasToken)
   const [user, setUser] = useState<null | Record<string, any>>(null)
   const [profile, setProfile] = useState<IAccountResponse | null>(null)
   const [isLoadingProfile, setIsLoadingProfile] = useState<boolean>(false)
@@ -112,7 +119,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         }
       }
       lastProfileDataStringRef.current = currentProfileDataString;
-    } 
+    }
   }, [profileData])
 
   useEffect(() => {
@@ -138,7 +145,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     navigate("/auth/login")
   }, [navigate])
 
-  // Memoize the context value to prevent unnecessary re-renders
+  
   const contextValue = useMemo(() => ({
     user,
     profile,

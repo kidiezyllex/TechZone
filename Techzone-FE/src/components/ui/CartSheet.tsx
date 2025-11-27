@@ -232,7 +232,7 @@ const CartSheet: React.FC<CartSheetProps> = ({ open, onOpenChange }) => {
     const item = items.find(item => item.id === id);
     if (!item) return;
 
-    // Allow empty string for user typing
+    
     if (value === '') {
       setQuantityInputs(prev => ({ ...prev, [id]: value }));
       return;
@@ -240,7 +240,7 @@ const CartSheet: React.FC<CartSheetProps> = ({ open, onOpenChange }) => {
 
     const newQuantity = parseInt(value) || 0;
 
-    // Immediate validation feedback
+    
     if (newQuantity < 0) {
       showToast({
         title: "Lỗi",
@@ -514,7 +514,7 @@ const CartSheet: React.FC<CartSheetProps> = ({ open, onOpenChange }) => {
                 </div>
 
                 <div className="border-t pt-4 space-y-4 mt-4">
-                  {/* Voucher Section */}
+                  {}
                   <div className="space-y-2">
                     <AnimatePresence mode="wait">
                       {appliedVoucher ? (
@@ -590,7 +590,7 @@ const CartSheet: React.FC<CartSheetProps> = ({ open, onOpenChange }) => {
                       <span>{formatPrice(finalSubtotal)}</span>
                     </div>
                     
-                    {/* Hiển thị tổng tiết kiệm từ khuyến mãi sản phẩm */}
+                    {}
                     {(() => {
                       const totalSavings = items.reduce((total, item) => {
                         if (item.hasDiscount && item.originalPrice) {
@@ -610,7 +610,7 @@ const CartSheet: React.FC<CartSheetProps> = ({ open, onOpenChange }) => {
                       return null;
                     })()}
                     
-                    {/* Hiển thị giảm giá từ voucher */}
+                    {}
                     {voucherDiscount > 0 && (
                       <div className="flex justify-between text-green-600">
                         <span className="text-sm font-semibold">Giảm giá voucher</span>
@@ -662,7 +662,7 @@ const CartSheet: React.FC<CartSheetProps> = ({ open, onOpenChange }) => {
         </SheetContent>
       </Sheet>
 
-      {/* Vouchers List Dialog */}
+      {}
       <VouchersListDialog
         open={showVouchersDialog}
         onOpenChange={setShowVouchersDialog}

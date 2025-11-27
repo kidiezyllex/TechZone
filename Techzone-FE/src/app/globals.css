@@ -25,14 +25,14 @@ html,
 
 ::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2);
-  /* Màu của thanh cuộn */
+  
   border-radius: 10px;
-  /* Bo tròn góc thanh cuộn */
+  
 }
 
 ::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0.1);
-  /* Màu nền của vùng cuộn */
+  
 }
 
 .ant-table-cell::before {
@@ -107,9 +107,9 @@ ul.ant-menu.ant-menu-sub.ant-menu-inline {
   list-style: disc !important;
 }
 
-/* Ant Design Pagination Custom Styles */
+
 .ant-pagination-item {
-  /* Base styles for all pagination items */
+  
   border-radius: 4px !important;
   font-weight: 500 !important;
   transition: all 0.3s ease !important;
@@ -238,20 +238,20 @@ ul.ant-menu.ant-menu-sub.ant-menu-inline {
     @apply border-border;
   }
   body {
-    /* !text-[#374151] */
+    
     @apply bg-background text-foreground !text-[#374151];
     
   }
 
   .text-outline-green {
-    -webkit-text-stroke: 1px #2C8B3D; /* violet-500 for better visibility */
+    -webkit-text-stroke: 1px #2C8B3D; 
     -webkit-text-fill-color: transparent;
     text-stroke: 1px #2C8B3D;
     text-fill-color: transparent;
     color: transparent;
   }
   .text-outline-white {
-    -webkit-text-stroke: 1px #ffffff; /* violet-500 for better visibility */
+    -webkit-text-stroke: 1px #ffffff; 
     -webkit-text-fill-color: transparent;
     text-stroke: 1px #ffffff;
     text-fill-color: transparent;
@@ -259,7 +259,7 @@ ul.ant-menu.ant-menu-sub.ant-menu-inline {
   }
 }
 
-/* Ẩn spinner loader của NextTopLoader */
+
 .nextjs-toploader-spinner {
   display: none !important;
 }

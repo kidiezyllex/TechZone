@@ -101,7 +101,7 @@ const categories = [
   }
 ];
 
-//                                                                                                                     Component Badge hiển thị nhãn cho sản phẩm
+
 const Badge = ({ text }: { text: string }) => {
   if (!text) return null;
 
@@ -118,7 +118,7 @@ const Badge = ({ text }: { text: string }) => {
   );
 };
 
-//                                                                                                                     Component DiscountTag hiển thị phần trăm giảm giá
+
 const DiscountTag = ({ discount }: { discount: number }) => {
   if (!discount) return null;
 
@@ -181,7 +181,7 @@ const CategoryCard = ({ category, index }: { category: typeof categories[0], ind
       }
     },
     hover: {
-      color: "#2C8B3D", //                                                                                                                     primary color
+      color: "#2C8B3D", 
       transition: { duration: 0.2 }
     }
   };
@@ -353,7 +353,7 @@ export const Categories = () => {
   return (
     <section ref={sectionRef} className="py-20 px-4 bg-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto max-w-7xl">
-        {/* Header Section */}
+        {}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <motion.div
             ref={headerRef}
@@ -390,7 +390,7 @@ export const Categories = () => {
           </motion.div>
         </div>
 
-        {/* Swiper Component */}
+        {}
         <motion.div
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}

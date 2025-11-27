@@ -10,7 +10,7 @@ import { LoadingGrid } from '@/components/Common/Loading'
 import { EmptyState } from '@/components/Common/EmptyState'
 import { Package, Search } from 'lucide-react'
 
-// Mock data - replace with real API
+
 const mockProducts = [
   {
     id: 1,

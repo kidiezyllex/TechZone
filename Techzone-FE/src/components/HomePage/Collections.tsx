@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@mdi/react';
 import { mdiArrowRight } from '@mdi/js';
 
-//                                                                                                                     Dữ liệu cho các bộ sưu tập
+
 const collectionsData = [
     {
         id: 1,
@@ -29,7 +29,7 @@ const collectionsData = [
     }
 ];
 
-//                                                                                                                     Component thẻ bộ sưu tập
+
 const CollectionCard = ({ collection, animation }: {
     collection: typeof collectionsData[0],
     animation: "fadeInLeft" | "fadeInUp" | "fadeInRight"
@@ -37,7 +37,7 @@ const CollectionCard = ({ collection, animation }: {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
 
-    //                                                                                                                     Xác định animation dựa trên prop
+    
     const getInitialAnimation = () => {
         switch (animation) {
             case "fadeInLeft":
@@ -68,14 +68,14 @@ const CollectionCard = ({ collection, animation }: {
             whileHover={{ y: -8 }}
             className="relative overflow-hidden h-[450px] group shadow-md hover:shadow-xl transition-shadow duration-500"
         >
-            {/* Background Image with Overlay */}
+            {}
             <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110 z-0"
                 style={{ backgroundImage: `url(${collection.image})` }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20 group-hover:from-black/60 group-hover:via-black/30 group-hover:to-black/10 transition-colors duration-500 z-10" />
 
-            {/* Content */}
+            {}
             <div className="relative h-full flex flex-col justify-end p-4 z-20">
                 <AnimatePresence>
                     <motion.div
@@ -126,12 +126,12 @@ export const Collections = () => {
 
     return (
         <section className="py-20 bg-muted/30 dark:bg-gray-900/95 relative overflow-hidden">
-            {/* Decorative elements */}
+            {}
             <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
             <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary/5 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
 
             <div className="container mx-auto">
-                {/* Header Section */}
+                {}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8">
                     <motion.div
                         ref={headerRef}
@@ -171,14 +171,14 @@ export const Collections = () => {
 
                 </div>
 
-                {/* Collection Cards */}
+                {}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <CollectionCard collection={collectionsData[0]} animation="fadeInLeft" />
                     <CollectionCard collection={collectionsData[1]} animation="fadeInUp" />
                     <CollectionCard collection={collectionsData[2]} animation="fadeInRight" />
                 </div>
 
-                {/* Mobile Button */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={isHeaderInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}

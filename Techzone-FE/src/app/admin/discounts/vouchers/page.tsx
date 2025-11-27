@@ -156,14 +156,7 @@ export default function VouchersPage() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="flex space-x-2">
-          {/* <Button
-            variant="outline"
-            onClick={() => setIsValidateDialogOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Icon path={mdiTagCheckOutline} size={0.7} />
-            Kiểm tra mã
-          </Button> */}
+          {}
           <a href="/admin/discounts/vouchers/create" className="flex items-center gap-2">
             <Button className="flex items-center gap-2">
               <Icon path={mdiPlus} size={0.7} />
@@ -409,7 +402,7 @@ export default function VouchersPage() {
               </Button>
               {[...Array(data.data.pagination.totalPages)].map((_, index) => {
                 const page = index + 1;
-                // Hiển thị trang hiện tại, 2 trang trước và 2 trang sau
+                
                 if (
                   page === 1 ||
                   page === data.data.pagination.totalPages ||
@@ -457,7 +450,7 @@ export default function VouchersPage() {
         </div>
       )}
 
-      {/* Xác nhận xóa dialog */}
+      {}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -486,7 +479,7 @@ export default function VouchersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Xác nhận gửi thông báo dialog */}
+      {}
       <Dialog open={isNotifyDialogOpen} onOpenChange={setIsNotifyDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -514,7 +507,7 @@ export default function VouchersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Validate Voucher Dialog */}
+      {}
       <Dialog open={isValidateDialogOpen} onOpenChange={resetValidateDialog}>
         <DialogContent className="sm:max-w-4xl">
           <DialogHeader>

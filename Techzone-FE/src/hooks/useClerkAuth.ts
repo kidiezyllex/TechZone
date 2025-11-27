@@ -4,9 +4,6 @@ import { register as registerUser, login as loginUser } from '@/api/authenticati
 import { useUser } from '@/context/useUserContext'
 import { toast } from 'react-toastify'
 
-/**
- * Hook để sync Clerk authentication với backend Techzone
- */
 export const useClerkAuthSync = () => {
   const { user: clerkUser, isSignedIn } = useClerkUser()
   const { getToken } = useClerkAuth()
@@ -22,17 +19,13 @@ export const useClerkAuthSync = () => {
         const email = clerkUser.emailAddresses[0]?.emailAddress
         if (!email) throw new Error('Email not found in Clerk user')
 
-        // Get token from Clerk
         const token = await getToken()
 
-        // Sync với backend - backend sẽ tạo tài khoản nếu chưa tồn tại
         const response = await loginUser({
           email,
-          // Sử dụng Clerk token để verify
           clerk_token: token,
         } as any)
 
-        // Lưu token vào local storage
         if (response && (response as any).data?.token) {
           loginTechzoneUser(
             (response as any).data?.account,
@@ -54,9 +47,6 @@ export const useClerkAuthSync = () => {
   }
 }
 
-/**
- * Hook để register via Clerk OAuth
- */
 export const useClerkRegister = () => {
   const { user: clerkUser, isSignedIn } = useClerkUser()
   const { getToken } = useClerkAuth()
@@ -76,7 +66,6 @@ export const useClerkRegister = () => {
 
         const token = await getToken()
 
-        // Register on backend via Clerk token
         const response = await registerUser({
           email,
           full_name: fullName,

@@ -22,7 +22,7 @@ export function BlogGrid({ posts }: BlogGridProps) {
           key={post.id}
           className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
         >
-          {/* Image */}
+          {}
           <div className="relative h-48 overflow-hidden bg-gray-100">
             <img
               src={post.image}
@@ -31,7 +31,7 @@ export function BlogGrid({ posts }: BlogGridProps) {
             />
           </div>
 
-          {/* Content */}
+          {}
           <div className="p-4">
             <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
               <Calendar size={14} />

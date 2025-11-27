@@ -113,13 +113,13 @@ export function Header() {
     return (
         <>
             <header className="bg-[#232F3E] text-maintext px-4 py-2">
-                {/* Desktop Header */}
+                {}
                 <div className="hidden md:flex items-center justify-between gap-2">
                     <a href="/" className="flex-shrink-0">
                         <img src="/images/logo.png" alt="Amazon" width={80} height={34} className="cursor-pointer" />
                     </a>
 
-                    {/* Search Bar */}
+                    {}
                     <div className="relative flex-1 max-w-[550px]">
                         <Input placeholder="Tôi đang tìm mua..." className="py-2 pr-10 h-[38px] rounded-sm w-full" />
                         <div className="absolute right-0 top-0 h-full flex items-center justify-center bg-[#febd69] w-[45px] rounded-r-sm cursor-pointer">
@@ -127,9 +127,9 @@ export function Header() {
                         </div>
                     </div>
 
-                    {/* Navigation */}
+                    {}
                     <nav className="flex items-center gap-2">
-                        {/* Language Selector */}
+                        {}
                         <Dropdown menu={{ items: languageMenu as unknown as ItemType[] }} trigger={["click"]} placement="bottomRight">
                             <div className="flex items-center cursor-pointer px-2">
                                 <img
@@ -144,7 +144,7 @@ export function Header() {
                             </div>
                         </Dropdown>
 
-                        {/* User Account */}
+                        {}
                         <a href="/auth/login" className="px-2" onClick={() => navigate("/seller/products/storehouse")}>
                             <div className="flex flex-col">
                                 {!isMounted ? null : (
@@ -165,7 +165,7 @@ export function Header() {
                             </div>
                         )}
 
-                        {/* Currency Selector */}
+                        {}
                         <Dropdown menu={{ items: currencyMenu as unknown as ItemType[] }} trigger={["click"]} placement="bottomRight">
                             <div className="flex items-center cursor-pointer px-2">
                                 <span className="mr-1 text-maintext text-sm transition-all duration-300 hover:!text-white/80 font-bold">
@@ -175,14 +175,14 @@ export function Header() {
                             </div>
                         </Dropdown>
 
-                        {/* Shopping Cart */}
+                        {}
                         <div className="px-2">
                             <CartIcon className="text-white" />
                         </div>
                     </nav>
                 </div>
 
-                {/* Mobile Header */}
+                {}
                 <div className="flex md:hidden items-center justify-between">
                     <div className="flex items-center">
 
@@ -212,7 +212,7 @@ export function Header() {
                     </div>
                 </div>
 
-                {/* Mobile Search - Expandable */}
+                {}
                 {searchExpanded && (
                     <div className="md:hidden mt-2 relative">
                         <Input
@@ -227,11 +227,11 @@ export function Header() {
                 )}
             </header>
 
-            {/* Mobile Menu Overlay */}
+            {}
             {mobileMenuOpen && (
                 <div className="md:hidden fixed inset-0 z-50 bg-black bg-opacity-50" onClick={toggleMobileMenu}>
                     <div className="bg-[#232F3E] h-full w-[80%] max-w-[300px] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                        {/* User Account Section */}
+                        {}
                         <div className="bg-[#37475A] p-4 text-white">
                             {!isMounted ? null : (
                                 <>
@@ -264,7 +264,7 @@ export function Header() {
                             )}
                         </div>
 
-                        {/* Language Selector */}
+                        {}
                         <div className="p-4 border-b border-gray-700">
                             <h3 className="text-white font-bold mb-2">Ngôn ngữ</h3>
                             <ul className="space-y-2">
@@ -287,7 +287,7 @@ export function Header() {
                             </ul>
                         </div>
 
-                        {/* Currency Selector */}
+                        {}
                         <div className="p-4 border-b border-gray-700">
                             <h3 className="text-white font-bold mb-2">Tiền tệ</h3>
                             <ul className="space-y-2">
@@ -305,7 +305,7 @@ export function Header() {
                             </ul>
                         </div>
 
-                        {/* Navigation Links */}
+                        {}
                         <div className="p-4">
                             <a href="/cart" className="block py-2 text-white hover:text-gray-300" onClick={() => setMobileMenuOpen(false)}>
                                 <div className="flex items-center">
