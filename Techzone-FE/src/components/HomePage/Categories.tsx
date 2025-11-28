@@ -13,88 +13,88 @@ import { Pagination, Navigation, Autoplay } from 'swiper/modules';
 const categories = [
   {
     id: 1,
-    name: 'Áo thun nam',
-    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    productCount: 150,
-    slug: 'ao-thun-nam',
-    description: 'Bộ sưu tập áo thun nam đa dạng, phong cách và thoải mái',
+    name: 'Laptop Gaming',
+    image: 'https://m.media-amazon.com/images/I/71gXelI8upL._AC_SL1500_.jpg',
+    productCount: 85,
+    slug: 'laptop-gaming',
+    description: 'Laptop gaming hiệu năng cao, card đồ họa mạnh mẽ cho game thủ',
     featured: true,
     badge: 'Bán chạy',
     discount: 15,
   },
   {
     id: 2,
-    name: 'Váy nữ',
-    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    name: 'Laptop Văn phòng',
+    image: 'https://m.media-amazon.com/images/I/71COoJZfsDL._AC_SL1500_.jpg',
     productCount: 120,
-    slug: 'vay-nu',
-    description: 'Váy nữ thời trang, thiết kế thanh lịch cho mọi dịp',
+    slug: 'laptop-van-phong',
+    description: 'Laptop văn phòng nhẹ nhàng, pin lâu, hiệu năng ổn định',
     featured: false,
     badge: 'Mới',
-    discount: 0,
-  },
-  {
-    id: 3,
-    name: 'Quần jeans',
-    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    productCount: 200,
-    slug: 'quan-jeans',
-    description: 'Quần jeans nam nữ chất lượng cao, form dáng hiện đại',
-    featured: true,
-    badge: 'Hot',
     discount: 10,
   },
   {
+    id: 3,
+    name: 'Laptop Đồ họa',
+    image: 'https://m.media-amazon.com/images/I/71-XrFgOH3L._AC_SL1500_.jpg',
+    productCount: 65,
+    slug: 'laptop-do-hoa',
+    description: 'Laptop chuyên đồ họa, màn hình sắc nét, màu sắc chính xác',
+    featured: true,
+    badge: 'Hot',
+    discount: 12,
+  },
+  {
     id: 4,
-    name: 'Áo sơ mi',
-    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    productCount: 90,
-    slug: 'ao-so-mi',
-    description: 'Áo sơ mi công sở và dạo phố, phong cách lịch lãm',
-    featured: false,
-    badge: '',
-    discount: 5,
+    name: 'Linh kiện PC',
+    image: 'https://m.media-amazon.com/images/I/718sTnDoLyL._AC_SL1500_.jpg',
+    productCount: 350,
+    slug: 'linh-kien-pc',
+    description: 'CPU, VGA, Mainboard, RAM, SSD - Đầy đủ linh kiện build PC',
+    featured: true,
+    badge: 'Hot',
+    discount: 8,
   },
   {
     id: 5,
-    name: 'Đầm dự tiệc',
-    image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    productCount: 75,
-    slug: 'dam-du-tiec',
-    description: 'Đầm dự tiệc sang trọng, tôn lên vẻ đẹp quyến rũ',
+    name: 'Phụ kiện',
+    image: 'https://m.media-amazon.com/images/I/61MoSPeCRuL._AC_SL1500_.jpg',
+    productCount: 280,
+    slug: 'phu-kien',
+    description: 'Chuột, bàn phím, tai nghe, màn hình và phụ kiện công nghệ',
     featured: true,
     badge: 'Sale',
     discount: 20,
   },
   {
     id: 6,
-    name: 'Áo khoác',
-    image: 'https://images.unsplash.com/photo-1715408153725-186c6c77fb45?q=80&w=465&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    productCount: 85,
-    slug: 'ao-khoac',
-    description: 'Áo khoác thời trang, giữ ấm và phong cách',
+    name: 'Laptop Ultrabook',
+    image: 'https://m.media-amazon.com/images/I/71MC0412PeL._AC_SL1500_.jpg',
+    productCount: 45,
+    slug: 'laptop-ultrabook',
+    description: 'Ultrabook siêu mỏng nhẹ, thiết kế cao cấp, di động tối đa',
     featured: false,
     badge: 'Mới',
-    discount: 8,
+    discount: 5,
   },
   {
     id: 7,
-    name: 'Đồ thể thao',
-    image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    productCount: 110,
-    slug: 'do-the-thao',
-    description: 'Đồ thể thao chất lượng cao, thoải mái khi vận động',
+    name: 'PC Build sẵn',
+    image: 'https://m.media-amazon.com/images/I/71ENeVg0MuL._AC_SL1500_.jpg',
+    productCount: 55,
+    slug: 'pc-build-san',
+    description: 'PC được build sẵn theo yêu cầu, tối ưu hiệu năng và giá cả',
     featured: true,
     badge: 'Hot',
-    discount: 12,
+    discount: 10,
   },
   {
     id: 8,
-    name: 'Thời trang trẻ em',
-    image: 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    name: 'Màn hình',
+    image: 'https://m.media-amazon.com/images/I/71HwP3+niaL._AC_SL1500_.jpg',
     productCount: 95,
-    slug: 'thoi-trang-tre-em',
-    description: 'Thời trang trẻ em đáng yêu, chất liệu an toàn',
+    slug: 'man-hinh',
+    description: 'Màn hình gaming, đồ họa đa dạng kích thước và độ phân giải',
     featured: false,
     badge: '',
     discount: 15,
@@ -139,68 +139,6 @@ const DiscountTag = ({ discount }: { discount: number }) => {
 const CategoryCard = ({ category, index }: { category: typeof categories[0], index: number }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "0px 0px -100px 0px" });
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        delay: index * 0.1,
-        ease: "easeOut"
-      }
-    },
-    hover: {
-      y: -12,
-      transition: {
-        duration: 0.3,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const imageVariants = {
-    hover: {
-      scale: 1.1,
-      transition: {
-        duration: 0.7,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const textVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.3,
-        delay: 0.2
-      }
-    },
-    hover: {
-      color: "#2C8B3D", 
-      transition: { duration: 0.2 }
-    }
-  };
-
-  const descriptionVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 0.8,
-      transition: {
-        duration: 0.3,
-        delay: 0.3
-      }
-    },
-    hover: {
-      opacity: 1,
-      transition: { duration: 0.2 }
-    }
-  };
-
   return (
     <motion.div
       ref={ref}
@@ -214,17 +152,17 @@ const CategoryCard = ({ category, index }: { category: typeof categories[0], ind
           <DiscountTag discount={category.discount} />
 
           <motion.div
-            className="h-full w-full"
+            className="h-full w-full p-4 bg-blue-300"
           >
             <img
               src={category.image}
               alt={category.name}
-              className="object-cover"
+              className="object-contain h-[200px] w-full bg-white rounded-md"
             />
           </motion.div>
 
-          <div className="absolute inset-0 bg-gradient-to-t from-main-dark-blue/80 via-main-dark-blue/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="absolute bottom-0 left-0 right-0 p-4">
+          <div className="absolute inset-0 bg-gradient-to-t from-main-dark-blue/50 via-main-dark-blue/60 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute bottom-0 left-0 right-0 p-4 pt-0">
               <motion.div
                 className="text-white space-y-2"
               >
@@ -238,18 +176,16 @@ const CategoryCard = ({ category, index }: { category: typeof categories[0], ind
                 </motion.p>
                 <div className="flex items-center justify-between">
                   <p className="text-gray-200 text-sm flex items-center gap-2">
-                    <span className="inline-block w-2 h-2 bg-primary rounded-full"></span>
+                    <span className="inline-block w-2 h-2 bg-secondary rounded-full"></span>
                     {category.productCount} sản phẩm
                   </p>
                   <motion.span
                     initial={{ opacity: 0.8, x: 0 }}
                     whileHover={{ opacity: 1, x: 5 }}
-                    className="text-primary flex items-center text-sm font-medium"
+                    className="text-white flex items-center text-sm font-medium"
                   >
                     Xem thêm
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <Icon path={mdiArrowRight} size={0.7} className="ml-2 group-hover:translate-x-1 transition-transform" />
                   </motion.span>
                 </div>
               </motion.div>
@@ -263,7 +199,7 @@ const CategoryCard = ({ category, index }: { category: typeof categories[0], ind
 
 const NavigationButton = ({ direction, onClick }: { direction: 'prev' | 'next', onClick: () => void }) => {
   return (
-    <motion.button 
+    <motion.button
       onClick={onClick}
       className={`absolute top-1/2 z-10 -translate-y-1/2 flex items-center justify-center w-10 h-10 bg-white/50 dark:bg-gray-800/80 rounded-full shadow-md border border-primary/30 text-primary ${direction === 'prev' ? 'left-2 md:left-5' : 'right-2 md:right-5'}`}
     >
@@ -299,10 +235,10 @@ export const Categories = () => {
       }
     }
   };
-  
+
   const headerRef = useRef(null);
   const isHeaderInView = useInView(headerRef, { once: true });
-  
+
   const handlePrev = () => {
     if (swiperRef.current && swiperRef.current.swiper) {
       swiperRef.current.swiper.slidePrev();
@@ -328,7 +264,7 @@ export const Categories = () => {
       .categories-swiper .swiper-pagination-bullet-active {
         width: 24px;
         border-radius: 5px;
-        background: var(--primary-color, #2C8B3D);
+        background: var(--primary-color, #0066CC);
         opacity: 1;
       }
       .categories-swiper .swiper-pagination {
@@ -344,7 +280,7 @@ export const Categories = () => {
       }
     `;
     document.head.appendChild(style);
-    
+
     return () => {
       document.head.removeChild(style);
     };
@@ -353,7 +289,6 @@ export const Categories = () => {
   return (
     <section ref={sectionRef} className="py-20 px-4 bg-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto max-w-7xl">
-        {}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <motion.div
             ref={headerRef}
@@ -385,12 +320,11 @@ export const Categories = () => {
               </motion.div>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-maintext dark:text-white">
-              THỜI TRANG <span className="text-extra">HOT TREND 2024</span>
+              CÔNG NGHỆ <span className="text-primary">HOT TREND 2025</span>
             </h2>
           </motion.div>
         </div>
 
-        {}
         <motion.div
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@mdi/react';
@@ -65,16 +65,16 @@ export default function StatisticsPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const queryClient = useQueryClient();
-  
-  
+
+
   const overviewFilters: IStatisticsFilter = {
     type: 'MONTHLY',
     startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
     limit: 1
   };
-  
-  
+
+
   const { data: statisticsData, isLoading: statisticsLoading, isError: statisticsError } = useStatistics(statisticsFilters);
   const { data: overviewStatistics, isLoading: overviewLoading, isError: overviewError } = useStatistics(overviewFilters);
   const { data: revenueData, isLoading: revenueLoading, isError: revenueError } = useRevenueReport(revenueFilters);
@@ -147,7 +147,7 @@ export default function StatisticsPage() {
     change: number;
   }
 
-  
+
   const StatCard = ({ title, value, icon, iconColor, bgColor, change }: StatCardProps) => {
     return (
       <Card className="h-full">
@@ -178,13 +178,13 @@ export default function StatisticsPage() {
     );
   };
 
-  
+
   const currentMonthData = statisticsData?.data?.statistics?.[0] || { totalOrders: 0, totalRevenue: 0, totalProfit: 0 };
 
-  
+
   const totalRevenue = revenueData?.data?.reduce((sum: number, item: any) => sum + item.totalRevenue, 0) || currentMonthData.totalRevenue || 0;
 
-  
+
   const newCustomersCount = accountsData?.data?.accounts?.filter(account => {
     const accountDate = new Date(account.createdAt);
     const currentDate = new Date();
@@ -193,29 +193,29 @@ export default function StatisticsPage() {
     return accountDate.getMonth() === currentMonth && accountDate.getFullYear() === currentYear;
   }).length || 0;
 
-  
+
   const mockRevenueData = revenueData?.data?.length ? revenueData.data : [
-    { date: '2024-01', totalRevenue: currentMonthData.totalRevenue, totalOrders: currentMonthData.totalOrders },
-    { date: '2024-02', totalRevenue: 0, totalOrders: 0 },
-    { date: '2024-03', totalRevenue: 0, totalOrders: 0 },
+    { date: '2025-01', totalRevenue: currentMonthData.totalRevenue, totalOrders: currentMonthData.totalOrders },
+    { date: '2025-02', totalRevenue: 0, totalOrders: 0 },
+    { date: '2025-03', totalRevenue: 0, totalOrders: 0 },
   ];
 
-  
+
   const mockTopProductsData = topProductsData?.data?.length ? topProductsData.data : [
-    { 
-      product: { id: '1', name: 'Sản phẩm mẫu 1', brand: { id: '1', name: 'Uniqlo' } }, 
-      totalQuantity: 10, 
-      totalRevenue: 1000000 
+    {
+      product: { id: '1', name: 'Sản phẩm mẫu 1', brand: { id: '1', name: 'Uniqlo' } },
+      totalQuantity: 10,
+      totalRevenue: 1000000
     },
-    { 
-      product: { id: '2', name: 'Sản phẩm mẫu 2', brand: { id: '2', name: 'Prada' } }, 
-      totalQuantity: 8, 
-      totalRevenue: 800000 
+    {
+      product: { id: '2', name: 'Sản phẩm mẫu 2', brand: { id: '2', name: 'Prada' } },
+      totalQuantity: 8,
+      totalRevenue: 800000
     },
-    { 
-      product: { id: '3', name: 'Sản phẩm mẫu 3', brand: { id: '3', name: 'Balenciaga' } }, 
-      totalQuantity: 5, 
-      totalRevenue: 500000 
+    {
+      product: { id: '3', name: 'Sản phẩm mẫu 3', brand: { id: '3', name: 'Balenciaga' } },
+      totalQuantity: 5,
+      totalRevenue: 500000
     }
   ];
 
@@ -233,7 +233,7 @@ export default function StatisticsPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        
+
         <Dialog open={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="outline">
@@ -291,8 +291,6 @@ export default function StatisticsPage() {
           <TabsTrigger value="products">Sản phẩm</TabsTrigger>
           <TabsTrigger value="statistics">Lịch sử</TabsTrigger>
         </TabsList>
-
-        {}
         <TabsContent value="overview" className="space-y-4">
           {statisticsLoading || revenueLoading || overviewLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
@@ -384,10 +382,10 @@ export default function StatisticsPage() {
                     <PieChart>
                       <Pie
                         data={mockTopProductsData.slice(0, 5).map((item, index) => ({
-                          name: item.product?.name 
-                            ? (item.product.name.length > 20 
-                                ? `${item.product.name.substring(0, 20)}...` 
-                                : item.product.name)
+                          name: item.product?.name
+                            ? (item.product.name.length > 20
+                              ? `${item.product.name.substring(0, 20)}...`
+                              : item.product.name)
                             : `Sản phẩm ${index + 1}`,
                           fullName: item.product?.name || `Sản phẩm ${index + 1}`,
                           quantity: item.totalQuantity,
@@ -398,7 +396,7 @@ export default function StatisticsPage() {
                         outerRadius={100}
                         innerRadius={40}
                         dataKey="quantity"
-                        label={({ name, percent }: { name: string; percent: number }) => 
+                        label={({ name, percent }: { name: string; percent: number }) =>
                           percent > 0.05 ? `${name}: ${(percent * 100).toFixed(1)}%` : ''
                         }
                         labelLine={false}
@@ -407,18 +405,18 @@ export default function StatisticsPage() {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip 
+                      <Tooltip
                         formatter={(value: number, name: string, props: any) => [
                           `${value} sản phẩm`,
                           props.payload.fullName || name
                         ]}
                         labelFormatter={() => 'Sản phẩm bán chạy'}
                       />
-                      <Legend 
-                        verticalAlign="bottom" 
+                      <Legend
+                        verticalAlign="bottom"
                         height={36}
-                        formatter={(value: string, entry: any) => 
-                          entry.payload?.fullName?.length > 25 
+                        formatter={(value: string, entry: any) =>
+                          entry.payload?.fullName?.length > 25
                             ? `${entry.payload.fullName.substring(0, 25)}...`
                             : entry.payload?.fullName || value
                         }
@@ -430,8 +428,6 @@ export default function StatisticsPage() {
             </Card>
           </div>
         </TabsContent>
-
-        {}
         <TabsContent value="revenue" className="space-y-4">
           <Card className="mb-4">
             <CardHeader>
@@ -536,8 +532,6 @@ export default function StatisticsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-
-        {}
         <TabsContent value="products" className="space-y-4 text-maintext">
           <Card className="mb-4">
             <CardHeader>
@@ -587,10 +581,10 @@ export default function StatisticsPage() {
                   <PieChart>
                     <Pie
                       data={mockTopProductsData.slice(0, topProductsFilters.limit || 10).map((item, index) => ({
-                        name: item.product?.name 
-                          ? (item.product.name.length > 20 
-                              ? `${item.product.name.substring(0, 20)}...` 
-                              : item.product.name)
+                        name: item.product?.name
+                          ? (item.product.name.length > 20
+                            ? `${item.product.name.substring(0, 20)}...`
+                            : item.product.name)
                           : `Sản phẩm ${index + 1}`,
                         fullName: item.product?.name || `Sản phẩm ${index + 1}`,
                         quantity: item.totalQuantity,
@@ -601,7 +595,7 @@ export default function StatisticsPage() {
                       outerRadius={100}
                       innerRadius={40}
                       dataKey="quantity"
-                      label={({ name, percent }: { name: string; percent: number }) => 
+                      label={({ name, percent }: { name: string; percent: number }) =>
                         percent > 0.05 ? `${name}: ${(percent * 100).toFixed(1)}%` : ''
                       }
                       labelLine={false}
@@ -610,18 +604,18 @@ export default function StatisticsPage() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value: number, name: string, props: any) => [
                         `${value} sản phẩm`,
                         props.payload.fullName || name
                       ]}
                       labelFormatter={() => 'Sản phẩm bán chạy'}
                     />
-                    <Legend 
-                      verticalAlign="bottom" 
+                    <Legend
+                      verticalAlign="bottom"
                       height={36}
-                      formatter={(value: string, entry: any) => 
-                        entry.payload?.fullName?.length > 25 
+                      formatter={(value: string, entry: any) =>
+                        entry.payload?.fullName?.length > 25
                           ? `${entry.payload.fullName.substring(0, 25)}...`
                           : entry.payload?.fullName || value
                       }
@@ -670,8 +664,6 @@ export default function StatisticsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-
-        {}
         <TabsContent value="statistics" className="space-y-4 text-maintext">
           <Card className="mb-4">
             <CardHeader>
@@ -762,17 +754,17 @@ export default function StatisticsPage() {
                             <TableCell className="font-medium text-maintext">{formatDate(item.date)}</TableCell>
                             <TableCell className="text-maintext">
                               <Badge variant="outline">
-                                {item.type === 'DAILY' ? 'Ngày' : 
-                                 item.type === 'WEEKLY' ? 'Tuần' : 
-                                 item.type === 'MONTHLY' ? 'Tháng' : 'Năm'}
+                                {item.type === 'DAILY' ? 'Ngày' :
+                                  item.type === 'WEEKLY' ? 'Tuần' :
+                                    item.type === 'MONTHLY' ? 'Tháng' : 'Năm'}
                               </Badge>
                             </TableCell>
                             <TableCell className="text-right text-maintext">{item.totalOrders}</TableCell>
                             <TableCell className="text-right text-maintext">{formatCurrency(item.totalRevenue)}</TableCell>
                             <TableCell className="text-right text-maintext">{formatCurrency(item.totalProfit)}</TableCell>
                             <TableCell className="text-center">
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={() => handleViewDetail(item.id || item.date)}
                               >
@@ -785,8 +777,6 @@ export default function StatisticsPage() {
                       </TableBody>
                     </Table>
                   </div>
-
-                  {}
                   {statisticsData && statisticsData.data.pagination.totalPages > 1 && (
                     <div className="flex justify-center items-center gap-2 mt-4">
                       <Button
@@ -816,8 +806,6 @@ export default function StatisticsPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {}
       <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
@@ -850,7 +838,7 @@ export default function StatisticsPage() {
                     <p className="text-xl font-bold text-yellow-600">{statisticsDetailData.data.customerCount?.new || 0}</p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 border rounded-lg">
                     <h4 className="text-lg font-semibold mb-2">Thông tin thống kê</h4>
@@ -858,9 +846,9 @@ export default function StatisticsPage() {
                       <div className="flex justify-between">
                         <span>Loại:</span>
                         <Badge variant="outline">
-                          {statisticsDetailData.data.type === 'DAILY' ? 'Ngày' : 
-                           statisticsDetailData.data.type === 'WEEKLY' ? 'Tuần' : 
-                           statisticsDetailData.data.type === 'MONTHLY' ? 'Tháng' : 'Năm'}
+                          {statisticsDetailData.data.type === 'DAILY' ? 'Ngày' :
+                            statisticsDetailData.data.type === 'WEEKLY' ? 'Tuần' :
+                              statisticsDetailData.data.type === 'MONTHLY' ? 'Tháng' : 'Năm'}
                         </Badge>
                       </div>
                       <div className="flex justify-between">
@@ -873,7 +861,7 @@ export default function StatisticsPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="p-4 border rounded-lg">
                     <h4 className="text-lg font-semibold mb-2">Thông tin bổ sung</h4>
                     <div className="space-y-2 text-sm">

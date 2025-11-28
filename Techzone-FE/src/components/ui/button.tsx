@@ -10,11 +10,11 @@ const buttonVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: "bg-[#F56C14] text-maintext text-mainBackgroundV1 hover:bg-[#3EB1B9] font-semibold",
+				default: "bg-primary text-white hover:bg-[#0052CC] font-semibold",
 				destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-				outline: "border border-[#F56C14] !bg-[#F56C1420] !text-[#F56C14] font-semibold hover:bg-accent hover:text-accent-foreground",
-				secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-				ghost: "hover:bg-orange-50 hover:text-accent-foreground",
+				outline: "border border-primary !bg-[#0066CC20] !text-primary font-semibold hover:bg-primary/10 hover:text-primary",
+				secondary: "bg-secondary text-white hover:bg-[#0099D1] font-semibold",
+				ghost: "hover:bg-blue-50 hover:text-primary",
 				link: "text-primary underline-offset-4 hover:underline",
 			},
 			size: {
@@ -22,7 +22,7 @@ const buttonVariants = cva(
 				sm: "h-8 px-3 text-xs",
 				lg: "h-10 px-8",
 				icon: "h-9 w-9",
-			  },
+			},
 		},
 		defaultVariants: {
 			variant: "default",
@@ -33,7 +33,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-		VariantProps<typeof buttonVariants> {
+	VariantProps<typeof buttonVariants> {
 	asChild?: boolean;
 	ripple?: boolean;
 	rippleColor?: string;

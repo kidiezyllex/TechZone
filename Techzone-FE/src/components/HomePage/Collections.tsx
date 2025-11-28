@@ -8,24 +8,24 @@ import { mdiArrowRight } from '@mdi/js';
 const collectionsData = [
     {
         id: 1,
-        title: "Nam",
-        subtitle: "Thời trang",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
-        url: "/collections/men"
+        title: "Gaming",
+        subtitle: "Laptop & PC",
+        image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?ixlib=rb-4.0.3&auto=format&fit=crop&w=987&q=80",
+        url: "/collections/gaming"
     },
     {
         id: 2,
-        title: "Nữ",
-        subtitle: "Thời trang",
-        image: "https://plus.unsplash.com/premium_photo-1668896122554-2a4456667f65?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        url: "/collections/women"
+        title: "Văn phòng",
+        subtitle: "Laptop & PC",
+        image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=987&q=80",
+        url: "/collections/van-phong"
     },
     {
         id: 3,
-        title: "Trẻ em",
-        subtitle: "Thời trang",
-        image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=986&q=80",
-        url: "/collections/kids"
+        title: "Đồ họa",
+        subtitle: "Laptop & PC",
+        image: "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=986&q=80",
+        url: "/collections/do-hoa"
     }
 ];
 
@@ -37,7 +37,7 @@ const CollectionCard = ({ collection, animation }: {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
 
-    
+
     const getInitialAnimation = () => {
         switch (animation) {
             case "fadeInLeft":
@@ -68,14 +68,11 @@ const CollectionCard = ({ collection, animation }: {
             whileHover={{ y: -8 }}
             className="relative overflow-hidden h-[450px] group shadow-md hover:shadow-xl transition-shadow duration-500"
         >
-            {}
             <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110 z-0"
                 style={{ backgroundImage: `url(${collection.image})` }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20 group-hover:from-black/60 group-hover:via-black/30 group-hover:to-black/10 transition-colors duration-500 z-10" />
-
-            {}
             <div className="relative h-full flex flex-col justify-end p-4 z-20">
                 <AnimatePresence>
                     <motion.div
@@ -125,13 +122,10 @@ export const Collections = () => {
     const isHeaderInView = useInView(headerRef, { once: true });
 
     return (
-        <section className="py-20 bg-muted/30 dark:bg-gray-900/95 relative overflow-hidden">
-            {}
+        <section className="py-20 bg-muted relative overflow-hidden">
             <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
             <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary/5 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
-
             <div className="container mx-auto">
-                {}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8">
                     <motion.div
                         ref={headerRef}
@@ -161,24 +155,20 @@ export const Collections = () => {
                                     <Icon path={mdiArrowRight} size={0.7} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                 </Button>
                             </motion.div>
-                            
+
                         </div>
                         <h2 className="text-3xl md:text-4xl font-bold text-maintext dark:text-white">
-                            BỘ SƯU TẬP <span className="text-extra">THỜI TRANG</span>
+                            BỘ SƯU TẬP <span className="text-extra">CÔNG NGHỆ</span>
                         </h2>
                     </motion.div>
 
 
                 </div>
-
-                {}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <CollectionCard collection={collectionsData[0]} animation="fadeInLeft" />
                     <CollectionCard collection={collectionsData[1]} animation="fadeInUp" />
                     <CollectionCard collection={collectionsData[2]} animation="fadeInRight" />
                 </div>
-
-                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={isHeaderInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}

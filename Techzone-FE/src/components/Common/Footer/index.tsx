@@ -64,9 +64,7 @@ export const Footer = () => {
 
   return (
     <>
-      {}
       <footer className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 text-white">
-        {}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
             className="absolute -top-20 -left-20 w-60 h-60 bg-gradient-to-br from-primary/20 to-blue-400/20 rounded-full blur-3xl"
@@ -98,7 +96,6 @@ export const Footer = () => {
 
         <div className="relative z-10 pt-16 pb-8">
           <div className="container mx-auto px-6">
-            {}
             <div className="flex flex-col justify-center items-center sm:hidden">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -146,11 +143,8 @@ export const Footer = () => {
                 </div>
               </motion.div>
             </div>
-
-            {}
             <div className="hidden sm:block">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                {}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -168,12 +162,11 @@ export const Footer = () => {
                     />
                   </div>
                   <p className="text-gray-400 leading-relaxed">
-                    Điểm đến tin cậy cho những tín đồ thời trang. Chúng tôi mang đến những sản phẩm chất lượng cao
-                    với thiết kế độc đáo và phong cách hiện đại.
+                    Điểm đến tin cậy cho công nghệ. Chúng tôi mang đến laptop, linh kiện PC và phụ kiện công nghệ chất lượng cao
+                    với hiệu năng vượt trội và giá cả hợp lý.
                   </p>
                 </motion.div>
 
-                {}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -199,8 +192,6 @@ export const Footer = () => {
                     </div>
                   </div>
                 </motion.div>
-
-                {}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -222,7 +213,6 @@ export const Footer = () => {
                   </ul>
                 </motion.div>
 
-                {}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -245,7 +235,6 @@ export const Footer = () => {
                 </motion.div>
               </div>
 
-              {}
               <motion.div
                 className="flex justify-center items-center gap-4 mb-8"
                 initial={{ opacity: 0, y: 20 }}
@@ -274,7 +263,6 @@ export const Footer = () => {
                 ))}
               </motion.div>
 
-              {}
               <motion.div
                 className="border-t border-white/20 pt-8"
                 initial={{ opacity: 0 }}
@@ -295,7 +283,7 @@ export const Footer = () => {
                   </div>
 
                   <div className="flex items-center gap-2 text-gray-400 text-sm">
-                    <span>©2024 Shop Quần Áo. Made with</span>
+                    <span>©2025 Techzone. Made with</span>
                     <Icon path={mdiHeart} size={0.8} className="text-red-500" />
                     <span>in Vietnam</span>
                   </div>
@@ -303,7 +291,6 @@ export const Footer = () => {
               </motion.div>
             </div>
 
-            {}
             <motion.div
               className="flex justify-center items-center gap-3 sm:hidden"
               initial={{ opacity: 0, y: 20 }}
@@ -331,7 +318,6 @@ export const Footer = () => {
               ))}
             </motion.div>
 
-            {}
             <motion.div
               className="sm:hidden mt-8 pt-6 border-t border-white/20 text-center"
               initial={{ opacity: 0 }}
@@ -339,7 +325,7 @@ export const Footer = () => {
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               <p className="text-gray-400 text-xs flex items-center justify-center gap-2">
-                <span>©2024 Shop Quần Áo. Made with</span>
+                <span>©2025 Techzone. Made with</span>
                 <Icon path={mdiHeart} size={0.6} className="text-red-500" />
                 <span>in Vietnam</span>
               </p>

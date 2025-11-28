@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
  
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@mdi/react';
+import { mdiClose, mdiGiftOutline } from '@mdi/js';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export const NewsletterPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -84,7 +86,7 @@ export const NewsletterPopup = () => {
                     Nhận ngay ưu đãi 20%
                   </h3>
                   <p className="text-maintext mb-4">
-                    Đăng ký nhận thông tin để không bỏ lỡ các ưu đãi đặc biệt và sản phẩm mới nhất từ AllwearStudio.
+                    Đăng ký nhận thông tin để không bỏ lỡ các ưu đãi đặc biệt và sản phẩm công nghệ mới nhất từ Techzone.
                   </p>
                   
                   {success ? (

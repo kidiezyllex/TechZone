@@ -2,15 +2,17 @@ import React, { useState } from 'react';
  
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@mdi/react';
+import { mdiMagnify, mdiClose } from '@mdi/js';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 
 const searchResults = [
-  { id: 1, name: 'Prada Air Max 270', price: 3200000, category: 'Giày thể thao' },
-  { id: 2, name: 'Uniqlo Ultraboost 21', price: 4500000, category: 'Giày chạy bộ' },
-  { id: 3, name: 'Balenciaga RS-X³', price: 2800000, category: 'Giày thời trang' },
-  { id: 4, name: 'New Balance 990v5', price: 4200000, category: 'Giày thể thao' },
-  { id: 5, name: 'Chanel Chuck 70', price: 1800000, category: 'Giày thời trang' },
+  { id: 1, name: 'ASUS ROG Strix G15', price: 22990000, category: 'Laptop Gaming' },
+  { id: 2, name: 'MacBook Pro M3', price: 38990000, category: 'Laptop Đồ họa' },
+  { id: 3, name: 'RTX 4070 Super', price: 17490000, category: 'Card đồ họa' },
+  { id: 4, name: 'Dell XPS 15', price: 28990000, category: 'Laptop Văn phòng' },
+  { id: 5, name: 'Intel Core i7-13700K', price: 9990000, category: 'CPU' },
 ];
 
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '@mdi/react';
+import { mdiChevronDoubleDown, mdiCheckCircle, mdiTruck, mdiShieldCheck, mdiStore, mdiStar } from '@mdi/js';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay, Navigation } from 'swiper/modules';
 
@@ -20,7 +21,7 @@ const FeatureCard = ({ icon, title, description }: { icon: string; title: string
         transition={{ duration: 0.5 }}
     >
         <div className="flex items-center mb-5">
-            <div className="p-4 rounded-full bg-gradient-to-r from-[#2C8B3D] to-[#88C140] mr-5">
+            <div className="p-4 rounded-full bg-gradient-to-r from-primary to-secondary mr-5">
                 <Icon path={icon} size={1.5} className="text-white" />
             </div>
             <h3 className="text-xl font-bold text-maintext dark:text-white">{title}</h3>
@@ -32,14 +33,14 @@ const FeatureCard = ({ icon, title, description }: { icon: string; title: string
 
 const TeamMember = ({ name, id, role }: { name: string; id: string; role: string }) => (
     <motion.div
-        className=" bg-gradient-to-r from-[#2C8B3D80] to-[#88C14080] flex flex-col items-center justify-center gap-2 p-4 px-2 rounded-[6px] relative overflow-hidden cursor-pointer"
+        className=" bg-gradient-to-r from-primary/50 to-secondary/50 flex flex-col items-center justify-center gap-2 p-4 px-2 rounded-[6px] relative overflow-hidden cursor-pointer"
         whileHover={{ y: -10, scale: 1.02 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
     >
-        <div className="w-24 h-24 flex-shrink-0 rounded-full overflow-hidden bg-gradient-to-r from-[#2C8B3D] to-[#F2A024] p-1 relative z-[2]">
+        <div className="w-24 h-24 flex-shrink-0 rounded-full overflow-hidden bg-gradient-to-r from-primary to-extra p-1 relative z-[2]">
             <img
                 draggable="false"
                 src="/images/member-avatar.png" alt={name} width={200} height={200} className="object-contain h-full w-full rounded-full" />
@@ -91,48 +92,48 @@ const TestimonialCard = ({ rating, title, description, image, name, role }: {
 const testimonialData = [
     {
         rating: 5,
-        title: "Cửa hàng giày tốt nhất!",
-        description: "Tôi rất hài lòng với dịch vụ của AllwearStudio. Sản phẩm chất lượng, giao hàng nhanh chóng và nhân viên phục vụ rất nhiệt tình.",
+        title: "Cửa hàng laptop tốt nhất!",
+        description: "Tôi rất hài lòng với dịch vụ của Techzone. Laptop chất lượng, giao hàng nhanh chóng và nhân viên tư vấn rất nhiệt tình.",
         image: "https://templatekits.themewarrior.com/champz/wp-content/uploads/sites/45/elementor/thumbs/testimo-1-pjspfmypsvn72mv2l3cj4mhf4j0bl9ruu9jw5bh1eo.jpg",
-        name: "Tom Robertson",
-        role: "Cầu thủ bóng đá"
+        name: "Nguyễn Văn An",
+        role: "Game thủ chuyên nghiệp"
     },
     {
         rating: 5,
         title: "Trải nghiệm tuyệt vời!",
-        description: "Mua sắm tại AllwearStudio là một trải nghiệm tuyệt vời. Sản phẩm đa dạng, giá cả phải chăng và dịch vụ chăm sóc khách hàng rất tốt.",
+        description: "Mua sắm tại Techzone là một trải nghiệm tuyệt vời. Sản phẩm đa dạng, giá cả phải chăng và dịch vụ chăm sóc khách hàng rất tốt.",
         image: "https://templatekits.themewarrior.com/champz/wp-content/uploads/sites/45/elementor/thumbs/testimo-2-pjspfoue6jprpusca45s9m0cbar20nzbiiuv3ve928.jpg",
-        name: "Amelia Robinson",
-        role: "Cầu thủ bóng đá"
+        name: "Trần Thị Mai",
+        role: "Designer đồ họa"
     },
     {
         rating: 5,
         title: "Chất lượng đáng tin cậy",
-        description: "Những đôi giày tôi mua từ AllwearStudio luôn bền đẹp và thoải mái. Tôi đã giới thiệu cửa hàng cho tất cả bạn bè của mình.",
+        description: "Laptop tôi mua từ Techzone luôn bền và hiệu năng cao. Tôi đã giới thiệu cửa hàng cho tất cả bạn bè của mình.",
         image: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D",
-        name: "Michael Johnson",
-        role: "Huấn luyện viên thể thao"
+        name: "Lê Minh Tuấn",
+        role: "Nhân viên IT"
     },
     {
         rating: 4,
         title: "Dịch vụ tận tâm",
-        description: "Nhân viên tại AllwearStudio luôn nhiệt tình và am hiểu về sản phẩm. Họ giúp tôi chọn được đôi giày phù hợp nhất với nhu cầu của mình.",
+        description: "Nhân viên tại Techzone luôn nhiệt tình và am hiểu về sản phẩm. Họ giúp tôi chọn được laptop phù hợp nhất với nhu cầu của mình.",
         image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHx8MA%3D%3D",
-        name: "Sarah Miller",
-        role: "Người yêu thể thao"
+        name: "Hoàng Thị Lan",
+        role: "Sinh viên"
     },
     {
         rating: 5,
         title: "Giao hàng nhanh chóng",
         description: "Tôi đặt hàng online và nhận được sản phẩm chỉ sau 2 ngày. Đóng gói cẩn thận và sản phẩm đúng như mô tả trên website.",
         image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D",
-        name: "David Thompson",
+        name: "Phạm Văn Đức",
         role: "Doanh nhân"
     },
     {
         rating: 5,
         title: "Sản phẩm chính hãng",
-        description: "Rất yên tâm khi mua sắm tại AllwearStudio vì họ chỉ bán hàng chính hãng. Giá cả hợp lý và chất lượng đảm bảo.",
+        description: "Rất yên tâm khi mua sắm tại Techzone vì họ chỉ bán hàng chính hãng. Giá cả hợp lý và chất lượng đảm bảo.",
         image: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHVzZXJ8ZW58MHx8MHx8fDA%3D",
         name: "Emily Parker",
         role: "Người mẫu"
@@ -142,15 +143,14 @@ const testimonialData = [
 export const AboutUs = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-            {}
             <section className="relative h-[80vh] flex items-center overflow-hidden">
                 <div className="absolute inset-0">
                     <img
                         src="https://templatekits.themewarrior.com/champz/wp-content/uploads/sites/45/2022/01/hero-about.jpg"
-                        alt="AllwearStudio Banner"
+                        alt="Techzone Banner"
                         className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#2C8B3D]/50 via-[#88C140]/50 to-[#F2A024]/70"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/50 via-secondary/50 to-extra/70"></div>
                     <div className="absolute inset-0 bg-black/50"></div>
                 </div>
                 <div className="container mx-auto px-4 relative z-10">
@@ -160,7 +160,7 @@ export const AboutUs = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <motion.h1 
+                        <motion.h1
                             className="text-5xl md:text-7xl font-normal text-white mb-4 leading-tight"
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -170,19 +170,19 @@ export const AboutUs = () => {
                                 Khám Phá Thế Giới
                             </span>
                             <br />
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#F2A024] to-[#88C140] font-extrabold">
-                                AllwearStudio
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-extra to-secondary font-extrabold">
+                                Techzone
                             </span>
                         </motion.h1>
-                        <motion.p 
+                        <motion.p
                             className="text-xl md:text-2xl text-white/80 mb-10 font-light"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4, duration: 0.8 }}
                         >
-                            Nơi kết nối đam mê, nơi định nghĩa phong cách
+                            Điểm đến tin cậy cho công nghệ
                             <br />
-                            Chúng tôi mang đến những sản phẩm chất lượng cao với giá cả phải chăng
+                            Chúng tôi mang đến laptop, linh kiện PC và phụ kiện công nghệ chất lượng cao
                         </motion.p>
                         <motion.div
                             className="inline-block"
@@ -200,8 +200,6 @@ export const AboutUs = () => {
                     </motion.div>
                 </div>
             </section>
-
-            {}
             <section className="py-24">
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -213,10 +211,10 @@ export const AboutUs = () => {
                         >
                             <h2 className="text-4xl font-bold text-maintext dark:text-white mb-8">Câu chuyện của chúng tôi</h2>
                             <p className="text-lg text-maintext dark:text-maintext mb-8">
-                                AllwearStudio được thành lập với sứ mệnh mang đến cho khách hàng những sản phẩm giày chất lượng cao với giá cả phải chăng. Chúng tôi tin rằng mỗi người đều xứng đáng được sở hữu những đôi giày thoải mái và thời trang.
+                                Techzone được thành lập với sứ mệnh mang đến cho khách hàng laptop và linh kiện máy tính chất lượng cao với giá cả phải chăng. Chúng tôi tin rằng mỗi người đều xứng đáng được sở hữu những thiết bị công nghệ hiện đại và hiệu năng cao.
                             </p>
                             <p className="text-lg text-maintext dark:text-maintext mb-8">
-                                Với hơn 5 năm kinh nghiệm trong ngành, chúng tôi đã xây dựng được mạng lưới cung cấp sản phẩm rộng khắp, đảm bảo luôn có sẵn các mẫu giày mới nhất và phổ biến nhất trên thị trường.
+                                Với hơn 5 năm kinh nghiệm trong ngành, chúng tôi đã xây dựng được mạng lưới cung cấp sản phẩm rộng khắp, đảm bảo luôn có sẵn các mẫu laptop, linh kiện PC mới nhất và phổ biến nhất trên thị trường.
                             </p>
                             <div className="flex flex-wrap gap-4">
                                 <motion.div
@@ -224,7 +222,7 @@ export const AboutUs = () => {
                                     whileHover={{ x: 5 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                 >
-                                    <Icon path={mdiCheckCircle} size={1} className="text-[#2C8B3D] mr-3" />
+                                    <Icon path={mdiCheckCircle} size={1} className="text-primary mr-3" />
                                     <span className="text-lg text-maintext dark:text-gray-300">Sản phẩm chính hãng</span>
                                 </motion.div>
                                 <motion.div
@@ -232,7 +230,7 @@ export const AboutUs = () => {
                                     whileHover={{ x: 5 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                 >
-                                    <Icon path={mdiCheckCircle} size={1} className="text-[#2C8B3D] mr-3" />
+                                    <Icon path={mdiCheckCircle} size={1} className="text-primary mr-3" />
                                     <span className="text-lg text-maintext dark:text-gray-300">Giao hàng nhanh chóng</span>
                                 </motion.div>
                                 <motion.div
@@ -240,7 +238,7 @@ export const AboutUs = () => {
                                     whileHover={{ x: 5 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                 >
-                                    <Icon path={mdiCheckCircle} size={1} className="text-[#2C8B3D] mr-3" />
+                                    <Icon path={mdiCheckCircle} size={1} className="text-primary mr-3" />
                                     <span className="text-lg text-maintext dark:text-gray-300">Hỗ trợ 24/7</span>
                                 </motion.div>
                             </div>
@@ -252,19 +250,17 @@ export const AboutUs = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-[#2C8B3D] to-[#F2A024] opacity-20"></div>
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary to-extra opacity-20"></div>
                             <img
                                 src="https://templatekits.themewarrior.com/champz/wp-content/uploads/sites/45/elementor/thumbs/about-sect-pjs7cmwyucho7hy38akr4ok276qbcwtfp44ksgi1sa.jpg"
-                                alt="AllwearStudio Store"
+                                alt="Techzone Store"
                                 className="object-cover"
                             />
                         </motion.div>
                     </div>
                 </div>
             </section>
-
-            {}
-            <section className="py-24 bg-gradient-to-br from-[#2C8B3D]/10 to-[#F2A024]/10">
+            <section className="py-24 bg-gradient-to-br from-primary/10 to-extra/10">
                 <div className="container mx-auto px-4">
                     <motion.div
                         className="text-center mb-20"
@@ -273,9 +269,9 @@ export const AboutUs = () => {
                         viewport={{ once: true }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h2 className="text-4xl font-bold text-maintext dark:text-white mb-4">Tại sao chọn AllwearStudio?</h2>
+                        <h2 className="text-4xl font-bold text-maintext dark:text-white mb-4">Tại sao chọn Techzone?</h2>
                         <p className="text-lg text-maintext dark:text-maintext max-w-2xl mx-auto">
-                            Chúng tôi cam kết mang đến trải nghiệm mua sắm tốt nhất cho khách hàng với những dịch vụ và sản phẩm chất lượng cao.
+                            Chúng tôi cam kết mang đến trải nghiệm mua sắm tốt nhất cho khách hàng với những dịch vụ và sản phẩm công nghệ chất lượng cao.
                         </p>
                     </motion.div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -302,8 +298,6 @@ export const AboutUs = () => {
                     </div>
                 </div>
             </section>
-
-            {}
             <section id="team" className="py-24">
                 <div className="container mx-auto px-4">
                     <motion.div
@@ -315,7 +309,7 @@ export const AboutUs = () => {
                     >
                         <h2 className="text-4xl font-bold text-maintext dark:text-white mb-4">Đội ngũ của chúng tôi</h2>
                         <p className="text-lg text-maintext dark:text-maintext max-w-2xl mx-auto">
-                            AllwearStudio được vận hành bởi một đội ngũ trẻ trung, năng động và đầy nhiệt huyết. Chúng tôi luôn nỗ lực để mang đến những sản phẩm và dịch vụ tốt nhất cho khách hàng.
+                            Techzone được vận hành bởi một đội ngũ trẻ trung, năng động và đầy nhiệt huyết. Chúng tôi luôn nỗ lực để mang đến những sản phẩm công nghệ và dịch vụ tốt nhất cho khách hàng.
                         </p>
                     </motion.div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
@@ -327,9 +321,7 @@ export const AboutUs = () => {
                     </div>
                 </div>
             </section>
-
-            {}
-            <section className="py-24 bg-gradient-to-r from-[#2C8B3D] to-[#88C140]">
+            <section className="py-24 bg-gradient-to-r from-primary to-secondary">
                 <div className="container mx-auto px-4">
                     <motion.div
                         className="text-center mb-20"
@@ -383,12 +375,10 @@ export const AboutUs = () => {
                     </Swiper>
                 </div>
             </section>
-
-            {}
             <section className="py-24">
                 <div className="container mx-auto px-4">
                     <motion.div
-                        className="bg-gradient-to-r from-[#2C8B3D] via-[#88C140] to-[#F2A024] rounded-[6px] p-16 text-center relative overflow-hidden"
+                        className="bg-gradient-to-r from-primary via-secondary to-extra rounded-[6px] p-16 text-center relative overflow-hidden"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -397,14 +387,14 @@ export const AboutUs = () => {
                         <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-10"></div>
                         <h2 className="text-4xl font-bold text-white mb-8 relative z-10">Sẵn sàng khám phá bộ sưu tập của chúng tôi?</h2>
                         <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto relative z-10">
-                            Hãy ghé thăm cửa hàng của chúng tôi hoặc mua sắm trực tuyến để tìm cho mình đôi giày phù hợp nhất.
+                            Hãy ghé thăm cửa hàng của chúng tôi hoặc mua sắm trực tuyến để tìm cho mình laptop và linh kiện PC phù hợp nhất.
                         </p>
                         <motion.div
                             className="inline-block relative z-10"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         >
-                            <a href="/products" className="bg-white text-[#2C8B3D] font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 text-lg">
+                            <a href="/products" className="bg-white text-primary font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 text-lg">
                                 Xem sản phẩm ngay
                             </a>
                         </motion.div>

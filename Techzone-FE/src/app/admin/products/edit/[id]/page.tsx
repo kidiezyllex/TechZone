@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProductDetail, useUpdateProduct, useUpdateProductStatus, useUpdateProductStock, useUpdateProductImages } from '@/hooks/product';
 import { useUploadImage } from '@/hooks/upload';
@@ -142,7 +142,7 @@ export default function EditProductPage() {
 
   const handleRemoveImage = async (variantId: string, imageIndex: number) => {
     try {
-      
+
       const variant = productData?.data.variants.find(v => v.id === variantId);
       if (!variant) {
         toast.error('Không tìm thấy biến thể');
@@ -333,7 +333,7 @@ export default function EditProductPage() {
                         <SelectValue placeholder="Chọn thương hiệu" />
                       </SelectTrigger>
                       <SelectContent>
-                        {['Prada', 'Uniqlo', 'Balenciaga', 'Chanel', 'Louis Vuitton'].map(brand => (
+                        {['ASUS', 'Dell', 'HP', 'Lenovo', 'Apple', 'MSI', 'Acer', 'Samsung'].map(brand => (
                           <SelectItem key={brand} value={brand}>
                             {brand}
                           </SelectItem>
@@ -352,7 +352,7 @@ export default function EditProductPage() {
                         <SelectValue placeholder="Chọn danh mục" />
                       </SelectTrigger>
                       <SelectContent>
-                        {['Giày thể thao', 'Giày chạy bộ', 'Giày đá bóng', 'Giày thời trang'].map(category => (
+                        {['Laptop Gaming', 'Laptop Văn phòng', 'Laptop Đồ họa', 'Laptop Ultrabook', 'Linh kiện PC', 'Phụ kiện'].map(category => (
                           <SelectItem key={category} value={category}>
                             {category}
                           </SelectItem>
@@ -362,7 +362,7 @@ export default function EditProductPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="material">Chất liệu</Label>
+                    <Label htmlFor="material">Chất liệu/Vỏ máy</Label>
                     <Select
                       value={productUpdate.material || ''}
                       onValueChange={(value) => setProductUpdate({ ...productUpdate, material: value })}
@@ -371,7 +371,7 @@ export default function EditProductPage() {
                         <SelectValue placeholder="Chọn chất liệu" />
                       </SelectTrigger>
                       <SelectContent>
-                        {['Canvas', 'Da', 'Vải', 'Nhựa', 'Cao su'].map(material => (
+                        {['Nhôm', 'Nhựa cao cấp', 'Carbon Fiber', 'Magnesium Alloy', 'Kim loại'].map(material => (
                           <SelectItem key={material} value={material}>
                             {material}
                           </SelectItem>
@@ -433,143 +433,149 @@ export default function EditProductPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <AnimatePresence>
-                {product.variants.map((variant) => (
-                  <motion.div
-                    key={variant.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="border p-4 rounded-[6px]"
-                  >
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <h3 className="text-lg font-medium">
-                          {variant.colorId.name} - {variant.sizeId.name}
-                        </h3>
-                        <p className="text-sm text-maintext">
-                          Giá: {new Intl.NumberFormat('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND',
-                            maximumFractionDigits: 0,
-                          }).format(variant.price)}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div className="space-y-2">
-                        <Label htmlFor={`stock-${variant.id}`} className="text-maintext">Số lượng tồn kho</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            id={`stock-${variant.id}`}
-                            type="number"
-                            min="0"
-                            defaultValue={variant.stock}
-                            placeholder="Nhập số lượng tồn kho"
-                          />
-                          <Button
-                            type="button"
-                            onClick={(e) => {
-                              const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                              handleUpdateStock(variant.id, parseInt(input.value) || 0);
-                            }}
-                            disabled={updateProductStock.isPending}
-                          >
-                            {updateProductStock.isPending && updateProductStock.variables?.payload.variantUpdates[0]?.variantId === variant.id ? (
-                              <Icon path={mdiLoading} size={0.7} className="animate-spin" />
-                            ) : (
-                              'Cập nhật'
-                            )}
-                          </Button>
+                {product.variants.map((variant) => {
+                  const colorId = variant.colorId;
+                  const sizeId = variant.sizeId;
+                  const colorName = typeof colorId === 'object' && colorId !== null ? colorId.name : (colorId ? String(colorId) : '');
+                  const sizeName = typeof sizeId === 'object' && sizeId !== null ? sizeId.name : (sizeId ? String(sizeId) : '');
+                  return (
+                    <motion.div
+                      key={variant.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="border p-4 rounded-[6px]"
+                    >
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <h3 className="text-lg font-medium">
+                            {colorName} - {sizeName}
+                          </h3>
+                          <p className="text-sm text-maintext">
+                            Giá: {new Intl.NumberFormat('vi-VN', {
+                              style: 'currency',
+                              currency: 'VND',
+                              maximumFractionDigits: 0,
+                            }).format(variant.price)}
+                          </p>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <Label className="text-maintext">Hình ảnh sản phẩm</Label>
-                      <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="file"
-                            id={`file-upload-${variant.id}`}
-                            onChange={(e) => {
-                              const files = e.target.files;
-                              if (files && files.length > 0) {
-                                handleImageUpload(files[0], variant.id);
-                                e.target.value = '';
-                              }
-                            }}
-                            accept="image/*"
-                            className="hidden"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => document.getElementById(`file-upload-${variant.id}`)?.click()}
-                            disabled={uploading || updateProductImages.isPending}
-                            className="flex items-center gap-2"
-                          >
-                            {uploading ? (
-                              <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`stock-${variant.id}`} className="text-maintext">Số lượng tồn kho</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id={`stock-${variant.id}`}
+                              type="number"
+                              min="0"
+                              defaultValue={variant.stock}
+                              placeholder="Nhập số lượng tồn kho"
+                            />
+                            <Button
+                              type="button"
+                              onClick={(e) => {
+                                const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                                handleUpdateStock(variant.id, parseInt(input.value) || 0);
+                              }}
+                              disabled={updateProductStock.isPending}
+                            >
+                              {updateProductStock.isPending && updateProductStock.variables?.payload.variantUpdates[0]?.variantId === variant.id ? (
                                 <Icon path={mdiLoading} size={0.7} className="animate-spin" />
-                                Đang tải...
-                              </>
-                            ) : (
-                              <>
-                                <Icon path={mdiUpload} size={0.7} />
-                                Tải lên hình ảnh
-                              </>
-                            )}
-                          </Button>
+                              ) : (
+                                'Cập nhật'
+                              )}
+                            </Button>
+                          </div>
                         </div>
+                      </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-                          {variant.images.length > 0 ? (
-                            variant.images.map((image, index) => (
+                      <div className="space-y-2">
+                        <Label className="text-maintext">Hình ảnh sản phẩm</Label>
+                        <div className="flex flex-col gap-4">
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="file"
+                              id={`file-upload-${variant.id}`}
+                              onChange={(e) => {
+                                const files = e.target.files;
+                                if (files && files.length > 0) {
+                                  handleImageUpload(files[0], variant.id);
+                                  e.target.value = '';
+                                }
+                              }}
+                              accept="image/*"
+                              className="hidden"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => document.getElementById(`file-upload-${variant.id}`)?.click()}
+                              disabled={uploading || updateProductImages.isPending}
+                              className="flex items-center gap-2"
+                            >
+                              {uploading ? (
+                                <>
+                                  <Icon path={mdiLoading} size={0.7} className="animate-spin" />
+                                  Đang tải...
+                                </>
+                              ) : (
+                                <>
+                                  <Icon path={mdiUpload} size={0.7} />
+                                  Tải lên hình ảnh
+                                </>
+                              )}
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+                            {variant.images.length > 0 ? (
+                              variant.images.map((image, index) => (
+                                <div
+                                  key={index}
+                                  className="relative group rounded-[6px] overflow-hidden border border-gray-200"
+                                  style={{ aspectRatio: '1/1' }}
+                                >
+                                  <img
+                                    src={image.imageUrl as any}
+                                    alt={`Variant image ${index + 1}`}
+                                    className="object-cover w-full h-full"
+                                  />
+                                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="icon"
+                                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                      onClick={() => handleRemoveImage(variant.id, index)}
+                                      disabled={updateProductImages.isPending}
+                                    >
+                                      {updateProductImages.isPending ? (
+                                        <Icon path={mdiLoading} size={0.7} className="animate-spin" />
+                                      ) : (
+                                        <Icon path={mdiTrashCanOutline} size={0.7} />
+                                      )}
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))
+                            ) : (
                               <div
-                                key={index}
-                                className="relative group rounded-[6px] overflow-hidden border border-gray-200"
+                                className="flex items-center justify-center border border-dashed border-gray-300 rounded-[6px] text-maintext"
                                 style={{ aspectRatio: '1/1' }}
                               >
-                                <img
-                                  src={image.imageUrl as any}
-                                  alt={`Variant image ${index + 1}`}
-                                  className="object-cover w-full h-full"
-                                />
-                                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
-                                  <Button
-                                    type="button"
-                                    variant="destructive"
-                                    size="icon"
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                    onClick={() => handleRemoveImage(variant.id, index)}
-                                    disabled={updateProductImages.isPending}
-                                  >
-                                    {updateProductImages.isPending ? (
-                                      <Icon path={mdiLoading} size={0.7} className="animate-spin" />
-                                    ) : (
-                                      <Icon path={mdiTrashCanOutline} size={0.7} />
-                                    )}
-                                  </Button>
+                                <div className="flex flex-col items-center p-4">
+                                  <Icon path={mdiImageOutline} size={1.5} />
+                                  <p className="text-xs mt-2">Chưa có hình ảnh</p>
                                 </div>
                               </div>
-                            ))
-                          ) : (
-                            <div
-                              className="flex items-center justify-center border border-dashed border-gray-300 rounded-[6px] text-maintext"
-                              style={{ aspectRatio: '1/1' }}
-                            >
-                              <div className="flex flex-col items-center p-4">
-                                <Icon path={mdiImageOutline} size={1.5} />
-                                <p className="text-xs mt-2">Chưa có hình ảnh</p>
-                              </div>
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </CardContent>
           </Card>

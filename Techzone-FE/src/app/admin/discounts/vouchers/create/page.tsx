@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
- 
+
 import { useNavigate } from 'react-router-dom';
 import { useCreateVoucher } from '@/hooks/voucher';
 import { IVoucherCreate } from '@/interface/request/voucher';
@@ -38,13 +38,13 @@ export default function CreateVoucherPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     let parsedValue: string | number = value;
-    
+
     if (type === 'number') {
       parsedValue = value === '' ? 0 : parseFloat(value);
     }
-    
+
     setVoucher({ ...voucher, [name]: parsedValue });
-    
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -52,7 +52,7 @@ export default function CreateVoucherPage() {
 
   const handleSelectChange = (name: string, value: string) => {
     setVoucher({ ...voucher, [name]: value });
-    
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -60,8 +60,8 @@ export default function CreateVoucherPage() {
 
   const handleDateChange = (name: string, value: string) => {
     setVoucher({ ...voucher, [name]: value });
-    
-    
+
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -69,61 +69,61 @@ export default function CreateVoucherPage() {
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!voucher.code.trim()) {
       newErrors.code = 'Mã voucher không được để trống';
     } else if (!/^[A-Z0-9_-]{3,20}$/.test(voucher.code)) {
       newErrors.code = 'Mã voucher chỉ bao gồm chữ hoa, số, gạch dưới và gạch ngang (3-20 ký tự)';
     }
-    
+
     if (!voucher.name.trim()) {
       newErrors.name = 'Tên voucher không được để trống';
     }
-    
+
     if (voucher.discountValue <= 0) {
       newErrors.discountValue = 'Giá trị voucher phải lớn hơn 0';
     }
-    
+
     if (voucher.discountType === 'PERCENTAGE' && voucher.discountValue > 100) {
       newErrors.discountValue = 'Phần trăm giảm giá không được vượt quá 100%';
     }
-    
+
     if (voucher.quantity <= 0) {
       newErrors.quantity = 'Số lượng voucher phải lớn hơn 0';
     }
-    
+
     if (!voucher.startDate) {
       newErrors.startDate = 'Ngày bắt đầu không được để trống';
     }
-    
+
     if (!voucher.endDate) {
       newErrors.endDate = 'Ngày kết thúc không được để trống';
     }
-    
+
     if (voucher.startDate && voucher.endDate && new Date(voucher.startDate) > new Date(voucher.endDate)) {
       newErrors.endDate = 'Ngày kết thúc phải sau ngày bắt đầu';
     }
-    
+
     if ((voucher.minOrderValue ?? 0) < 0) {
       newErrors.minOrderValue = 'Giá trị đơn hàng tối thiểu không được âm';
     }
-    
+
     if (voucher.discountType === 'PERCENTAGE' && voucher.maxDiscount !== undefined && voucher.maxDiscount <= 0) {
       newErrors.maxDiscount = 'Giảm giá tối đa phải lớn hơn 0';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast.error('Vui lòng điền đầy đủ thông tin');
       return;
     }
-    
+
     try {
       await createVoucher.mutateAsync(voucher, {
         onSuccess: (response) => {
@@ -198,7 +198,7 @@ export default function CreateVoucherPage() {
                     name="code"
                     value={voucher.code}
                     onChange={handleInputChange}
-                    placeholder="VD: SUMMER2024"
+                    placeholder="VD: SUMMER2025"
                     className={errors.code ? 'border-red-500' : ''}
                   />
                   <Button type="button" variant="default" onClick={() => {
@@ -235,7 +235,7 @@ export default function CreateVoucherPage() {
                   name="name"
                   value={voucher.name}
                   onChange={handleInputChange}
-                  placeholder="VD: Đợt khuyến mãi mùa hè 2024"
+                  placeholder="VD: Đợt khuyến mãi mùa hè 2025"
                   className={errors.name ? 'border-red-500' : ''}
                 />
                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
@@ -283,8 +283,8 @@ export default function CreateVoucherPage() {
                 </div>
                 {errors.discountValue && <p className="text-red-500 text-sm">{errors.discountValue}</p>}
                 <p className="text-xs text-maintext">
-                  {voucher.discountType === 'PERCENTAGE' 
-                    ? 'Phần trăm giảm giá (0-100%)' 
+                  {voucher.discountType === 'PERCENTAGE'
+                    ? 'Phần trăm giảm giá (0-100%)'
                     : 'Số tiền giảm giá cố định'}
                 </p>
               </div>
@@ -412,7 +412,7 @@ export default function CreateVoucherPage() {
               >
                 Đặt lại
               </Button>
-              <Button 
+              <Button
                 type="submit"
                 disabled={createVoucher.isPending}
               >

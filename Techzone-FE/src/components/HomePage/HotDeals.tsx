@@ -74,7 +74,7 @@ export const HotDeals = () => {
               <div className="absolute z-10"></div>
               <img 
                 src="/images/hot-deals-product.png" 
-                alt="Giày thể thao phiên bản đặc biệt" 
+                alt="Laptop Gaming hiệu năng cao" 
                 width={700} 
                 height={700}
                 className="w-full h-auto object-cover"
@@ -87,18 +87,18 @@ export const HotDeals = () => {
             className="w-full md:w-1/2 flex flex-col space-y-4"
           >
             <motion.div>
-              <span className="inline-block px-4 py-1.5 mb-4 text-xs font-semibold tracking-wider text-[#F2A024] uppercase bg-amber-100 dark:bg-amber-900/30 rounded-full">
+              <span className="inline-block px-4 py-1.5 mb-4 text-xs font-semibold tracking-wider text-extra uppercase bg-extra/10 dark:bg-extra/20 rounded-full">
                 Ưu đãi hấp dẫn
               </span>
-              <h2 className="text-3xl md:text-4xl font-bold uppercase mb-2 bg-gradient-to-r from-[#2C8B3D] via-[#88C140] to-[#F2A024] bg-clip-text text-transparent drop-shadow-sm">
-                Giày Thể Thao Phiên Bản Giới Hạn
+              <h2 className="text-3xl md:text-4xl font-bold uppercase mb-2 bg-gradient-to-r from-primary via-secondary to-extra bg-clip-text text-transparent drop-shadow-sm">
+                Laptop Gaming Hiệu Năng Cao
               </h2>
             </motion.div>
             
             <motion.div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-primary">1.300.000₫</span>
-                <span className="text-lg text-maintext line-through">3.000.000₫</span>
+                <span className="text-2xl font-bold text-primary">18.990.000₫</span>
+                <span className="text-lg text-maintext line-through">24.990.000₫</span>
               </div>
               
               <div className="flex items-center">
@@ -113,13 +113,13 @@ export const HotDeals = () => {
             
             <motion.ul className="space-y-4">
               {[
-                "Công nghệ đệm khí tiên tiến cho cảm giác thoải mái tối đa",
-                "Thiết kế thể thao hiện đại, phù hợp với mọi phong cách",
-                "Chất liệu bền bỉ, thoáng khí và chống thấm nước",
-                "Đế cao su cao cấp chống trơn trượt hiệu quả"
+                "CPU Intel Core i7-13700H hiệu năng mạnh mẽ",
+                "Card đồ họa RTX 4060 8GB cho gaming mượt mà",
+                "Màn hình 15.6 inch 144Hz Full HD sắc nét",
+                "RAM 16GB DDR5 và SSD 512GB tốc độ cao"
               ].map((text, index) => (
                 <li key={index} className="flex items-start">
-                  <Icon path={mdiChevronDoubleRight} size={0.7} className="mt-1 mr-2 text-[#88C140]" />
+                  <Icon path={mdiChevronDoubleRight} size={0.7} className="mt-1 mr-2 text-secondary" />
                   <span className="text-maintext dark:text-gray-300 text-sm">{text}</span>
                 </li>
               ))}
@@ -128,13 +128,13 @@ export const HotDeals = () => {
             <motion.p
               className="text-maintext dark:text-maintext text-sm leading-relaxed"
             >
-              Giày thể thao phiên bản giới hạn với thiết kế độc đáo và công nghệ tiên tiến. Sự kết hợp hoàn hảo giữa phong cách hiện đại và hiệu suất cao cấp mang đến trải nghiệm thoải mái nhất cho người sử dụng.
+              Laptop gaming hiệu năng cao với thiết kế mạnh mẽ và công nghệ tiên tiến. Sự kết hợp hoàn hảo giữa hiệu năng vượt trội và thiết kế đẳng cấp mang đến trải nghiệm gaming tuyệt vời nhất.
             </motion.p>
             
             <motion.div
               className="flex flex-wrap gap-4 items-center mt-2"
             >
-              <InteractiveHoverButton className="uppercase font-medium rounded-none bg-gradient-to-r from-green-500 to-green-600 text-white px-16">
+              <InteractiveHoverButton className="uppercase font-medium rounded-none bg-gradient-to-r from-primary to-secondary text-white px-16">
                 Mua ngay
               </InteractiveHoverButton>
               
@@ -142,7 +142,7 @@ export const HotDeals = () => {
                 href="#"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center w-10 h-10 rounded-none bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:shadow-green-500/30 transition-all duration-300"
+                className="flex items-center justify-center w-10 h-10 rounded-none bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
               >
                 <Icon path={mdiWhatsapp} size={1} />
               </motion.a>

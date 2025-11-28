@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,7 +71,7 @@ export default function CreateReturnPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const createReturn = useCreateReturn();
   const navigate = useNavigate();
 
@@ -85,7 +85,7 @@ export default function CreateReturnPage() {
       id: '1',
       code: 'ORD001',
       totalAmount: 1500000,
-      createdAt: '2024-01-15T10:00:00Z',
+      createdAt: '2025-01-15T10:00:00Z',
       status: 'HOAN_THANH',
       items: [
         {
@@ -110,7 +110,7 @@ export default function CreateReturnPage() {
   ];
 
   useEffect(() => {
-    
+
     if (customerSearch.trim()) {
       const filtered = mockCustomers.filter(customer =>
         customer.fullName.toLowerCase().includes(customerSearch.toLowerCase()) ||
@@ -124,7 +124,7 @@ export default function CreateReturnPage() {
   }, [customerSearch]);
 
   useEffect(() => {
-    
+
     if (selectedCustomer) {
       setOrders(mockOrders);
     } else {
@@ -170,30 +170,30 @@ export default function CreateReturnPage() {
       };
       setSelectedItems(prev => [...prev, newItem]);
     } else {
-      setSelectedItems(prev => prev.filter(selected => 
-        !(selected.product === item.product.id && 
-          selected.variant.colorId === item.variant.colorId && 
+      setSelectedItems(prev => prev.filter(selected =>
+        !(selected.product === item.product.id &&
+          selected.variant.colorId === item.variant.colorId &&
           selected.variant.sizeId === item.variant.sizeId)
       ));
     }
   };
 
   const handleQuantityChange = (index: number, newQuantity: number) => {
-    setSelectedItems(prev => prev.map((item, i) => 
+    setSelectedItems(prev => prev.map((item, i) =>
       i === index ? { ...item, quantity: Math.max(1, Math.min(newQuantity, item.maxQuantity)) } : item
     ));
   };
 
   const handleReasonChange = (index: number, reason: string) => {
-    setSelectedItems(prev => prev.map((item, i) => 
+    setSelectedItems(prev => prev.map((item, i) =>
       i === index ? { ...item, reason } : item
     ));
   };
 
   const isItemSelected = (item: OrderItem) => {
-    return selectedItems.some(selected => 
-      selected.product === item.product.id && 
-      selected.variant.colorId === item.variant.colorId && 
+    return selectedItems.some(selected =>
+      selected.product === item.product.id &&
+      selected.variant.colorId === item.variant.colorId &&
       selected.variant.sizeId === item.variant.sizeId
     );
   };
@@ -264,8 +264,6 @@ export default function CreateReturnPage() {
           </Button>
         </a>
       </div>
-
-      {}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -294,7 +292,7 @@ export default function CreateReturnPage() {
                   onChange={(e) => setCustomerSearch(e.target.value)}
                 />
               </div>
-              
+
               {customers.length > 0 && (
                 <div className="border rounded-lg max-h-60 overflow-y-auto">
                   {customers.map((customer) => (
@@ -314,8 +312,6 @@ export default function CreateReturnPage() {
           )}
         </CardContent>
       </Card>
-
-      {}
       {selectedCustomer && (
         <Card>
           <CardHeader>
@@ -367,8 +363,6 @@ export default function CreateReturnPage() {
           </CardContent>
         </Card>
       )}
-
-      {}
       {selectedOrder && (
         <Card>
           <CardHeader>
@@ -401,7 +395,7 @@ export default function CreateReturnPage() {
                       </p>
                     </div>
                   </div>
-                  
+
                   {isItemSelected(item) && (
                     <div className="mt-4 space-y-3 pl-8">
                       <div className="flex items-center gap-4">
@@ -412,9 +406,9 @@ export default function CreateReturnPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => {
-                                const selectedIndex = selectedItems.findIndex(selected => 
-                                  selected.product === item.product.id && 
-                                  selected.variant.colorId === item.variant.colorId && 
+                                const selectedIndex = selectedItems.findIndex(selected =>
+                                  selected.product === item.product.id &&
+                                  selected.variant.colorId === item.variant.colorId &&
                                   selected.variant.sizeId === item.variant.sizeId
                                 );
                                 if (selectedIndex !== -1) {
@@ -428,15 +422,15 @@ export default function CreateReturnPage() {
                               type="number"
                               min="1"
                               max={item.quantity}
-                              value={selectedItems.find(selected => 
-                                selected.product === item.product.id && 
-                                selected.variant.colorId === item.variant.colorId && 
+                              value={selectedItems.find(selected =>
+                                selected.product === item.product.id &&
+                                selected.variant.colorId === item.variant.colorId &&
                                 selected.variant.sizeId === item.variant.sizeId
                               )?.quantity || 1}
                               onChange={(e) => {
-                                const selectedIndex = selectedItems.findIndex(selected => 
-                                  selected.product === item.product.id && 
-                                  selected.variant.colorId === item.variant.colorId && 
+                                const selectedIndex = selectedItems.findIndex(selected =>
+                                  selected.product === item.product.id &&
+                                  selected.variant.colorId === item.variant.colorId &&
                                   selected.variant.sizeId === item.variant.sizeId
                                 );
                                 if (selectedIndex !== -1) {
@@ -449,9 +443,9 @@ export default function CreateReturnPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => {
-                                const selectedIndex = selectedItems.findIndex(selected => 
-                                  selected.product === item.product.id && 
-                                  selected.variant.colorId === item.variant.colorId && 
+                                const selectedIndex = selectedItems.findIndex(selected =>
+                                  selected.product === item.product.id &&
+                                  selected.variant.colorId === item.variant.colorId &&
                                   selected.variant.sizeId === item.variant.sizeId
                                 );
                                 if (selectedIndex !== -1) {
@@ -464,20 +458,20 @@ export default function CreateReturnPage() {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div>
                         <label className="text-sm font-medium mb-1 block">Lý do trả hàng *</label>
                         <Textarea
                           placeholder="Nhập lý do trả hàng..."
-                          value={selectedItems.find(selected => 
-                            selected.product === item.product.id && 
-                            selected.variant.colorId === item.variant.colorId && 
+                          value={selectedItems.find(selected =>
+                            selected.product === item.product.id &&
+                            selected.variant.colorId === item.variant.colorId &&
                             selected.variant.sizeId === item.variant.sizeId
                           )?.reason || ''}
                           onChange={(e) => {
-                            const selectedIndex = selectedItems.findIndex(selected => 
-                              selected.product === item.product.id && 
-                              selected.variant.colorId === item.variant.colorId && 
+                            const selectedIndex = selectedItems.findIndex(selected =>
+                              selected.product === item.product.id &&
+                              selected.variant.colorId === item.variant.colorId &&
                               selected.variant.sizeId === item.variant.sizeId
                             );
                             if (selectedIndex !== -1) {
@@ -495,8 +489,6 @@ export default function CreateReturnPage() {
           </CardContent>
         </Card>
       )}
-
-      {}
       {selectedItems.length > 0 && (
         <Card>
           <CardHeader>
@@ -514,12 +506,12 @@ export default function CreateReturnPage() {
               </TableHeader>
               <TableBody>
                 {selectedItems.map((item, index) => {
-                  const orderItem = selectedOrder?.items.find(oi => 
+                  const orderItem = selectedOrder?.items.find(oi =>
                     oi.product.id === item.product &&
                     oi.variant.colorId === item.variant.colorId &&
                     oi.variant.sizeId === item.variant.sizeId
                   );
-                  
+
                   return (
                     <TableRow key={index}>
                       <TableCell>
@@ -538,7 +530,7 @@ export default function CreateReturnPage() {
                 })}
               </TableBody>
             </Table>
-            
+
             <div className="border-t pt-4 mt-4">
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span>Tổng tiền hoàn trả:</span>
@@ -548,16 +540,14 @@ export default function CreateReturnPage() {
           </CardContent>
         </Card>
       )}
-
-      {}
       <div className="flex justify-end gap-4">
         <a href="/admin/returns">
           <Button variant="outline" disabled={isSubmitting}>
             Hủy
           </Button>
         </a>
-        <Button 
-          onClick={handleSubmit} 
+        <Button
+          onClick={handleSubmit}
           disabled={isSubmitting || !selectedCustomer || !selectedOrder || selectedItems.length === 0}
         >
           {isSubmitting ? 'Đang tạo...' : 'Tạo yêu cầu trả hàng'}

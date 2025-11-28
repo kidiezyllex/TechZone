@@ -8,113 +8,113 @@ import { InteractiveHoverButton } from '../Common/InteractiveHoverButton';
 const bestSellerData = [
   {
     id: 1,
-    name: "DSW Original Denim Pants",
-    price: 550000,
-    originalPrice: 650000,
-    discount: 15,
-    image: "//bizweb.dktcdn.net/thumb/large/100/287/440/products/quan-jean-ong-rong-nam-nu-davies-hoa-tiet-theu-chu-chi-noi-dam-chat-hiphop-mau-den-1-e12f0f46-c931-48df-810a-32d6801dc9b9.jpg?v=1749181163443",
+    name: "ASUS ROG Strix G15",
+    price: 22990000,
+    originalPrice: 25990000,
+    discount: 12,
+    image: "https://m.media-amazon.com/images/I/61LlFyN+B3L._AC_SL1200_.jpg",
     rating: 5,
-    slug: "quan-jean-ong-rong-theu-chu-chi-noi-d-q8",
-    brand: "DAVIES",
-    colors: ["Đen", "Xanh đen"],
+    slug: "asus-rog-strix-g15",
+    brand: "ASUS",
+    colors: ["Đen", "Xám"],
     isBestSeller: true,
     stock: 8
   },
   {
     id: 2,
-    name: "DSW Prickly Tee",
-    price: 350000,
-    originalPrice: 420000,
-    discount: 17,
-    image: "//bizweb.dktcdn.net/thumb/large/100/287/440/products/ao-phong-rong-nam-nu-in-chu-davies-hoa-tiet-gai-mau-den-phong-cach-hiphop-duong-pho-tay-lo-1.jpg?v=1748918666657",
+    name: "MacBook Pro M3 14 inch",
+    price: 38990000,
+    originalPrice: 42990000,
+    discount: 9,
+    image: "https://m.media-amazon.com/images/I/51ZqjuoQFWL._AC_SL1200_.jpg",
     rating: 5,
-    slug: "ao-phong-rong-nam-nu-in-chu-hoa-tiet-gai-d-t33",
-    brand: "DAVIES",
-    colors: ["Đen", "Trắng"],
+    slug: "macbook-pro-m3-14",
+    brand: "Apple",
+    colors: ["Bạc", "Xám"],
     isBestSeller: true,
     stock: 12
   },
   {
     id: 3,
-    name: "DSW Dark Whisper Tee",
-    price: 350000,
-    originalPrice: 420000,
-    discount: 17,
-    image: "//bizweb.dktcdn.net/thumb/large/100/287/440/products/ao-thun-hiphop-duong-pho-nam-nu-davies-in-hoa-tiet-chu-cach-dieu-form-rong-tay-ngan-mau-den-1-86db8e6b-431a-4755-b19e-fc812362bff7.jpg?v=1748600994207",
+    name: "RTX 4070 Super 12GB",
+    price: 17490000,
+    originalPrice: 18990000,
+    discount: 8,
+    image: "https://m.media-amazon.com/images/I/81PChIf5pwL._AC_SL1500_.jpg",
     rating: 5,
-    slug: "ao-thun-hiphop-duong-pho-hinh-in-chu-cach-dieu-d-t32",
-    brand: "DAVIES",
-    colors: ["Đen", "Trắng"],
+    slug: "rtx-4070-super-12gb",
+    brand: "NVIDIA",
+    colors: ["Đen"],
     isBestSeller: true,
     stock: 10
   },
   {
     id: 4,
-    name: "DSW Spark Tee",
-    price: 350000,
-    originalPrice: 420000,
-    discount: 17,
-    image: "//bizweb.dktcdn.net/thumb/large/100/287/440/products/ao-thun-form-rong-tay-ngan-in-chu-davies-hoa-tiet-sam-set-tia-lua-loang-mau-dam-chat-hiphop-mau-den-1.jpg?v=1748592652377",
+    name: "Dell XPS 15 OLED",
+    price: 28990000,
+    originalPrice: 32990000,
+    discount: 12,
+    image: "https://m.media-amazon.com/images/I/61XuP8qrI+L._AC_SL1500_.jpg",
     rating: 5,
-    slug: "ao-thun-form-rong-hoa-tiet-sam-set-tia-lua-loang-mau-d-t31",
-    brand: "DAVIES",
-    colors: ["Đen", "Cam", "Vàng"],
+    slug: "dell-xps-15-oled",
+    brand: "Dell",
+    colors: ["Bạc", "Đen"],
     isBestSeller: true,
     stock: 15
   },
   {
     id: 5,
-    name: "DSW Young Vietnamese Tee",
-    price: 350000,
-    originalPrice: 420000,
+    name: "Intel Core i7-13700K",
+    price: 9990000,
+    originalPrice: 11990000,
     discount: 17,
-    image: "//bizweb.dktcdn.net/thumb/large/100/287/440/products/ao-thun-nam-nu-form-rong-davies-hoa-tiet-phoi-chu-mau-tuong-phan-phong-cach-hiphop-mau-den-1-f31adeaa-9e80-4c3f-a483-0b0b0719dc6d.jpg?v=1748593325673",
+    image: "https://m.media-amazon.com/images/I/81PChIf5pwL._AC_SL1500_.jpg",
     rating: 5,
-    slug: "ao-thun-nam-nu-form-rong-hoa-tiet-phoi-chu-tuong-phan-d-t30",
-    brand: "DAVIES",
-    colors: ["Đen", "Trắng"],
+    slug: "intel-core-i7-13700k",
+    brand: "Intel",
+    colors: ["Bạc"],
     isBestSeller: true,
     stock: 18
   },
   {
     id: 6,
-    name: "DSW Hunter Hooded Bomber Jacket",
-    price: 585000,
-    originalPrice: 720000,
-    discount: 19,
-    image: "//bizweb.dktcdn.net/thumb/large/100/287/440/products/ao-khoac-bomber-co-mu-phoi-long-vu-local-brand-davies-6.jpg?v=1748075564577",
-    rating: 5,
-    slug: "ao-khoac-bomber-co-mu-hunter-hooded-jacket",
-    brand: "DAVIES",
-    colors: ["Đen", "Xanh rêu"],
+    name: "HP Pavilion 15",
+    price: 14990000,
+    originalPrice: 17990000,
+    discount: 17,
+    image: "https://m.media-amazon.com/images/I/51ZqjuoQFWL._AC_SL1200_.jpg",
+    rating: 4,
+    slug: "hp-pavilion-15",
+    brand: "HP",
+    colors: ["Bạc", "Đen"],
     isBestSeller: true,
     stock: 6
   },
   {
     id: 7,
-    name: "DSW Fleece Zip-Up Jacket",
-    price: 490000,
-    originalPrice: 590000,
-    discount: 17,
-    image: "//bizweb.dktcdn.net/thumb/large/100/287/440/products/ao-khoac-long-cuu-hoa-tiet-camo-davies-co-tru-phoi-vien-kem-lot-du-logo-su-hiphop-zipper-1.jpg?v=1747987600177",
+    name: "Samsung 980 PRO 1TB",
+    price: 2990000,
+    originalPrice: 3490000,
+    discount: 14,
+    image: "https://m.media-amazon.com/images/I/81PChIf5pwL._AC_SL1500_.jpg",
     rating: 4,
-    slug: "ao-khoac-long-cuu-hoa-tiet-camo-co-tru-d-ak16",
-    brand: "DAVIES",
-    colors: ["Xanh rêu", "Đen", "Kem"],
+    slug: "samsung-980-pro-1tb",
+    brand: "Samsung",
+    colors: ["Đen"],
     isBestSeller: false,
     stock: 8
   },
   {
     id: 8,
-    name: "DSW Davies Crew Puffer Vest",
-    price: 475000,
-    originalPrice: 570000,
-    discount: 17,
-    image: "//bizweb.dktcdn.net/thumb/large/100/287/440/products/ao-khoac-gile-nam-nu-hiphop-davies-hoa-tiet-chan-phao-khoa-keo-logo-inox-in-chu-1.jpg?v=1747717003593",
+    name: "Corsair Vengeance 32GB",
+    price: 3990000,
+    originalPrice: 4490000,
+    discount: 11,
+    image: "https://m.media-amazon.com/images/I/81PChIf5pwL._AC_SL1500_.jpg",
     rating: 4,
-    slug: "ao-khoac-gile-nam-nu-hiphop-chan-phao-d-ak15",
-    brand: "DAVIES",
-    colors: ["Đen", "Xám"],
+    slug: "corsair-vengeance-32gb",
+    brand: "Corsair",
+    colors: ["Đen", "Trắng"],
     isBestSeller: false,
     stock: 12
   }
@@ -136,10 +136,10 @@ const RatingStars = ({ rating }: { rating: number }) => {
   return (
     <div className="flex gap-1 items-center">
       {[...Array(5)].map((_, i) => (
-        <Icon 
-          key={i} 
-          path={mdiStar} 
-          size={0.7} 
+        <Icon
+          key={i}
+          path={mdiStar}
+          size={0.7}
           className={i < rating ? "text-amber-500" : "text-gray-300"}
         />
       ))}
@@ -151,7 +151,7 @@ const RatingStars = ({ rating }: { rating: number }) => {
 
 const DiscountBadge = ({ discount }: { discount: number }) => {
   if (!discount) return null;
-  
+
   return (
     <div className="absolute top-3 left-3 z-10 px-2 py-1 rounded-none font-medium text-xs text-white bg-gradient-to-r from-red-500 to-amber-500">
       -{discount}%
@@ -162,9 +162,9 @@ const DiscountBadge = ({ discount }: { discount: number }) => {
 
 const BestSellerBadge = ({ isBestSeller }: { isBestSeller: boolean }) => {
   if (!isBestSeller) return null;
-  
+
   return (
-    <div className="absolute top-3 left-3 z-10 px-2 py-1 rounded-none font-medium text-xs text-white bg-gradient-to-r from-[#2C8B3D] to-[#88C140]">
+    <div className="absolute top-3 left-3 z-10 px-2 py-1 rounded-none font-medium text-xs text-white bg-gradient-to-r from-primary to-secondary">
       Best Seller
     </div>
   );
@@ -176,20 +176,20 @@ const ColorOptions = ({ colors }: { colors: string[] }) => {
     <div className="flex gap-1 items-center">
       {colors.map((color, i) => (
         <div key={i} className="group relative">
-          <div 
-            className="w-4 h-4 rounded-full border cursor-pointer hover:scale-110 transition-transform duration-200" 
-            style={{ 
-              backgroundColor: color === 'Đen' ? 'black' : 
-                           color === 'Trắng' ? 'white' : 
-                           color === 'Xanh' ? '#3B82F6' : 
-                           color === 'Xanh đen' ? '#1e293b' :
-                           color === 'Đỏ' ? '#EF4444' :
-                           color === 'Hồng' ? '#EC4899' :
-                           color === 'Xám' ? '#6B7280' :
-                           color === 'Cam' ? '#F97316' :
-                           color === 'Vàng' ? '#EAB308' :
-                           color === 'Kem' ? '#FEF3C7' :
-                           color === 'Xanh rêu' ? '#4D7C0F' : '#9CA3AF'
+          <div
+            className="w-4 h-4 rounded-full border cursor-pointer hover:scale-110 transition-transform duration-200"
+            style={{
+              backgroundColor: color === 'Đen' ? 'black' :
+                color === 'Trắng' ? 'white' :
+                  color === 'Xanh' ? '#3B82F6' :
+                    color === 'Xanh đen' ? '#1e293b' :
+                      color === 'Đỏ' ? '#EF4444' :
+                        color === 'Hồng' ? '#EC4899' :
+                          color === 'Xám' ? '#6B7280' :
+                            color === 'Cam' ? '#F97316' :
+                              color === 'Vàng' ? '#EAB308' :
+                                color === 'Kem' ? '#FEF3C7' :
+                                  color === 'Xanh rêu' ? '#4D7C0F' : '#9CA3AF'
             }}
           />
         </div>
@@ -203,10 +203,10 @@ const ProductCard = ({ product, index }: { product: typeof bestSellerData[0], in
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
 
-  
+
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { 
-      style: 'currency', 
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
       currency: 'VND',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
@@ -214,7 +214,7 @@ const ProductCard = ({ product, index }: { product: typeof bestSellerData[0], in
   };
 
   return (
-    <motion.div 
+    <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 50 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
@@ -225,10 +225,10 @@ const ProductCard = ({ product, index }: { product: typeof bestSellerData[0], in
         <div className="relative aspect-square w-full overflow-hidden">
           {product.discount > 0 && <DiscountBadge discount={product.discount} />}
           {product.isBestSeller && <BestSellerBadge isBestSeller={product.isBestSeller} />}
-          
+
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
-          
-          <img 
+
+          <img
             src={product.image.startsWith('//') ? `https:${product.image}` : product.image}
             alt={product.name}
             className="object-cover transition-transform duration-700 group-hover:scale-110 w-full h-full"
@@ -239,27 +239,26 @@ const ProductCard = ({ product, index }: { product: typeof bestSellerData[0], in
             }}
           />
         </div>
-        {}
         <div className="absolute bottom-0 left-0 right-0 p-3 flex justify-center items-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-20">
-          <Button 
-            size="sm" 
-            variant="secondary" 
+          <Button
+            size="sm"
+            variant="secondary"
             className="rounded-full w-9 h-9 bg-white/80 hover:bg-white shadow-md backdrop-blur-sm flex items-center justify-center"
             title="Xem nhanh"
           >
             <Icon path={mdiEye} size={0.7} className="text-maintext" />
           </Button>
-          <Button 
-            size="sm" 
-            variant="secondary" 
+          <Button
+            size="sm"
+            variant="secondary"
             className="rounded-full w-9 h-9 bg-white/80 hover:bg-white shadow-md backdrop-blur-sm flex items-center justify-center"
             title="Yêu thích"
           >
             <Icon path={mdiHeartOutline} size={0.7} className="text-maintext" />
           </Button>
-          <Button 
-            size="sm" 
-            variant="secondary" 
+          <Button
+            size="sm"
+            variant="secondary"
             className="rounded-full w-9 h-9 bg-white/80 hover:bg-white shadow-md backdrop-blur-sm flex items-center justify-center"
             title="Thêm vào giỏ hàng"
           >
@@ -267,12 +266,12 @@ const ProductCard = ({ product, index }: { product: typeof bestSellerData[0], in
           </Button>
         </div>
       </a>
-      
+
       <div className="p-4 pb-0 flex flex-col gap-1">
-        <div className="text-xs font-medium text-[#2C8B3D] uppercase tracking-wider">
+        <div className="text-xs font-medium text-primary uppercase tracking-wider">
           {product.brand}
         </div>
-        <h3 className="text-maintext dark:text-white font-semibold text-lg truncate group-hover:text-[#2C8B3D] transition-colors duration-200">
+        <h3 className="text-maintext dark:text-white font-semibold text-lg truncate group-hover:text-primary transition-colors duration-200">
           <a href={`/products/${product.slug}`}>
             {product.name}
           </a>
@@ -281,7 +280,7 @@ const ProductCard = ({ product, index }: { product: typeof bestSellerData[0], in
           <RatingStars rating={product.rating} />
         </div>
         <div className="flex items-baseline gap-2 mb-1">
-          <span className="font-bold text-lg bg-gradient-to-r from-[#2C8B3D] to-[#88C140] bg-clip-text text-transparent">
+          <span className="font-bold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             {formatPrice(product.price)}
           </span>
           {product.discount > 0 && (
@@ -291,18 +290,18 @@ const ProductCard = ({ product, index }: { product: typeof bestSellerData[0], in
           )}
         </div>
         <div className='flex gap-1 items-center justify-between mb-4'>
-            <ColorOptions colors={product.colors} />
-        
-        {product.stock <= 10 && (
-          <div className="text-xs text-orange-600 font-medium">
-            (Chỉ còn {product.stock} sản phẩm)
-          </div>
-        )}</div>
+          <ColorOptions colors={product.colors} />
+
+          {product.stock <= 10 && (
+            <div className="text-xs text-orange-600 font-medium">
+              (Chỉ còn {product.stock} sản phẩm)
+            </div>
+          )}</div>
       </div>
       <div className="flex w-full flex-col items-center justify-end flex-1">
-       <InteractiveHoverButton className='rounded-none uppercase font-normal w-fit'>
-        Xem chi tiết
-        <Icon path={mdiArrowRight} size={0.7} className="ml-2 group-hover:translate-x-1 transition-transform" />
+        <InteractiveHoverButton className='rounded-none uppercase font-normal w-fit'>
+          Xem chi tiết
+          <Icon path={mdiArrowRight} size={0.7} className="ml-2 group-hover:translate-x-1 transition-transform" />
         </InteractiveHoverButton>
       </div>
     </motion.div>
@@ -315,8 +314,8 @@ export const BestSeller = () => {
 
   const headerVariants = {
     hidden: { opacity: 0, y: -20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: { duration: 0.6, ease: 'easeOut' }
     }
@@ -325,40 +324,38 @@ export const BestSeller = () => {
   return (
     <section className="py-20 pt-12 bg-[#FAFAFB] dark:bg-gray-900">
       <div className="container mx-auto">
-        {}
         <motion.div
           ref={headerRef}
           initial="hidden"
           animate={isHeaderInView ? "visible" : "hidden"}
           className="text-center mb-12"
         >
-          <span className="inline-block px-4 py-1.5 mb-4 text-xs font-semibold tracking-wider text-[#2C8B3D] uppercase bg-[#E9F5E2] rounded-full">Bán chạy nhất</span>
+          <span className="inline-block px-4 py-1.5 mb-4 text-xs font-semibold tracking-wider text-primary uppercase bg-primary/10 rounded-full">Bán chạy nhất</span>
           <h2 className="text-3xl font-bold text-center mb-4 relative">
             <span className="inline-block relative">
-              <span className="uppercase bg-gradient-to-r from-[#2C8B3D] to-[#88C140] bg-clip-text text-transparent drop-shadow-sm">
+              <span className="uppercase bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent drop-shadow-sm">
                 Sản phẩm bán chạy
               </span>
               <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></div>
             </span>
           </h2>
           <p className="text-maintext dark:text-gray-300 max-w-2xl mx-auto">
-            Khám phá những sản phẩm bán chạy nhất với chất lượng và thiết kế vượt trội
+            Khám phá laptop và linh kiện PC bán chạy nhất với hiệu năng và chất lượng vượt trội
           </p>
         </motion.div>
-        
-        {}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {bestSellerData.map((product, index) => (
             <ProductCard key={product.id} product={product} index={index} />
           ))}
         </div>
         <div className="flex w-full flex-col items-center justify-end flex-1 mt-8">
-       <InteractiveHoverButton className='!rounded-full uppercase font-normal w-fit'>
-        Xem tất cả
-        <Icon path={mdiArrowLeft} size={1} className="
+          <InteractiveHoverButton className='!rounded-full uppercase font-normal w-fit'>
+            Xem tất cả
+            <Icon path={mdiArrowLeft} size={1} className="
         ml-2 group-hover:translate-x-1 transition-transform transform scale-x-[-1]" />
-        </InteractiveHoverButton>
-      </div>
+          </InteractiveHoverButton>
+        </div>
       </div>
     </section>
   );

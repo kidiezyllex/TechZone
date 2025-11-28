@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
- 
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -150,7 +150,7 @@ const mockDiscounts: Discount[] = [
     discountType: 'percentage',
     discountValue: 15,
     startDate: '2023-11-01T00:00:00Z',
-    endDate: '2024-01-31T23:59:59Z',
+    endDate: '2025-01-31T23:59:59Z',
     usageCount: 27,
     applyToProducts: 'specific',
     productIds: ['5', '6', '7', '8'],
@@ -160,15 +160,15 @@ const mockDiscounts: Discount[] = [
   },
   {
     id: '7',
-    code: 'NEWYEAR2024',
-    name: 'Năm mới 2024',
-    description: 'Khuyến mại đầu năm 2024',
+    code: 'NEWYEAR2025',
+    name: 'Năm mới 2025',
+    description: 'Khuyến mại đầu năm 2025',
     discountType: 'percentage',
     discountValue: 24,
     minOrderValue: 1000000,
     maxDiscountAmount: 500000,
-    startDate: '2024-01-01T00:00:00Z',
-    endDate: '2024-01-31T23:59:59Z',
+    startDate: '2025-01-01T00:00:00Z',
+    endDate: '2025-01-31T23:59:59Z',
     usageCount: 0,
     applyToProducts: 'all',
     status: 'scheduled',
@@ -278,7 +278,7 @@ export default function DiscountsPage() {
             </div>
 
             <TabsContent value="all" className="mt-0">
-              <DiscountTable 
+              <DiscountTable
                 discounts={filteredDiscounts}
                 formatCurrency={formatCurrency}
                 formatDate={formatDate}
@@ -287,7 +287,7 @@ export default function DiscountsPage() {
               />
             </TabsContent>
             <TabsContent value="active" className="mt-0">
-              <DiscountTable 
+              <DiscountTable
                 discounts={filteredDiscounts}
                 formatCurrency={formatCurrency}
                 formatDate={formatDate}
@@ -296,7 +296,7 @@ export default function DiscountsPage() {
               />
             </TabsContent>
             <TabsContent value="scheduled" className="mt-0">
-              <DiscountTable 
+              <DiscountTable
                 discounts={filteredDiscounts}
                 formatCurrency={formatCurrency}
                 formatDate={formatDate}
@@ -305,7 +305,7 @@ export default function DiscountsPage() {
               />
             </TabsContent>
             <TabsContent value="expired" className="mt-0">
-              <DiscountTable 
+              <DiscountTable
                 discounts={filteredDiscounts}
                 formatCurrency={formatCurrency}
                 formatDate={formatDate}
@@ -316,8 +316,6 @@ export default function DiscountsPage() {
           </Tabs>
         </CardContent>
       </Card>
-
-      {}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -432,7 +430,7 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
                       <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                         <span className="sr-only">Mở menu</span>
                         <svg width="15" height="15" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
-                          <path d="M3.625 7.5C3.625 8.12132 3.12132 8.625 2.5 8.625C1.87868 8.625 1.375 8.12132 1.375 7.5C1.375 6.87868 1.87868 6.375 2.5 6.375C3.12132 6.375 3.625 6.87868 3.625 7.5ZM8.625 7.5C8.625 8.12132 8.12132 8.625 7.5 8.625C6.87868 8.625 6.375 8.12132 6.375 7.5C6.375 6.87868 6.87868 6.375 7.5 6.375C8.12132 6.375 8.625 6.87868 8.625 7.5ZM13.625 7.5C13.625 8.12132 13.1213 8.625 12.5 8.625C11.8787 8.625 11.375 8.12132 11.375 7.5C11.375 6.87868 11.8787 6.375 12.5 6.375C13.1213 6.375 13.625 6.87868 13.625 7.5Z"Rule="evenodd" clipRule="evenodd"></path>
+                          <path d="M3.625 7.5C3.625 8.12132 3.12132 8.625 2.5 8.625C1.87868 8.625 1.375 8.12132 1.375 7.5C1.375 6.87868 1.87868 6.375 2.5 6.375C3.12132 6.375 3.625 6.87868 3.625 7.5ZM8.625 7.5C8.625 8.12132 8.12132 8.625 7.5 8.625C6.87868 8.625 6.375 8.12132 6.375 7.5C6.375 6.87868 6.87868 6.375 7.5 6.375C8.12132 6.375 8.625 6.87868 8.625 7.5ZM13.625 7.5C13.625 8.12132 13.1213 8.625 12.5 8.625C11.8787 8.625 11.375 8.12132 11.375 7.5C11.375 6.87868 11.8787 6.375 12.5 6.375C13.1213 6.375 13.625 6.87868 13.625 7.5Z" Rule="evenodd" clipRule="evenodd"></path>
                         </svg>
                       </Button>
                     </DropdownMenuTrigger>
@@ -442,7 +440,7 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
                         <span>Chỉnh sửa</span>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         className="flex items-center text-red-600 cursor-pointer"
                         onClick={() => onDelete(discount)}
                       >
