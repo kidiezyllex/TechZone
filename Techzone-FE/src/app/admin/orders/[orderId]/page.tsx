@@ -99,7 +99,7 @@ interface OrderData {
 interface OrderStep {
     status: string;
     label: string;
-    icon: string; 
+    icon: string;
     colors: {
         bgClass: string;
         textClass: string;
@@ -180,7 +180,6 @@ const OrderStepper = ({ currentStatus }: { currentStatus: string }) => {
                             </div>
                         );
                     })}
-                    {}
                     <div className="absolute top-7 left-0 right-0 flex items-center -z-0 px-4 sm:px-8 md:px-12">
                         {orderSteps.map((step, index) => {
                             if (index === orderSteps.length - 1) return null;
@@ -242,7 +241,7 @@ const PaymentStatusBadge = ({ status }: { status: string }) => {
 
 
 const getProductInfo = (item: OrderItem): ProductInfo => {
-    
+
     if (item.productVariant?.product) {
         return {
             name: item.productVariant.product.name || "Tên sản phẩm chưa cập nhật",
@@ -255,7 +254,7 @@ const getProductInfo = (item: OrderItem): ProductInfo => {
         };
     }
 
-    
+
     return {
         name: item.product?.name || "Tên sản phẩm chưa cập nhật",
         code: item.product?.code || "N/A",
@@ -271,7 +270,7 @@ const getProductInfo = (item: OrderItem): ProductInfo => {
 const getVariantImage = (item: OrderItem): string => {
     const productInfo = getProductInfo(item);
 
-    
+
     if (productInfo.images && productInfo.images.length > 0) {
         const firstImage = productInfo.images[0];
         if (typeof firstImage === 'string') {
@@ -283,7 +282,7 @@ const getVariantImage = (item: OrderItem): string => {
         }
     }
 
-    
+
     if (item.variant && item.variant.colorId && item.variant.sizeId) {
         const matchingVariant = item.product?.variants?.find((v: any) =>
             v.colorId === item.variant.colorId && v.sizeId === item.variant.sizeId
@@ -291,7 +290,7 @@ const getVariantImage = (item: OrderItem): string => {
         return matchingVariant?.images?.[0] || '/images/white-image.png';
     }
 
-    
+
     if (item.product?.variants) {
         const variantWithImage = item.product.variants.find((v: any) => v.images && v.images.length > 0);
         return variantWithImage?.images?.[0] || '/images/white-image.png';
@@ -337,21 +336,21 @@ export default function OrderDetailPage() {
     const queryClient = useQueryClient();
     const invoiceRef = useRef<HTMLDivElement>(null);
 
-    
+
     const getAvailableOrderStatuses = (currentStatus: string) => {
         const statusOrder = ["CHO_XAC_NHAN", "CHO_GIAO_HANG", "DANG_VAN_CHUYEN", "DA_GIAO_HANG", "HOAN_THANH"];
         const currentIndex = statusOrder.indexOf(currentStatus);
 
-        if (currentIndex === -1) return statusOrder; 
+        if (currentIndex === -1) return statusOrder;
 
-        
+
         return statusOrder.slice(currentIndex);
     };
 
     const handleStatusUpdate = async () => {
         if (!statusToUpdate) return;
 
-        
+
         if (statusToUpdate === "HOAN_THANH" && paymentStatusToUpdate === "PENDING") {
             toast.error("Không thể hoàn thành đơn hàng khi chưa thanh toán");
             return;
@@ -395,7 +394,7 @@ export default function OrderDetailPage() {
         }
     };
 
-    
+
     const handlePrintInvoice = async () => {
         if (!orderDetail?.data) {
             toast.error("Không có dữ liệu đơn hàng để in");
@@ -477,7 +476,7 @@ export default function OrderDetailPage() {
     if (isLoading) {
         return (
             <div className="space-y-4">
-                {}
+
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                     <div className="mb-0 md:mb-0">
                         <Breadcrumb>
@@ -503,7 +502,7 @@ export default function OrderDetailPage() {
                     </div>
                 </div>
 
-                {}
+
                 <Card className="mb-4 overflow-hidden">
                     <CardContent className="p-4">
                         <div className="flex justify-between items-start relative">
@@ -518,11 +517,11 @@ export default function OrderDetailPage() {
                     </CardContent>
                 </Card>
 
-                {}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {}
+
                     <div className="space-y-4">
-                        {}
+
                         <Card>
                             <CardHeader>
                                 <CardTitle>Thông tin đơn hàng</CardTitle>
@@ -539,7 +538,7 @@ export default function OrderDetailPage() {
                             </CardContent>
                         </Card>
 
-                        {}
+
                         <Card>
                             <CardHeader>
                                 <CardTitle>Thông tin khách hàng</CardTitle>
@@ -556,7 +555,7 @@ export default function OrderDetailPage() {
                             </CardContent>
                         </Card>
 
-                        {}
+
                         <Card>
                             <CardHeader>
                                 <CardTitle>Địa chỉ giao hàng</CardTitle>
@@ -571,9 +570,9 @@ export default function OrderDetailPage() {
                         </Card>
                     </div>
 
-                    {}
+
                     <div className="space-y-4">
-                        {}
+
                         <Card>
                             <CardHeader>
                                 <CardTitle>Sản phẩm đã đặt</CardTitle>
@@ -616,7 +615,7 @@ export default function OrderDetailPage() {
                             </CardContent>
                         </Card>
 
-                        {}
+
                         <Card>
                             <CardHeader>
                                 <CardTitle>Tổng quan đơn hàng</CardTitle>
@@ -769,7 +768,7 @@ export default function OrderDetailPage() {
                         </CardContent>
                     </Card>
 
-                    {}
+
                     {order.staff && (
                         <Card>
                             <CardHeader>
@@ -786,7 +785,7 @@ export default function OrderDetailPage() {
                         </Card>
                     )}
 
-                    {}
+
                     <Card>
                         <CardHeader>
                             <CardTitle>Địa chỉ giao hàng</CardTitle>
@@ -810,7 +809,7 @@ export default function OrderDetailPage() {
                     </Card>
                 </div>
 
-                {}
+
                 <div className="space-y-4">
                     <Card>
                         <CardHeader>
@@ -872,7 +871,7 @@ export default function OrderDetailPage() {
                         </CardContent>
                     </Card>
 
-                    {}
+
                     <Card>
                         <CardHeader>
                             <CardTitle>Tổng quan đơn hàng</CardTitle>
@@ -902,7 +901,7 @@ export default function OrderDetailPage() {
                 </div>
             </div>
 
-            {}
+
             <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -951,7 +950,7 @@ export default function OrderDetailPage() {
                 </DialogContent>
             </Dialog>
 
-            {}
+
             <Dialog open={isConfirmCancelDialogOpen} onOpenChange={setIsConfirmCancelDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -971,7 +970,7 @@ export default function OrderDetailPage() {
                 </DialogContent>
             </Dialog>
 
-            {}
+
             <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
@@ -985,7 +984,7 @@ export default function OrderDetailPage() {
                                         <div className='w-full justify-center mb-4'>
                                             <img
                                                 draggable="false"
-                                                src="/images/logo.svg"
+                                                src="/images/logo.png"
                                                 alt="logo"
                                                 width={100}
                                                 height={100}

@@ -17,7 +17,7 @@ export const addResourceHints = () => {
   ];
 
   const criticalImages = [
-    '/images/logo.svg',
+    '/images/logo.png',
     '/images/background.jpg',
   ];
 

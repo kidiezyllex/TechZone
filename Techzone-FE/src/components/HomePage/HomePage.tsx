@@ -21,7 +21,6 @@ export const HomePage = () => {
             <NewArrivals />
             <BestSeller />
             <Testimonials />
-            <Newsletter />
             <Footer />
         </main>
     );

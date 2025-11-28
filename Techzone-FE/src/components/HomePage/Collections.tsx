@@ -122,7 +122,7 @@ export const Collections = () => {
     const isHeaderInView = useInView(headerRef, { once: true });
 
     return (
-        <section className="py-20 bg-muted relative overflow-hidden">
+        <section className="py-20 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
             <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary/5 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
             <div className="container mx-auto">
@@ -158,7 +158,7 @@ export const Collections = () => {
 
                         </div>
                         <h2 className="text-3xl md:text-4xl font-bold text-maintext dark:text-white">
-                            BỘ SƯU TẬP <span className="text-extra">CÔNG NGHỆ</span>
+                            BỘ SƯU TẬP <span className="text-primary">CÔNG NGHỆ</span>
                         </h2>
                     </motion.div>
 

@@ -62,12 +62,12 @@ const SidebarLayout = memo(function SidebarLayout({ children }: SidebarLayoutPro
     setHoverMenu(null);
   });
 
-  
+
   const memoizedMenuItems = useMemo(() => menuItems, []);
 
   return (
     <div className="flex flex-row min-h-screen w-screen">
-      {}
+
       <div
         className={cn(
           "bg-white shadow-md min-h-screen transition-all duration-300",
@@ -80,7 +80,7 @@ const SidebarLayout = memo(function SidebarLayout({ children }: SidebarLayoutPro
               <a href="/" className="flex items-center">
                 <img
                   draggable="false"
-                  src="/images/logo.svg"
+                  src="/images/logo.png"
                   alt="logo"
                   width={100}
                   height={100}
@@ -215,7 +215,7 @@ const SidebarLayout = memo(function SidebarLayout({ children }: SidebarLayoutPro
           </nav>
         </div>
       </div>
-      {}
+
       <div className="w-full flex-1 flex flex-col bg-[#1C2B38]">
         <AdminHeader />
         <main className="p-4 min-h-[calc(100vh-66px)]">

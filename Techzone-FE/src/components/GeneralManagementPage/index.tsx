@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useState, createContext } from 'react';
- 
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -35,7 +34,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
-
 import { useUser } from '@/context/useUserContext';
 import { useOrdersByUser, useOrderDetail } from '@/hooks/order';
 import { useToast } from '@/hooks/useToast';
@@ -85,21 +83,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDate } from '@/lib/utils';
 import { formatPrice } from '@/utils/formatters';
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-const sidebarAnimation = {
-  hidden: { opacity: 0, x: -20 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.3 } }
-};
-
-const contentAnimation = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3, delay: 0.2 } }
-};
+import { toast } from 'react-toastify';
 
 export const AccountTabContext = createContext({
   activeTab: 'profile',
@@ -182,7 +169,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
     const orderDate = new Date(createdAt);
     const now = new Date();
 
-    
+
     const generateTimestamp = (hoursOffset: number) => {
       const timestamp = new Date(orderDate.getTime() + hoursOffset * 60 * 60 * 1000);
       return format(timestamp, 'HH:mm dd/MM/yyyy', { locale: vi });
@@ -391,10 +378,8 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                 <OrderStatusBadge status={orderData.data.orderStatus} />
               </div>
             </DialogHeader>
-
             <div className="py-4 space-y-4">
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {}
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2">
@@ -423,7 +408,6 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                     </div>
                   </CardContent>
                 </Card>
-                {}
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2">
@@ -454,7 +438,6 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                   </CardContent>
                 </Card>
               </div>
-              {}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2">
@@ -544,8 +527,6 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                   </div>
                 </CardContent>
               </Card>
-
-              {}
               <Card className="overflow-hidden">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -557,19 +538,14 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                   <div className="relative">
                     {getShippingProgress(orderData.data.orderStatus, orderData.data.createdAt).map((step, index, array) => (
                       <div key={index} className="relative flex items-start pb-8 last:pb-0">
-                        {}
                         {index < array.length - 1 && (
                           <div className="absolute left-6 top-12 w-0.5 h-full bg-gradient-to-b from-gray-300 to-gray-200"></div>
                         )}
-
-                        {}
                         <div className="relative flex-shrink-0 mr-4">
                           <div className={`w-12 h-12 rounded-full ${step.color} flex items-center justify-center shadow-lg ring-4 ring-white`}>
                             <Icon path={step.icon} size={0.7} className="text-white" />
                           </div>
                         </div>
-
-                        {}
                         <div className="flex-1 min-w-0 bg-white rounded-lg border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="text-sm font-semibold text-maintext">{step.title}</h4>
@@ -593,7 +569,6 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                 </CardContent>
               </Card>
             </div>
-
             <DialogFooter className="border-t pt-4">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Đóng
@@ -609,8 +584,6 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
     </Dialog>
   );
 };
-
-
 const ReturnStatusBadge = ({ status }: { status: string }) => {
   const statusConfig: Record<string, { label: string; className: string }> = {
     'CHO_XU_LY': { label: 'Chờ xử lý', className: '!bg-yellow-400 !text-white !border-yellow-500 text-nowrap' },
@@ -645,7 +618,7 @@ const CreateReturnDialog: React.FC<CreateReturnDialogProps> = ({
   const { profile } = useUser();
   const userId = profile?.data?.id;
   const { data: ordersData } = useOrdersByUser(userId || '');
-  
+
   const [selectedItems, setSelectedItems] = useState<Array<{
     product: string;
     variant: { colorId: string; sizeId: string };
@@ -663,16 +636,16 @@ const CreateReturnDialog: React.FC<CreateReturnDialogProps> = ({
   const handleAddItem = (item: any) => {
     const productVariant = item.productVariant as any;
     const product = productVariant?.product;
-    
+
     if (!product || !productVariant) {
       toast.error("Không thể xác định thông tin sản phẩm");
       return;
     }
 
     const existingIndex = selectedItems.findIndex(
-      si => si.product === product.id && 
-           si.variant.colorId === productVariant.colorId && 
-           si.variant.sizeId === productVariant.sizeId
+      si => si.product === product.id &&
+        si.variant.colorId === productVariant.colorId &&
+        si.variant.sizeId === productVariant.sizeId
     );
 
     if (existingIndex >= 0) {
@@ -758,7 +731,7 @@ const CreateReturnDialog: React.FC<CreateReturnDialogProps> = ({
                 const imageUrl = productVariant?.images?.[0]?.imageUrl;
                 const color = productVariant?.color;
                 const size = productVariant?.size;
-                
+
                 if (!product) {
                   return (
                     <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
@@ -831,8 +804,6 @@ const CreateReturnDialog: React.FC<CreateReturnDialogProps> = ({
               })}
             </div>
           </div>
-
-          {}
           {selectedItems.length > 0 && (
             <div>
               <h4 className="font-medium mb-3">Sản phẩm trả hàng:</h4>
@@ -872,8 +843,6 @@ const CreateReturnDialog: React.FC<CreateReturnDialogProps> = ({
               </div>
             </div>
           )}
-
-          {}
           <div>
             <label className="block text-sm font-medium mb-2">Lý do trả hàng *</label>
             <Textarea
@@ -884,7 +853,6 @@ const CreateReturnDialog: React.FC<CreateReturnDialogProps> = ({
             />
           </div>
         </div>
-
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Hủy
@@ -906,7 +874,6 @@ const CreateReturnDialog: React.FC<CreateReturnDialogProps> = ({
     </Dialog>
   );
 };
-
 
 interface ReturnDetailDialogProps {
   returnId: string | null;
@@ -965,7 +932,6 @@ const ReturnDetailDialog: React.FC<ReturnDetailDialogProps> = ({
             </DialogHeader>
 
             <div className="space-y-4">
-              {}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">Thông tin đơn hàng gốc</CardTitle>
@@ -973,15 +939,13 @@ const ReturnDetailDialog: React.FC<ReturnDetailDialogProps> = ({
                 <CardContent>
                   <p className="text-sm">
                     Mã đơn hàng: <span className="font-medium">
-                      {typeof returnData.data.originalOrder === 'string' 
-                        ? returnData.data.originalOrder 
+                      {typeof returnData.data.originalOrder === 'string'
+                        ? returnData.data.originalOrder
                         : returnData.data.originalOrder.code}
                     </span>
                   </p>
                 </CardContent>
               </Card>
-
-              {}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">Sản phẩm trả hàng</CardTitle>
@@ -989,7 +953,7 @@ const ReturnDetailDialog: React.FC<ReturnDetailDialogProps> = ({
                 <CardContent>
                   <div className="space-y-3">
                     {returnData.data.items.map((item: any, index) => {
-                      
+
                       const productVariant = item.productVariant as any;
                       const product = productVariant?.product || item.product;
                       const imageUrl = productVariant?.images?.[0]?.imageUrl || product?.variants?.[0]?.images?.[0];
@@ -1035,8 +999,6 @@ const ReturnDetailDialog: React.FC<ReturnDetailDialogProps> = ({
                   </div>
                 </CardContent>
               </Card>
-
-              {}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">Thông tin hoàn tiền</CardTitle>
@@ -1088,14 +1050,14 @@ const ProfileTab = () => {
   const { showToast } = useToast();
   const updateProfileMutation = useUpdateUserProfile();
 
-  
+
   const formSchema = z.object({
     fullName: z.string().min(2, { message: "Họ và tên phải có ít nhất 2 ký tự" }),
     email: z.string().email({ message: "Email không hợp lệ" }),
     phoneNumber: z.string().regex(/^[0-9]{10,11}$/, { message: "Số điện thoại không hợp lệ" }).optional().or(z.literal(''))
   });
 
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -1105,7 +1067,7 @@ const ProfileTab = () => {
     }
   });
 
-  
+
   useEffect(() => {
     if (userData) {
       form.reset({
@@ -1116,7 +1078,7 @@ const ProfileTab = () => {
     }
   }, [userData, form]);
 
-  
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     updateProfileMutation.mutate(
       {
@@ -1240,7 +1202,7 @@ const PasswordTab = () => {
   const changePasswordMutation = useChangePassword();
   const { showToast } = useToast();
 
-  
+
   const formSchema = z
     .object({
       currentPassword: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
@@ -1252,7 +1214,7 @@ const PasswordTab = () => {
       path: ["confirmPassword"],
     });
 
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -1262,7 +1224,7 @@ const PasswordTab = () => {
     },
   });
 
-  
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     changePasswordMutation.mutate(
       {
@@ -1563,7 +1525,6 @@ const VouchersTab = () => {
   );
 };
 
-
 const ReturnsTab = () => {
   const { data: returnsData, isLoading, isError, refetch } = useMyReturns();
   const [selectedReturnId, setSelectedReturnId] = useState<string | null>(null);
@@ -1628,8 +1589,8 @@ const ReturnsTab = () => {
                       <TableCell className="font-medium px-3 py-2">{returnItem.code}</TableCell>
                       <TableCell className="px-3 py-2">{formatDate(returnItem.createdAt)}</TableCell>
                       <TableCell className="px-3 py-2">
-                        {typeof returnItem.originalOrder === 'string' 
-                          ? returnItem.originalOrder 
+                        {typeof returnItem.originalOrder === 'string'
+                          ? returnItem.originalOrder
                           : returnItem.originalOrder.code}
                       </TableCell>
                       <TableCell className="px-3 py-2">
@@ -1678,8 +1639,6 @@ const ReturnsTab = () => {
           )}
         </CardContent>
       </Card>
-
-      {}
       <ReturnDetailDialog
         returnId={selectedReturnId}
         open={returnDetailOpen}
@@ -1705,7 +1664,7 @@ export default function GeneralManagementPage() {
   const { data: returnableOrdersData, refetch: refetchReturnableOrders } = useReturnableOrders();
 
   useEffect(() => {
-            const updateActiveTabFromHash = () => {
+    const updateActiveTabFromHash = () => {
       if (typeof window !== 'undefined' && window.location.hash === '#account-tabs') {
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab');
@@ -1782,9 +1741,9 @@ export default function GeneralManagementPage() {
   };
 
   const isOrderReturnable = (order: IOrder) => {
-    
-    return order.orderStatus === 'HOAN_THANH' && 
-           returnableOrdersData?.data?.orders?.some(ro => ro.id === order.id);
+
+    return order.orderStatus === 'HOAN_THANH' &&
+      returnableOrdersData?.data?.orders?.some(ro => ro.id === order.id);
   };
 
   const formatDate = (dateString: string) => {
@@ -1888,8 +1847,6 @@ export default function GeneralManagementPage() {
               </CardContent>
             </Card>
           </motion.div>
-
-          {}
           <motion.div
             className="md:col-span-9"
             initial="hidden"
@@ -1954,7 +1911,7 @@ export default function GeneralManagementPage() {
                                       const productVariant = item.productVariant as any;
                                       const product = productVariant?.product;
                                       const imageUrl = productVariant?.images?.[0]?.imageUrl;
-                                      
+
                                       return (
                                         <div key={index} className="relative">
                                           <img
@@ -2055,15 +2012,11 @@ export default function GeneralManagementPage() {
           </motion.div>
         </div>
       </div>
-
-      {}
       <OrderDetailDialog
         orderId={selectedOrderId}
         open={orderDetailOpen}
         onOpenChange={setOrderDetailOpen}
       />
-
-      {}
       <CreateReturnDialog
         orderId={createReturnOrderId}
         open={createReturnOpen}

@@ -57,7 +57,7 @@ export const BrandLogos = () => {
       </h2>
       <div className="container mx-auto relative z-10">
         <div className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
-          <ul className="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-logo-cloud">
+          <ul className="flex items-center justify-center md:justify-start [&_li]:mx-2 [&_img]:max-w-none animate-logo-cloud">
             {logos.map((logo) => (
               <li key={logo.name} className="flex items-center justify-center w-[150px]">
                 <img
@@ -66,12 +66,12 @@ export const BrandLogos = () => {
                   alt={logo.name}
                   width={1000}
                   height={1000}
-                  className="max-h-20 h-20 object-contain select-none"
+                  className="max-h-16 h-16 object-contain select-none"
                 />
               </li>
             ))}
           </ul>
-          <ul className="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-logo-cloud" aria-hidden="true">
+          <ul className="flex items-center justify-center md:justify-start [&_li]:mx-2 [&_img]:max-w-none animate-logo-cloud" aria-hidden="true">
             {logos.map((logo) => (
               <li key={logo.name} className="flex items-center justify-center w-[150px]">
                 <img
@@ -80,7 +80,7 @@ export const BrandLogos = () => {
                   alt={logo.name}
                   width={1000}
                   height={1000}
-                  className="max-h-20 h-20 object-contain select-none"
+                  className="max-h-16 h-16 object-contain select-none"
                 />
               </li>
             ))}

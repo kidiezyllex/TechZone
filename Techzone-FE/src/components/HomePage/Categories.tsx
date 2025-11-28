@@ -152,44 +152,41 @@ const CategoryCard = ({ category, index }: { category: typeof categories[0], ind
           <DiscountTag discount={category.discount} />
 
           <motion.div
-            className="h-full w-full p-4 bg-blue-300"
+            className="h-full w-full p-4 bg-slate-500"
           >
             <img
               src={category.image}
               alt={category.name}
-              className="object-contain h-[200px] w-full bg-white rounded-md"
+              className="object-contain h-[220px] w-full bg-white rounded-md p-4"
             />
           </motion.div>
-
-          <div className="absolute inset-0 bg-gradient-to-t from-main-dark-blue/50 via-main-dark-blue/60 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="absolute bottom-0 left-0 right-0 p-4 pt-0">
-              <motion.div
-                className="text-white space-y-2"
+          <div className="absolute bottom-0 left-0 right-0 p-4 pt-0">
+            <motion.div
+              className="text-white space-y-2"
+            >
+              <h3 className="text-2xl font-bold mb-1">
+                {category.name}
+              </h3>
+              <motion.p
+                className="text-gray-200 text-sm line-clamp-2 mb-3"
               >
-                <h3 className="text-2xl font-bold mb-1">
-                  {category.name}
-                </h3>
-                <motion.p
-                  className="text-gray-200 text-sm line-clamp-2 mb-3"
+                {category.description}
+              </motion.p>
+              <div className="flex items-center justify-between">
+                <p className="text-gray-200 text-sm flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 bg-secondary rounded-full"></span>
+                  {category.productCount} sản phẩm
+                </p>
+                <motion.span
+                  initial={{ opacity: 0.8, x: 0 }}
+                  whileHover={{ opacity: 1, x: 5 }}
+                  className="text-white flex items-center text-sm font-medium"
                 >
-                  {category.description}
-                </motion.p>
-                <div className="flex items-center justify-between">
-                  <p className="text-gray-200 text-sm flex items-center gap-2">
-                    <span className="inline-block w-2 h-2 bg-secondary rounded-full"></span>
-                    {category.productCount} sản phẩm
-                  </p>
-                  <motion.span
-                    initial={{ opacity: 0.8, x: 0 }}
-                    whileHover={{ opacity: 1, x: 5 }}
-                    className="text-white flex items-center text-sm font-medium"
-                  >
-                    Xem thêm
-                    <Icon path={mdiArrowRight} size={0.7} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </motion.span>
-                </div>
-              </motion.div>
-            </div>
+                  Xem thêm
+                  <Icon path={mdiArrowRight} size={0.7} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </motion.span>
+              </div>
+            </motion.div>
           </div>
         </div>
       </a>
@@ -335,7 +332,7 @@ export const Categories = () => {
           <Swiper
             ref={swiperRef}
             slidesPerView={1}
-            spaceBetween={20}
+            spaceBetween={16}
             pagination={{
               clickable: true,
               dynamicBullets: true,
@@ -347,15 +344,15 @@ export const Categories = () => {
             breakpoints={{
               640: {
                 slidesPerView: 2,
-                spaceBetween: 20,
+                spaceBetween: 16,
               },
               768: {
                 slidesPerView: 3,
-                spaceBetween: 30,
+                spaceBetween: 16,
               },
               1024: {
                 slidesPerView: 4,
-                spaceBetween: 30,
+                spaceBetween: 16,
               },
             }}
             modules={[Pagination, Navigation, Autoplay]}

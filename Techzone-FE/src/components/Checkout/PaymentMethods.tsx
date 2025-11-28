@@ -83,8 +83,7 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
               key={method.id}
               value={method}
               className={({ checked }) =>
-                `${
-                  checked ? 'bg-indigo-50 border-indigo-500' : 'border-gray-200'
+                `${checked ? 'bg-indigo-50 border-indigo-500' : 'border-gray-200'
                 } relative border rounded-[6px] p-4 flex cursor-pointer focus:outline-none`
               }
             >
@@ -108,9 +107,8 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
                       </div>
                     </div>
                     <div
-                      className={`${
-                        checked ? 'text-indigo-500' : 'text-maintext'
-                      } flex-shrink-0`}
+                      className={`${checked ? 'text-indigo-500' : 'text-maintext'
+                        } flex-shrink-0`}
                     >
                       <method.icon className="w-6 h-6" />
                     </div>

@@ -81,7 +81,7 @@ export const Newsletter = () => {
             className="text-center"
           >
             <motion.h2
-              className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent mb-6 "
+              className="text-4xl md:text-5xl font-bold text-primary mb-6 "
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -98,7 +98,7 @@ export const Newsletter = () => {
               Tham gia cộng đồng công nghệ của chúng tôi để nhận những thông tin hot nhất về
               <span className="font-semibold text-primary"> laptop mới</span>,
               <span className="font-semibold text-blue-600"> linh kiện PC</span> và
-              <span className="font-semibold text-purple-600"> phụ kiện công nghệ</span> từ các thương hiệu hàng đầu.
+              <span className="font-semibold text-extra"> phụ kiện công nghệ</span> từ các thương hiệu hàng đầu.
             </motion.p>
 
             <motion.div
