@@ -161,38 +161,25 @@ const blogs = [
 export default function HomePage() {
   return (
     <>
-      {}
       <Container className="mb-12">
         <HeroSlider banners={heroBanners} />
       </Container>
-
       <Container>
-        {}
         <Section title="Danh mục nổi bật" subtitle="Khám phá các sản phẩm chính">
           <CategoryGrid categories={categories} />
         </Section>
-
-        {}
         <Section title="" className="mb-12">
           <FlashSale endTime={new Date(Date.now() + 8 * 60 * 60 * 1000)} />
         </Section>
-
-        {}
         <Section title="Sản phẩm mới nhất" subtitle="Hàng vừa cập nhật">
           <ProductCarousel products={latestProducts} />
         </Section>
-
-        {}
         <Section title="Sản phẩm bán chạy (Top 10)" subtitle="Những sản phẩm yêu thích nhất của khách hàng" className="mt-12">
           <ProductCarousel products={topProducts} />
         </Section>
-
-        {}
         <Section title="Thương hiệu nổi bật" subtitle="Các hãng uy tín hàng đầu thế giới" className="mt-12">
           <BrandGrid brands={brands} />
         </Section>
-
-        {}
         <Section className="mt-12 mb-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
@@ -218,8 +205,6 @@ export default function HomePage() {
             </Card>
           </div>
         </Section>
-
-        {}
         <Section title="Gợi ý theo danh mục" subtitle="Những sản phẩm nổi bật nhất" className="mb-12">
           <div className="space-y-8">
             {[
@@ -236,8 +221,6 @@ export default function HomePage() {
             ))}
           </div>
         </Section>
-
-        {}
         <Section title="Tin tức / Blog nổi bật" subtitle="Cập nhật kiến thức công nghệ mỗi ngày" className="mb-12">
           <BlogGrid posts={blogs} />
         </Section>

@@ -472,7 +472,7 @@ export default function StatisticsPage() {
                 </div>
               </div>
 
-              <div className="p-4 bg-slate-50 rounded-[6px] mb-4">
+              <div className="p-4 bg-slate-50 rounded-md mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="text-center">
                     <h3 className="text-lg font-semibold text-maintext">Tổng doanh thu</h3>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
- 
+
 import { IProductVariant } from '@/interface/request/product';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -76,7 +76,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
 
   const convertToVND = () => {
     const dollarAmount = variant.price || 0;
-    const vndAmount = Math.round(dollarAmount * 25912.04 / 1000) * 1000; 
+    const vndAmount = Math.round(dollarAmount * 25912.04 / 1000) * 1000;
     onChange({
       ...variant,
       price: vndAmount
@@ -95,7 +95,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
           >
             <SelectTrigger id={`colorId-${variant.colorId}`} className="w-full">
               <SelectValue placeholder="Chọn màu sắc">
-                {variant.colorId 
+                {variant.colorId
                   ? (colorsData?.data || []).find(color => color.id.toString() === variant.colorId?.toString())?.name || 'Chọn màu sắc'
                   : 'Chọn màu sắc'
                 }
@@ -106,7 +106,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
                 <SelectItem key={color.id} value={color.id.toString()}>
                   <div className="flex items-center justify-between w-full">
                     <span>{color.name}</span>
-                    <div 
+                    <div
                       className="w-4 h-4 rounded-full border border-gray-300 ml-2"
                       style={{ backgroundColor: color.code }}
                     />
@@ -126,11 +126,11 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
           >
             <SelectTrigger id={`sizeId-${variant.sizeId}`} className="w-full">
               <SelectValue placeholder="Chọn kích thước">
-                {variant.sizeId 
+                {variant.sizeId
                   ? (() => {
-                      const foundSize = (sizesData?.data || []).find(size => size.id.toString() === variant.sizeId?.toString());
-                      return foundSize ? getSizeLabel(foundSize.value) : 'Chọn kích thước';
-                    })()
+                    const foundSize = (sizesData?.data || []).find(size => size.id.toString() === variant.sizeId?.toString());
+                    return foundSize ? getSizeLabel(foundSize.value) : 'Chọn kích thước';
+                  })()
                   : 'Chọn kích thước'
                 }
               </SelectValue>
@@ -166,7 +166,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
               onClick={convertToVND}
               title="Chuyển đổi từ USD sang VNĐ (1 USD = 25,912.04 VNĐ)"
             >
-              <Icon path={mdiTransferRight} size={0.7} className='text-white'/>
+              <Icon path={mdiTransferRight} size={0.7} className='text-white' />
               Chuyển sang đơn vị VNĐ
             </Button>
           </div>
@@ -229,7 +229,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.2 }}
-                    className="relative group rounded-[6px] overflow-hidden border border-gray-200"
+                    className="relative group rounded-md overflow-hidden border border-gray-200"
                     style={{ aspectRatio: '1/1' }}
                   >
                     <img
@@ -253,7 +253,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
               </AnimatePresence>
             ) : (
               <div
-                className="flex items-center justify-center border border-dashed border-gray-300 rounded-[6px] text-maintext"
+                className="flex items-center justify-center border border-dashed border-gray-300 rounded-md text-maintext"
                 style={{ aspectRatio: '1/1' }}
               >
                 <div className="flex flex-col items-center p-4">

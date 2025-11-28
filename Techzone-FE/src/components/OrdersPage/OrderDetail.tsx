@@ -17,8 +17,8 @@ interface OrderDetailProps {
 
 export const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose }) => {
   const [activeTab, setActiveTab] = useState<'details' | 'history'>('details');
-  
-  
+
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -27,7 +27,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose }) => {
     }).format(amount);
   };
 
-  
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('vi-VN', {
@@ -39,7 +39,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose }) => {
     }).format(date);
   };
 
-  
+
   const getPaymentMethodName = (method: string) => {
     switch (method) {
       case 'cash':
@@ -57,7 +57,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose }) => {
     }
   };
 
-  
+
   const getOrderTypeName = (type: string) => {
     switch (type) {
       case 'store':
@@ -69,7 +69,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose }) => {
     }
   };
 
-  
+
   const renderStatusHistory = (history: OrderStatusHistory[]) => {
     return (
       <div className="space-y-4 my-4">
@@ -115,7 +115,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose }) => {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-[6px] shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-white rounded-md shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         <div className="flex items-center justify-between px-4 py-4 border-b bg-gray-50">
           <div>

@@ -49,13 +49,15 @@ const logos = [
 export const BrandLogos = () => {
   return (
     <section className="py-12 pb-0 bg-gradient-to-br bg-white relative overflow-hidden">
-      <h2 className="text-2xl font-bold text-center mb-8 relative">
-        <span className="uppercase bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent drop-shadow-sm ">
-          Thương hiệu đối tác
+      <h2 className="text-3xl font-bold text-center mb-4 relative">
+        <span className="inline-block relative">
+          <span className="uppercase text-indigo-900">
+            Thương hiệu đối tác
+          </span>
+          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-indigo-900 rounded-full"></div>
         </span>
-        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></div>
       </h2>
-      <div className="container mx-auto relative z-10">
+      <div className="container mx-auto relative z-10 mt-10">
         <div className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
           <ul className="flex items-center justify-center md:justify-start [&_li]:mx-2 [&_img]:max-w-none animate-logo-cloud">
             {logos.map((logo) => (

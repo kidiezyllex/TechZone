@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
- 
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@mdi/react';
@@ -106,7 +106,7 @@ export default function CategoriesPage() {
               <Input
                 type="text"
                 placeholder="Tìm kiếm theo tên danh mục..."
-                className="pl-10 pr-4 py-2 w-full border rounded-[6px]"
+                className="pl-10 pr-4 py-2 w-full border rounded-md"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -144,7 +144,7 @@ export default function CategoriesPage() {
       </Card>
 
       {isLoading ? (
-        <div className="bg-white rounded-[6px] shadow-sm overflow-visible">
+        <div className="bg-white rounded-md shadow-sm overflow-visible">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -173,8 +173,8 @@ export default function CategoriesPage() {
                     </TableCell>
                     <TableCell className="px-4 py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end space-x-2">
-                        <Skeleton className="h-8 w-8 rounded-[6px]" />
-                        <Skeleton className="h-8 w-8 rounded-[6px]" />
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                        <Skeleton className="h-8 w-8 rounded-md" />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -184,7 +184,7 @@ export default function CategoriesPage() {
           </div>
         </div>
       ) : isError ? (
-        <div className="bg-white rounded-[6px] shadow-sm p-4 text-center">
+        <div className="bg-white rounded-md shadow-sm p-4 text-center">
           <p className="text-red-500">Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau.</p>
           <Button
             variant="outline"
@@ -195,7 +195,7 @@ export default function CategoriesPage() {
           </Button>
         </div>
       ) : (
-        <div className="bg-white rounded-[6px] shadow-sm overflow-visible">
+        <div className="bg-white rounded-md shadow-sm overflow-visible">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -344,7 +344,7 @@ function EditCategoryDialog({ categoryId, isOpen, onClose }: EditCategoryDialogP
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    
+
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -511,7 +511,7 @@ function CreateCategoryDialog({ isOpen, onClose }: CreateCategoryDialogProps) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    
+
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }

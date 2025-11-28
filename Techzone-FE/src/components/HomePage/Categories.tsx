@@ -128,7 +128,7 @@ const DiscountTag = ({ discount }: { discount: number }) => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        className="bg-red-medium text-white px-2 py-1 rounded-[6px] text-xs font-bold"
+        className="bg-red-medium text-white px-3 py-1 rounded-full text-xs font-bold"
       >
         -{discount}%
       </motion.div>
@@ -144,7 +144,7 @@ const CategoryCard = ({ category, index }: { category: typeof categories[0], ind
       ref={ref}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
-      className="relative overflow-hidden rounded-[6px] shadow-lg hover:shadow-xl transition-all duration-300 h-full"
+      className="relative overflow-hidden rounded-md shadow-lg hover:shadow-xl transition-all duration-300 h-full"
     >
       <a href={`/categories/${category.slug}`} className="block group h-full">
         <div className="aspect-[4/5] relative overflow-hidden h-full">
@@ -152,7 +152,7 @@ const CategoryCard = ({ category, index }: { category: typeof categories[0], ind
           <DiscountTag discount={category.discount} />
 
           <motion.div
-            className="h-full w-full p-4 bg-slate-500"
+            className="h-full w-full p-3 bg-indigo-900"
           >
             <img
               src={category.image}

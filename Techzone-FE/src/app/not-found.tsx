@@ -13,7 +13,7 @@ export default function NotFound() {
           Nội dung bạn tìm kiếm không có. Vui lòng quay lại!
         </p>
         <button
-          className="bg-primary hover:bg-opacity-90 !text-white/80 px-4 py-2 rounded-[6px]"
+          className="bg-primary hover:bg-opacity-90 !text-white/80 px-4 py-2 rounded-md"
           onClick={() => navigate(-1)}
         >
           Quay lại

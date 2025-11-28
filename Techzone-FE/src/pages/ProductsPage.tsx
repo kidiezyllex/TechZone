@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
- 
+
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
@@ -93,16 +93,16 @@ export default function ProductsPage() {
   const productsQuery = useProducts(paginationParams)
   const searchQuery2 = useSearchProducts(isSearching ? { keyword: searchQuery, status: "ACTIVE" } : { keyword: "" })
   const { data: rawData, isLoading, isError } = isSearching ? searchQuery2 : productsQuery
-  const { data: promotionsData } = usePromotions({status: "ACTIVE"});
+  const { data: promotionsData } = usePromotions({ status: "ACTIVE" });
   console.log(promotionsData)
   const data = useMemo(() => {
     if (!rawData || !rawData.data || !rawData.data.products) return rawData
     let filteredProducts = [...rawData.data.products]
     if (promotionsData?.data?.promotions) {
       filteredProducts = applyPromotionsToProducts(filteredProducts, promotionsData.data.promotions)
-    } 
+    }
 
-    
+
     if (filters.brands && filters.brands.length > 0) {
       const brandsArray = Array.isArray(filters.brands) ? filters.brands : [filters.brands]
       filteredProducts = filteredProducts.filter((product) => {
@@ -142,36 +142,36 @@ export default function ProductsPage() {
       const maxPrice = filters.maxPrice !== undefined ? filters.maxPrice : Number.POSITIVE_INFINITY
 
       filteredProducts = filteredProducts.filter((product: any) => {
-        
+
         let price = product.variants[0]?.price || 0;
-        
+
         if (promotionsData?.data?.promotions) {
           const discount = calculateProductDiscount(
             product.id,
             price,
             promotionsData.data.promotions
           );
-          
+
           if (discount.discountPercent > 0) {
             price = discount.discountedPrice;
           }
         }
-        
+
         return price >= minPrice && price <= maxPrice
       })
     }
 
-    
+
     if (sortOption !== "default") {
       filteredProducts.sort((a: any, b: any) => {
-        
+
         let priceA = a.variants[0]?.price || 0;
         let priceB = b.variants[0]?.price || 0;
-        
+
         if (promotionsData?.data?.promotions) {
           const discountA = calculateProductDiscount(a.id, priceA, promotionsData.data.promotions);
           const discountB = calculateProductDiscount(b.id, priceB, promotionsData.data.promotions);
-          
+
           if (discountA.discountPercent > 0) {
             priceA = discountA.discountedPrice;
           }
@@ -179,7 +179,7 @@ export default function ProductsPage() {
             priceB = discountB.discountedPrice;
           }
         }
-        
+
         const dateA = new Date(a.createdAt).getTime()
         const dateB = new Date(b.createdAt).getTime()
 
@@ -200,7 +200,7 @@ export default function ProductsPage() {
       })
     }
 
-    
+
     return {
       ...rawData,
       data: {
@@ -236,26 +236,26 @@ export default function ProductsPage() {
     if (!product.variants?.[0]) return;
 
     const firstVariant = product.variants[0];
-    
+
     if (firstVariant.stock === 0) {
       toast.error('Sản phẩm đã hết hàng');
       return;
     }
-    
-    
+
+
     let finalPrice = firstVariant.price;
     let originalPrice = undefined;
     let discountPercent = 0;
     let hasDiscount = false;
 
-    
+
     if (promotionsData?.data?.promotions) {
       const discount = calculateProductDiscount(
         product.id,
         firstVariant.price,
         promotionsData.data.promotions
       );
-      
+
       if (discount.discountPercent > 0) {
         finalPrice = discount.discountedPrice;
         originalPrice = discount.originalPrice;
@@ -279,7 +279,7 @@ export default function ProductsPage() {
       size: firstVariant.size?.code || firstVariant.size?.name,
       colors: [firstVariant.color?.name || 'Default'],
       stock: firstVariant.stock,
-      
+
       colorId: firstVariant.color?.id || firstVariant.colorId || '',
       sizeId: firstVariant.size?.id || firstVariant.sizeId || '',
       colorName: firstVariant.color?.name || 'Default',
@@ -329,7 +329,7 @@ export default function ProductsPage() {
         </BreadcrumbList>
       </Breadcrumb>
       <div className="flex flex-col lg:flex-row gap-4 items-start">
-        {}
+
         <AnimatePresence>
           {isFilterOpen && (
             <motion.div
@@ -339,7 +339,7 @@ export default function ProductsPage() {
               transition={{ duration: 0.3 }}
               className="lg:hidden w-full"
             >
-              <div className="bg-white rounded-[6px] shadow-sm border p-4 mb-4">
+              <div className="bg-white rounded-md shadow-sm border p-4 mb-4">
                 <div className="flex justify-between items-center mb-2">
                   <h2 className="font-medium">Bộ lọc sản phẩm</h2>
                   <Button variant="ghost" size="sm" onClick={toggleFilter}>
@@ -353,7 +353,7 @@ export default function ProductsPage() {
         </AnimatePresence>
 
         <div className="hidden lg:block w-full lg:w-1/4 xl:w-1/5 ">
-          <div className="bg-white rounded-[6px] shadow-sm border p-4 sticky top-20">
+          <div className="bg-white rounded-md shadow-sm border p-4 sticky top-20">
             <h2 className="font-medium mb-4">Bộ lọc sản phẩm</h2>
             <ProductFilters filters={filters} onChange={handleFilterChange} />
 
@@ -368,7 +368,7 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {}
+
         <div className="w-full lg:w-3/4 xl:w-4/5">
           <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
             <div className="flex gap-2 flex-1">
@@ -446,7 +446,7 @@ export default function ProductsPage() {
                 ))}
               </div>
 
-              {}
+
               <div className="flex justify-center mt-8">
                 <Pagination>
                   <PaginationContent>
@@ -464,7 +464,7 @@ export default function ProductsPage() {
                       const totalPages = (data?.data?.pagination as any)?.totalPages || 1
                       const currentPage = (data?.data?.pagination as any)?.currentPage || 1
 
-                      
+
                       if (totalPages > 0) {
                         pages.push(
                           <PaginationItem key={1}>
@@ -482,7 +482,7 @@ export default function ProductsPage() {
                         )
                       }
 
-                      
+
                       if (currentPage > 3) {
                         pages.push(
                           <PaginationItem key="start-ellipsis">
@@ -491,7 +491,7 @@ export default function ProductsPage() {
                         )
                       }
 
-                      
+
                       for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
                         if (i !== 1 && i !== totalPages) {
                           pages.push(
@@ -554,7 +554,7 @@ export default function ProductsPage() {
                 </Pagination>
               </div>
 
-              <div className="lg:hidden mt-8 bg-white rounded-[6px] shadow-sm border p-4">
+              <div className="lg:hidden mt-8 bg-white rounded-md shadow-sm border p-4">
                 <VoucherForm
                   orderValue={filteredProducts.reduce((sum, product) => sum + (product.variants[0]?.price || 0), 0)}
                   onApplyVoucher={handleApplyVoucher}
@@ -616,7 +616,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
             </div>
           </a>
 
-          {}
+
           <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
             {(() => {
               if (promotionsData?.data?.promotions && product.variants?.[0]) {
@@ -625,7 +625,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
                   product.variants[0].price,
                   promotionsData.data.promotions
                 );
-                
+
                 if (discount.discountPercent > 0) {
                   return (
                     <motion.div
@@ -642,7 +642,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
               }
               return null;
             })()}
-            {}
+
             {(() => {
               const totalStock = product.variants.reduce((sum: number, variant: any) => sum + (variant.stock || 0), 0);
               if (totalStock === 0) {
@@ -672,7 +672,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
             })()}
           </div>
 
-          {}
+
           <motion.div
             className="absolute right-2 top-2 transform -translate-y-1/2 flex flex-col gap-4 z-50"
             initial={{ x: 60, opacity: 0 }}
@@ -754,19 +754,19 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
                 transition={{ duration: 0.2 }}
               >
                 {(() => {
-                  
+
                   if (promotionsData?.data?.promotions) {
                     const discount = calculateProductDiscount(
                       product.id,
                       product.variants[0].price,
                       promotionsData.data.promotions
                     );
-                    
+
                     if (discount.discountPercent > 0) {
                       return formatPrice(discount.discountedPrice);
                     }
                   }
-                  
+
                   return formatPrice(product.variants[0]?.price || 0);
                 })()}
               </motion.div>
@@ -777,7 +777,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
                     product.variants[0].price,
                     promotionsData.data.promotions
                   );
-                  
+
                   if (discount.discountPercent > 0) {
                     return (
                       <div className="text-xs text-maintext line-through font-medium bg-gray-100 px-2 py-1 rounded-sm italic">
@@ -854,7 +854,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
             )}
           </div>
 
-          {}
+
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-b-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
       </Card>
@@ -976,7 +976,7 @@ const ProductFilters = ({ filters, onChange }: ProductFiltersProps) => {
 
     const uniqueSizes = Array.from(new Set(allSizes.map((size) => JSON.stringify(size))))
       .map((sizeStr) => JSON.parse(sizeStr))
-      .sort((a, b) => (a.value || 0) - (b.value || 0)) 
+      .sort((a, b) => (a.value || 0) - (b.value || 0))
 
     return uniqueSizes
   }, [products])
@@ -1002,7 +1002,7 @@ const ProductFilters = ({ filters, onChange }: ProductFiltersProps) => {
   const handlePriceChange = (values: number[]) => {
     setSelectedPriceRange(values as [number, number])
 
-    
+
     const timerId = setTimeout(() => {
       onChange({
         minPrice: values[0],

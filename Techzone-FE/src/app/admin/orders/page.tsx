@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
- 
+
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -231,8 +231,8 @@ export default function OrdersPage() {
       "Số điện thoại": order.customer?.phoneNumber || order.shippingPhoneNumber || "N/A",
       "Ngày tạo": formatDate(order.createdAt),
       "Tổng tiền": formatCurrency(order.total),
-      "Trạng thái đơn hàng": order.orderStatus, 
-      "Trạng thái thanh toán": order.paymentStatus, 
+      "Trạng thái đơn hàng": order.orderStatus,
+      "Trạng thái thanh toán": order.paymentStatus,
     }))
 
     const worksheet = XLSX.utils.json_to_sheet(formattedOrders)
@@ -330,8 +330,8 @@ export default function OrdersPage() {
         halign: "left",
       },
       columnStyles: {
-        3: { halign: "right" }, 
-        4: { halign: "center" }, 
+        3: { halign: "right" },
+        4: { halign: "center" },
         5: { halign: "center" },
       },
     })
@@ -429,7 +429,7 @@ export default function OrdersPage() {
                         "w-full justify-start text-left font-normal text-primary",
                         !dateRange && "text-muted-foreground",
                       )}
-                    > 
+                    >
                       <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
                       {dateRange?.from ? (
                         dateRange.to ? (
@@ -460,20 +460,20 @@ export default function OrdersPage() {
                   {showFilters ? "Ẩn bộ lọc" : "Hiện bộ lọc"}
                 </Button>
                 <div className="flex flex-col sm:flex-row gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <Icon path={mdiFileExport} size={0.7} className="mr-2" />
-                Xuất dữ liệu
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleExportExcel}>Xuất Excel</DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportPDF}>Xuất PDF</DropdownMenuItem>
-              <DropdownMenuItem>In danh sách</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline">
+                        <Icon path={mdiFileExport} size={0.7} className="mr-2" />
+                        Xuất dữ liệu
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={handleExportExcel}>Xuất Excel</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleExportPDF}>Xuất PDF</DropdownMenuItem>
+                      <DropdownMenuItem>In danh sách</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
             </div>
 
@@ -628,7 +628,7 @@ export default function OrdersPage() {
         <div className="space-y-4">
           {[...Array(5)].map((_, index) => (
             <div key={index} className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded-[6px]" />
+              <Skeleton className="h-12 w-12 rounded-md" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-[250px]" />
                 <Skeleton className="h-4 w-[200px]" />
@@ -906,7 +906,7 @@ const OrderDetailDialog = ({
             <div className="space-y-4">
               <div>
                 <h3 className="text-sm font-medium text-maintext">Thông tin đơn hàng</h3>
-                <div className="mt-2 rounded-[6px] border p-4 space-y-4">
+                <div className="mt-2 rounded-md border p-4 space-y-4">
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Mã đơn hàng:</span>
                     <span className="text-sm font-medium">{orderDetail.orderNumber}</span>
@@ -932,7 +932,7 @@ const OrderDetailDialog = ({
 
               <div>
                 <h3 className="text-sm font-medium text-maintext">Thông tin khách hàng</h3>
-                <div className="mt-2 rounded-[6px] border p-4 space-y-4">
+                <div className="mt-2 rounded-md border p-4 space-y-4">
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Tên khách hàng:</span>
                     <span className="text-sm font-medium">{orderDetail.customer?.fullName}</span>
@@ -952,7 +952,7 @@ const OrderDetailDialog = ({
 
               <div>
                 <h3 className="text-sm font-medium text-maintext">Địa chỉ giao hàng</h3>
-                <div className="mt-2 rounded-[6px] border p-4">
+                <div className="mt-2 rounded-md border p-4">
                   {orderDetail.shippingAddress ? (
                     <div className="space-y-2">
                       <p className="text-sm font-medium">{orderDetail.shippingAddress.name}</p>
@@ -974,7 +974,7 @@ const OrderDetailDialog = ({
             <div className="space-y-4">
               <div>
                 <h3 className="text-sm font-medium text-maintext">Sản phẩm đã đặt</h3>
-                <div className="mt-2 rounded-[6px]">
+                <div className="mt-2 rounded-md">
                   <div className="max-h-[300px] overflow-y-auto">
                     <Table>
                       <TableHeader>
@@ -1022,7 +1022,7 @@ const OrderDetailDialog = ({
 
               <div>
                 <h3 className="text-sm font-medium text-maintext">Tổng tiền</h3>
-                <div className="mt-2 rounded-[6px] border p-4 space-y-4">
+                <div className="mt-2 rounded-md border p-4 space-y-4">
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Tổng tiền hàng:</span>
                     <span className="text-sm font-medium">{formatCurrency(orderDetail.subTotal)}</span>
@@ -1040,7 +1040,7 @@ const OrderDetailDialog = ({
                 </div>
               </div>
 
-              {}
+
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <Button

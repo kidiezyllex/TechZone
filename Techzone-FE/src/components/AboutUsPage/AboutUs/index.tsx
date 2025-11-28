@@ -13,7 +13,7 @@ import 'swiper/css/navigation';
 
 const FeatureCard = ({ icon, title, description }: { icon: string; title: string; description: string }) => (
     <motion.div
-        className="bg-white backdrop-blur-md p-8 rounded-[6px] transition-all duration-300 border border-white/20"
+        className="bg-white backdrop-blur-md p-8 rounded-md transition-all duration-300 border border-white/20"
         whileHover={{ y: -10, scale: 1.02 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -33,7 +33,7 @@ const FeatureCard = ({ icon, title, description }: { icon: string; title: string
 
 const TeamMember = ({ name, id, role }: { name: string; id: string; role: string }) => (
     <motion.div
-        className=" bg-gradient-to-r from-primary/50 to-secondary/50 flex flex-col items-center justify-center gap-2 p-4 px-2 rounded-[6px] relative overflow-hidden cursor-pointer"
+        className=" bg-gradient-to-r from-primary/50 to-secondary/50 flex flex-col items-center justify-center gap-2 p-4 px-2 rounded-md relative overflow-hidden cursor-pointer"
         whileHover={{ y: -10, scale: 1.02 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -63,7 +63,7 @@ const TestimonialCard = ({ rating, title, description, image, name, role }: {
     role: string;
 }) => (
     <motion.div
-        className="bg-white/15 backdrop-blur-md p-8 rounded-[6px] shadow-lg transition-all duration-300 border border-white/20 h-full"
+        className="bg-white/15 backdrop-blur-md p-8 rounded-md shadow-lg transition-all duration-300 border border-white/20 h-full"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -378,7 +378,7 @@ export const AboutUs = () => {
             <section className="py-24">
                 <div className="container mx-auto px-4">
                     <motion.div
-                        className="bg-gradient-to-r from-primary via-secondary to-extra rounded-[6px] p-16 text-center relative overflow-hidden"
+                        className="bg-gradient-to-r from-primary via-secondary to-extra rounded-md p-16 text-center relative overflow-hidden"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}

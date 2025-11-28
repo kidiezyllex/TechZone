@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@mdi/react';
@@ -99,10 +99,10 @@ export default function PromotionsPage() {
       now.getMinutes(),
       now.getSeconds()
     );
-    
+
     const startUTC = new Date(promotion.startDate).getTime();
     const endUTC = new Date(promotion.endDate).getTime();
-    
+
     if (promotion.status === 'UNACTIVE') {
       return <Badge variant="destructive">Không hoạt động</Badge>;
     }
@@ -111,11 +111,11 @@ export default function PromotionsPage() {
       if (nowUTC < startUTC) {
         return <Badge variant="secondary">Chưa bắt đầu</Badge>;
       }
-      
+
       if (nowUTC > endUTC) {
         return <Badge variant="outline">Đã kết thúc</Badge>;
       }
-      
+
       return <Badge variant="default">Đang hoạt động</Badge>;
     }
 
@@ -162,7 +162,7 @@ export default function PromotionsPage() {
               <Input
                 type="text"
                 placeholder="Tìm kiếm theo tên chiến dịch..."
-                className="pl-10 pr-4 py-2 w-full border rounded-[6px]"
+                className="pl-10 pr-4 py-2 w-full border rounded-md"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -246,10 +246,10 @@ export default function PromotionsPage() {
       </Card>
 
       {isLoading ? (
-        <div className="bg-white rounded-[6px] shadow-sm p-4 space-y-4">
+        <div className="bg-white rounded-md shadow-sm p-4 space-y-4">
           {[...Array(5)].map((_, index) => (
             <div key={index} className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded-[6px]" />
+              <Skeleton className="h-12 w-12 rounded-md" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-[250px]" />
                 <Skeleton className="h-4 w-[200px]" />
@@ -258,7 +258,7 @@ export default function PromotionsPage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="bg-white rounded-[6px] shadow-sm p-4 text-center">
+        <div className="bg-white rounded-md shadow-sm p-4 text-center">
           <p className="text-red-500">Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau.</p>
           <Button
             variant="outline"
@@ -269,7 +269,7 @@ export default function PromotionsPage() {
           </Button>
         </div>
       ) : (
-        <div className="bg-white rounded-[6px] shadow-sm overflow-hidden">
+        <div className="bg-white rounded-md shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -383,7 +383,7 @@ export default function PromotionsPage() {
               </Button>
               {[...Array(data.data.pagination.totalPages)].map((_, index) => {
                 const page = index + 1;
-                
+
                 if (
                   page === 1 ||
                   page === data.data.pagination.totalPages ||
@@ -431,7 +431,7 @@ export default function PromotionsPage() {
         </div>
       )}
 
-      {}
+
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>

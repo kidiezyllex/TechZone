@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -62,7 +62,7 @@ export default function CreateOrderPage() {
   const [subTotal, setSubTotal] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [total, setTotal] = useState(0);
-  
+
   const { data: productsData } = useProducts({
     name: searchTerm,
     limit: 10,
@@ -72,7 +72,7 @@ export default function CreateOrderPage() {
   useEffect(() => {
     const newSubTotal = selectedProducts.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     setSubTotal(newSubTotal);
-    
+
     setDiscount(0);
     setTotal(newSubTotal - discount);
   }, [selectedProducts, discount]);
@@ -87,7 +87,7 @@ export default function CreateOrderPage() {
       quantity: 1,
       price: product.salePrice || product.regularPrice,
     };
-    
+
     setSelectedProducts([...selectedProducts, newProduct]);
     setProductListOpen(false);
   };
@@ -100,7 +100,7 @@ export default function CreateOrderPage() {
 
   const handleQuantityChange = (index: number, newQuantity: number) => {
     if (newQuantity < 1) return;
-    
+
     const updatedProducts = [...selectedProducts];
     updatedProducts[index].quantity = newQuantity;
     setSelectedProducts(updatedProducts);
@@ -108,33 +108,33 @@ export default function CreateOrderPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (selectedProducts.length === 0) {
       toast.error('Vui lòng thêm ít nhất một sản phẩm vào đơn hàng');
       return;
     }
-    
+
     if (!customerName || !customerPhone) {
       toast.error('Vui lòng nhập thông tin khách hàng');
       return;
     }
-    
+
     if (!shippingName || !shippingPhone || !shippingAddress || !provinceId || !districtId || !wardId) {
       toast.error('Vui lòng nhập đầy đủ thông tin giao hàng');
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
-      
-      
-      const customerID = "64f720fb93a46d138d413045"; 
-      
+
+
+      const customerID = "64f720fb93a46d138d413045";
+
       const orderData = {
         customer: customerID,
         items: selectedProducts,
-        voucher: voucherCode || '', 
+        voucher: voucherCode || '',
         subTotal,
         discount,
         total,
@@ -148,7 +148,7 @@ export default function CreateOrderPage() {
         },
         paymentMethod: paymentMethod as any,
       };
-      
+
       await createOrder.mutateAsync(orderData as any, {
         onSuccess: () => {
           toast.success('Tạo đơn hàng thành công');
@@ -210,11 +210,11 @@ export default function CreateOrderPage() {
               </CardHeader>
               <CardContent>
                 {selectedProducts.length === 0 ? (
-                  <div className="text-center py-4 border rounded-[6px]">
+                  <div className="text-center py-4 border rounded-md">
                     <p className="text-maintext">Chưa có sản phẩm nào. Vui lòng thêm sản phẩm vào đơn hàng.</p>
                   </div>
                 ) : (
-                  <div className="border rounded-[6px]">
+                  <div className="border rounded-md">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -229,7 +229,7 @@ export default function CreateOrderPage() {
                         {selectedProducts.map((item, index) => (
                           <TableRow key={index}>
                             <TableCell>
-                              {}
+
                               Product {index + 1} ({item.product})
                             </TableCell>
                             <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
@@ -281,7 +281,7 @@ export default function CreateOrderPage() {
                     </Table>
                   </div>
                 )}
-                
+
                 <div className="mt-4 space-y-2 border-t pt-4">
                   <div className="flex justify-between">
                     <span className="text-sm">Tổng tiền sản phẩm:</span>
@@ -328,7 +328,7 @@ export default function CreateOrderPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="customerEmail">Email (không bắt buộc)</Label>
                   <Input
@@ -341,7 +341,7 @@ export default function CreateOrderPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Thông tin giao hàng</CardTitle>
@@ -369,30 +369,30 @@ export default function CreateOrderPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="province">Tỉnh/Thành phố</Label>
-                    <Select 
-                      value={provinceId} 
+                    <Select
+                      value={provinceId}
                       onValueChange={setProvinceId}
                     >
                       <SelectTrigger id="province">
                         <SelectValue placeholder="Chọn Tỉnh/Thành phố" />
                       </SelectTrigger>
                       <SelectContent>
-                        {}
+
                         <SelectItem value="01">Hà Nội</SelectItem>
                         <SelectItem value="02">Hồ Chí Minh</SelectItem>
                         <SelectItem value="03">Đà Nẵng</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="district">Quận/Huyện</Label>
-                    <Select 
-                      value={districtId} 
+                    <Select
+                      value={districtId}
                       onValueChange={setDistrictId}
                       disabled={!provinceId}
                     >
@@ -400,17 +400,17 @@ export default function CreateOrderPage() {
                         <SelectValue placeholder="Chọn Quận/Huyện" />
                       </SelectTrigger>
                       <SelectContent>
-                        {}
+
                         <SelectItem value="001">Quận 1</SelectItem>
                         <SelectItem value="002">Quận 2</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="ward">Phường/Xã</Label>
-                    <Select 
-                      value={wardId} 
+                    <Select
+                      value={wardId}
                       onValueChange={setWardId}
                       disabled={!districtId}
                     >
@@ -418,14 +418,14 @@ export default function CreateOrderPage() {
                         <SelectValue placeholder="Chọn Phường/Xã" />
                       </SelectTrigger>
                       <SelectContent>
-                        {}
+
                         <SelectItem value="00001">Phường 1</SelectItem>
                         <SelectItem value="00002">Phường 2</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="address">Địa chỉ cụ thể</Label>
                   <Input
@@ -439,7 +439,7 @@ export default function CreateOrderPage() {
               </CardContent>
             </Card>
           </div>
-          
+
           <div className="space-y-4">
             <Card>
               <CardHeader>
@@ -460,7 +460,7 @@ export default function CreateOrderPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="voucherCode">Mã giảm giá (nếu có)</Label>
                   <Input
@@ -470,9 +470,9 @@ export default function CreateOrderPage() {
                     placeholder="Nhập mã giảm giá"
                   />
                 </div>
-                
+
                 <Separator className="my-4" />
-                
+
                 <div className="space-y-4">
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Tổng tiền sản phẩm:</span>
@@ -487,10 +487,10 @@ export default function CreateOrderPage() {
                     <span className="text-lg">{formatCurrency(total)}</span>
                   </div>
                 </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full mt-6" 
+
+                <Button
+                  type="submit"
+                  className="w-full mt-6"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -517,7 +517,7 @@ export default function CreateOrderPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="mb-4"
             />
-            
+
             {!productsData || productsData.data.products.length === 0 ? (
               <div className="text-center py-4">
                 <p className="text-maintext">Không tìm thấy sản phẩm phù hợp.</p>
@@ -538,10 +538,10 @@ export default function CreateOrderPage() {
                         <TableCell>
                           <div className="flex items-center space-x-4">
                             {product.images?.[0] && (
-                              <img 
-                                src={product.images[0]} 
+                              <img
+                                src={product.images[0]}
                                 alt={product.name}
-                                className="h-10 w-10 rounded-[6px] object-cover" 
+                                className="h-10 w-10 rounded-md object-cover"
                               />
                             )}
                             <div>

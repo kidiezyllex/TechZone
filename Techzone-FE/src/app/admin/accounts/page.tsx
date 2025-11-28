@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -112,13 +112,13 @@ export default function AccountsPage() {
     setFilters({ ...filters, page: newPage });
   };
 
-  
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Chưa xác định';
     return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: vi });
   };
 
-  
+
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'ADMIN':
@@ -132,7 +132,7 @@ export default function AccountsPage() {
     }
   };
 
-  
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -144,7 +144,7 @@ export default function AccountsPage() {
     }
   };
 
-  
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -155,7 +155,7 @@ export default function AccountsPage() {
   };
 
   const getRandomAvatar = () => {
-    const avatarCount = 4; 
+    const avatarCount = 4;
     const randomIndex = Math.floor(Math.random() * avatarCount) + 1;
     return `/images/dfavatar${randomIndex}.png`;
   };
@@ -251,7 +251,7 @@ export default function AccountsPage() {
               <Input
                 type="text"
                 placeholder="Tìm kiếm theo tên, email, số điện thoại..."
-                className="pl-10 pr-4 py-2 w-full border rounded-[6px]"
+                className="pl-10 pr-4 py-2 w-full border rounded-md"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -467,7 +467,7 @@ export default function AccountsPage() {
         </CardContent>
       </Card>
 
-      {}
+
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -507,7 +507,7 @@ export default function AccountsPage() {
         </DialogContent>
       </Dialog>
 
-      {}
+
       <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
         <DialogContent>
           <DialogHeader>

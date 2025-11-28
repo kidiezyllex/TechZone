@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@mdi/react';
@@ -96,19 +96,19 @@ export default function ReturnsPage() {
   const handleDateRangeChange = (range: { from?: Date; to?: Date }) => {
     setDateRange(range);
     const newFilters = { ...filters };
-    
+
     if (range.from) {
       newFilters.startDate = format(range.from, 'yyyy-MM-dd');
     } else {
       delete newFilters.startDate;
     }
-    
+
     if (range.to) {
       newFilters.endDate = format(range.to, 'yyyy-MM-dd');
     } else {
       delete newFilters.endDate;
     }
-    
+
     setFilters({ ...newFilters, page: 1 });
   };
 
@@ -129,9 +129,9 @@ export default function ReturnsPage() {
 
   const handleUpdateStatus = async (returnId: string, status: 'CHO_XU_LY' | 'DA_HOAN_TIEN' | 'DA_HUY') => {
     try {
-      await updateStatus.mutateAsync({ 
-        returnId, 
-        payload: { status } 
+      await updateStatus.mutateAsync({
+        returnId,
+        payload: { status }
       }, {
         onSuccess: () => {
           toast.success('Đã cập nhật trạng thái thành công');
@@ -329,7 +329,7 @@ export default function ReturnsPage() {
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-slate-50 p-4 rounded-[6px] mb-4"
+                  className="bg-slate-50 p-4 rounded-md mb-4"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -380,8 +380,8 @@ export default function ReturnsPage() {
                     </div>
                   </div>
                   <div className="flex gap-2 mt-4">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => {
                         setDateRange({});
@@ -399,7 +399,7 @@ export default function ReturnsPage() {
               <div className="space-y-4">
                 {[...Array(5)].map((_, index) => (
                   <div key={index} className="flex items-center space-x-4">
-                    <Skeleton className="h-12 w-12 rounded-[6px]" />
+                    <Skeleton className="h-12 w-12 rounded-md" />
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-[250px]" />
                       <Skeleton className="h-4 w-[200px]" />
@@ -434,13 +434,13 @@ export default function ReturnsPage() {
                       <TableRow key={(returnItem as any)?.id}>
                         <TableCell className="font-medium">{returnItem.code}</TableCell>
                         <TableCell>
-                          {typeof returnItem.customer === 'string' ? 
-                            returnItem.customer : 
+                          {typeof returnItem.customer === 'string' ?
+                            returnItem.customer :
                             returnItem.customer.fullName}
                         </TableCell>
                         <TableCell>
-                          {typeof returnItem.originalOrder === 'string' ? 
-                            returnItem.originalOrder : 
+                          {typeof returnItem.originalOrder === 'string' ?
+                            returnItem.originalOrder :
                             returnItem.originalOrder.code}
                         </TableCell>
                         <TableCell>{formatDate(returnItem.createdAt)}</TableCell>
@@ -457,7 +457,7 @@ export default function ReturnsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 className="cursor-pointer text-maintext"
                                 onClick={() => {
                                   setSelectedReturn((returnItem as any)?.id);
@@ -544,7 +544,7 @@ export default function ReturnsPage() {
         </CardContent>
       </Card>
 
-      {}
+
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-4xl">
           <DialogHeader>
@@ -557,8 +557,8 @@ export default function ReturnsPage() {
             <DialogClose asChild>
               <Button variant="outline">Hủy</Button>
             </DialogClose>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => returnToDelete && handleDeleteReturn(returnToDelete)}
               disabled={deleteReturn.isPending}
             >
@@ -568,14 +568,14 @@ export default function ReturnsPage() {
         </DialogContent>
       </Dialog>
 
-      {}
+
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="sm:max-w-[90%] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Chi tiết yêu cầu trả hàng</DialogTitle>
           </DialogHeader>
-          <ReturnDetailContent 
-            returnId={selectedReturn || ''} 
+          <ReturnDetailContent
+            returnId={selectedReturn || ''}
             formatCurrency={formatCurrency}
             formatDate={formatDate}
             onUpdateStatus={handleUpdateStatus}
@@ -583,7 +583,7 @@ export default function ReturnsPage() {
         </DialogContent>
       </Dialog>
 
-      {}
+
       <StatusUpdateModal
         isOpen={statusUpdateModal.isOpen}
         onClose={() => setStatusUpdateModal({ isOpen: false, returnId: '', currentStatus: '' })}
@@ -593,7 +593,7 @@ export default function ReturnsPage() {
         isLoading={updateStatus.isPending}
       />
 
-      {}
+
       <SearchReturnModal
         isOpen={searchModal}
         onClose={() => setSearchModal(false)}
@@ -604,12 +604,12 @@ export default function ReturnsPage() {
 
 import { useReturnDetail } from '@/hooks/return';
 
-function ReturnDetailContent({ 
-  returnId, 
-  formatCurrency, 
+function ReturnDetailContent({
+  returnId,
+  formatCurrency,
   formatDate,
   onUpdateStatus
-}: { 
+}: {
   returnId: string;
   formatCurrency: (amount: number) => string;
   formatDate: (date: string) => string;
@@ -632,7 +632,7 @@ function ReturnDetailContent({
   }
 
   const returnData = data.data;
-  const customer = typeof returnData.customer === 'string' 
+  const customer = typeof returnData.customer === 'string'
     ? { fullName: 'Không có thông tin', email: '', phoneNumber: '' }
     : returnData.customer;
 
@@ -725,10 +725,10 @@ function ReturnDetailContent({
             </TableHeader>
             <TableBody>
               {returnData.items.map((item: any, index: number) => {
-                const product = typeof item.product === 'string' 
+                const product = typeof item.product === 'string'
                   ? { name: 'Không có thông tin', code: item.product, images: [] }
                   : item.product;
-                
+
                 return (
                   <TableRow key={index}>
                     <TableCell>
@@ -737,11 +737,11 @@ function ReturnDetailContent({
                           <img
                             src={product.images[0]}
                             alt={product.name}
-                            className="object-cover rounded-[6px]"
+                            className="object-cover rounded-md"
                           />
                         </div>
                       ) : (
-                        <div className="w-16 h-16 bg-gray-100 rounded-[6px] flex items-center justify-center">
+                        <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
                           <Icon path={mdiMagnify} size={1} className="text-maintext" />
                         </div>
                       )}
@@ -780,15 +780,15 @@ function ReturnDetailContent({
 
       {returnData.status === 'CHO_XU_LY' && (
         <div className="border-t pt-4 flex justify-end space-x-2">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="gap-2"
             onClick={() => onUpdateStatus(returnId, 'DA_HUY')}
           >
             <Icon path={mdiCancel} size={0.7} />
             Từ chối trả hàng
           </Button>
-          <Button 
+          <Button
             className="gap-2"
             onClick={() => onUpdateStatus(returnId, 'DA_HOAN_TIEN')}
           >

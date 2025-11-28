@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAccount, useUpdateAccount, useUpdateAccountStatus } from '@/hooks/account';
 import { IAccountUpdate, IAccountStatusUpdate } from '@/interface/request/account';
@@ -30,7 +30,7 @@ export default function EditAccountPage() {
   const { data: accountData, isLoading, error } = useAccount(id);
   const updateAccount = useUpdateAccount(id);
   const updateAccountStatus = useUpdateAccountStatus(id);
-  
+
   const [formData, setFormData] = useState<IAccountUpdate>({
     fullName: '',
     email: '',
@@ -39,7 +39,7 @@ export default function EditAccountPage() {
     status: 'ACTIVE'
   });
 
-  const [displayGender, setDisplayGender] = useState<string>('Khác'); 
+  const [displayGender, setDisplayGender] = useState<string>('Khác');
 
   useEffect(() => {
     if (accountData?.data) {
@@ -143,8 +143,8 @@ export default function EditAccountPage() {
       <div className="flex flex-col items-center justify-center h-full">
         <h2 className="text-xl font-bold">Không thể tải thông tin tài khoản</h2>
         <p className="text-maintext">Có lỗi xảy ra: {error?.message || "Không tìm thấy tài khoản"}</p>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => navigate(-1)}
           className="mt-4"
         >
@@ -182,7 +182,7 @@ export default function EditAccountPage() {
         </Button>
       </div>
 
-      <div className="flex items-center space-x-4 bg-white p-8 rounded-[6px] shadow-md">
+      <div className="flex items-center space-x-4 bg-white p-8 rounded-md shadow-md">
         <Avatar className="w-24 h-24 border-2 border-primary">
           <AvatarImage src={formData.avatar} />
           <AvatarFallback className="text-2xl">
@@ -206,7 +206,7 @@ export default function EditAccountPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-4 rounded-[6px] shadow-md">
+      <form onSubmit={handleSubmit} className="bg-white p-4 rounded-md shadow-md">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 bg-white">
           <TabsList className="grid w-full md:w-[400px] grid-cols-2">
             <TabsTrigger value="info" className="text-maintext">Thông tin cơ bản</TabsTrigger>
@@ -259,11 +259,11 @@ export default function EditAccountPage() {
 
                   <div className="space-y-2">
                     <Label>Giới tính</Label>
-                    <RadioGroup 
+                    <RadioGroup
                       value={displayGender}
                       onValueChange={(value) => {
                         setDisplayGender(value);
-                        
+
                         const apiGender = value === 'Nam' ? true : value === 'Nữ' ? false : undefined;
                         setFormData((prev) => ({ ...prev, gender: apiGender }));
                       }}
@@ -334,15 +334,15 @@ export default function EditAccountPage() {
         </Tabs>
 
         <div className="mt-4 flex justify-end space-x-4">
-          <Button 
-            variant="outline" 
-            type="button" 
+          <Button
+            variant="outline"
+            type="button"
             onClick={() => navigate(-1)}
           >
             Hủy
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={updateAccount.isPending}
             className="flex items-center gap-2"
           >

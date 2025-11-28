@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { useNavigate } from 'react-router-dom';
 import { useCreateProduct } from '@/hooks/product';
 import { useUploadImage } from '@/hooks/upload';
@@ -255,7 +255,7 @@ export default function CreateProductPage() {
                       onValueChange={value => setProduct({ ...product, brand: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn thương hiệu">
-                          {product.brand 
+                          {product.brand
                             ? (brandsData?.data || []).find(brand => brand.id.toString() === product.brand?.toString())?.name || 'Chọn thương hiệu'
                             : 'Chọn thương hiệu'
                           }
@@ -278,7 +278,7 @@ export default function CreateProductPage() {
                       onValueChange={value => setProduct({ ...product, category: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn danh mục">
-                          {product.category 
+                          {product.category
                             ? (categoriesData?.data || []).find(category => category.id.toString() === product.category?.toString())?.name || 'Chọn danh mục'
                             : 'Chọn danh mục'
                           }
@@ -301,7 +301,7 @@ export default function CreateProductPage() {
                       onValueChange={value => setProduct({ ...product, material: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn chất liệu">
-                          {product.material 
+                          {product.material
                             ? (materialsData?.data || []).find(material => material.id.toString() === product.material?.toString())?.name || 'Chọn chất liệu'
                             : 'Chọn chất liệu'
                           }
@@ -413,7 +413,7 @@ export default function CreateProductPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.2 }}
-                      className="border p-4 rounded-[6px]"
+                      className="border p-4 rounded-md"
                     >
                       <div className="flex justify-between items-center mb-4">
                         <h3 className="text-lg font-medium">Biến thể #{index + 1}</h3>

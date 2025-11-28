@@ -164,10 +164,10 @@ export const BestSeller = () => {
           <span className="inline-block px-4 py-1.5 mb-4 text-xs font-semibold tracking-wider text-primary uppercase bg-primary/10 rounded-full">Bán chạy nhất</span>
           <h2 className="text-3xl font-bold text-center mb-4 relative">
             <span className="inline-block relative">
-              <span className="uppercase bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent drop-shadow-sm">
+              <span className="uppercase text-indigo-900">
                 Sản phẩm bán chạy
               </span>
-              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></div>
+              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-indigo-900 rounded-full"></div>
             </span>
           </h2>
           <p className="text-maintext dark:text-gray-300 max-w-4xl mx-auto text-lg">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { useNavigate, useParams } from 'react-router-dom';
 import { useVoucherDetail, useUpdateVoucher } from '@/hooks/voucher';
 import { IVoucherUpdate } from '@/interface/request/voucher';
@@ -54,7 +54,7 @@ export default function EditVoucherPage() {
         maxDiscount: voucherData.data.maxDiscount,
         status: voucherData.data.status
       });
-      
+
       setOriginalVoucher({
         code: voucherData.data.code,
         discountType: voucherData.data.discountType,
@@ -67,15 +67,15 @@ export default function EditVoucherPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     let parsedValue: string | number = value;
-    
-    
+
+
     if (type === 'number') {
       parsedValue = value === '' ? 0 : parseFloat(value);
     }
-    
+
     setVoucher({ ...voucher, [name]: parsedValue });
-    
-    
+
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -83,8 +83,8 @@ export default function EditVoucherPage() {
 
   const handleSelectChange = (name: string, value: string) => {
     setVoucher({ ...voucher, [name]: value });
-    
-    
+
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -92,8 +92,8 @@ export default function EditVoucherPage() {
 
   const handleDateChange = (name: string, value: string) => {
     setVoucher({ ...voucher, [name]: value });
-    
-    
+
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -101,47 +101,47 @@ export default function EditVoucherPage() {
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!voucher.name?.trim()) {
       newErrors.name = 'Tên voucher không được để trống';
     }
-    
+
     if (voucher.quantity !== undefined && voucher.quantity < originalVoucher.usedCount) {
       newErrors.quantity = `Số lượng không được nhỏ hơn số lượng đã sử dụng (${originalVoucher.usedCount})`;
     }
-    
+
     if (!voucher.startDate) {
       newErrors.startDate = 'Ngày bắt đầu không được để trống';
     }
-    
+
     if (!voucher.endDate) {
       newErrors.endDate = 'Ngày kết thúc không được để trống';
     }
-    
+
     if (voucher.startDate && voucher.endDate && new Date(voucher.startDate) > new Date(voucher.endDate)) {
       newErrors.endDate = 'Ngày kết thúc phải sau ngày bắt đầu';
     }
-    
+
     if (voucher.minOrderValue !== undefined && voucher.minOrderValue < 0) {
       newErrors.minOrderValue = 'Giá trị đơn hàng tối thiểu không được âm';
     }
-    
+
     if (originalVoucher.discountType === 'PERCENTAGE' && voucher.maxDiscount !== undefined && voucher.maxDiscount <= 0) {
       newErrors.maxDiscount = 'Giảm giá tối đa phải lớn hơn 0';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast.error('Vui lòng điền đầy đủ thông tin');
       return;
     }
-    
+
     try {
       await updateVoucher.mutateAsync(
         { voucherId, payload: voucher },
@@ -275,7 +275,7 @@ export default function EditVoucherPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="code" className="text-maintext">Mã voucher</Label>
-                <div className="px-2.5 border rounded-[6px] bg-gray-50 mt-1 h-9 flex items-center justify-between">
+                <div className="px-2.5 border rounded-md bg-gray-50 mt-1 h-9 flex items-center justify-between">
                   {originalVoucher.code}
                 </div>
                 <p className="text-xs text-maintext mt-1 italic">Mã voucher không thể thay đổi sau khi tạo</p>
@@ -283,7 +283,7 @@ export default function EditVoucherPage() {
 
               <div>
                 <Label htmlFor="discountType" className="text-maintext">Loại voucher</Label>
-                <div className="px-2.5 border rounded-[6px] bg-gray-50 mt-1 h-9 flex items-center justify-between">
+                <div className="px-2.5 border rounded-md bg-gray-50 mt-1 h-9 flex items-center justify-between">
                   {originalVoucher.discountType === 'PERCENTAGE' ? 'Phần trăm (%)' : 'Số tiền cố định (VNĐ)'}
                 </div>
                 <p className="text-xs text-maintext mt-1 italic">Loại voucher không thể thay đổi sau khi tạo</p>
@@ -291,7 +291,7 @@ export default function EditVoucherPage() {
 
               <div>
                 <Label htmlFor="discountValue" className="text-maintext">Giá trị</Label>
-                <div className="px-2.5 border rounded-[6px] bg-gray-50 mt-1 h-9 flex items-center justify-between flex">
+                <div className="px-2.5 border rounded-md bg-gray-50 mt-1 h-9 flex items-center justify-between flex">
                   <span>{originalVoucher.discountValue}</span>
                   <span className="ml-2">
                     {originalVoucher.discountType === 'PERCENTAGE' ? '%' : 'VNĐ'}

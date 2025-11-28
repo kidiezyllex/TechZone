@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@mdi/react';
@@ -156,7 +156,7 @@ export default function VouchersPage() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="flex space-x-2">
-          {}
+
           <a href="/admin/discounts/vouchers/create" className="flex items-center gap-2">
             <Button className="flex items-center gap-2">
               <Icon path={mdiPlus} size={0.7} />
@@ -178,7 +178,7 @@ export default function VouchersPage() {
               <Input
                 type="text"
                 placeholder="Tìm kiếm theo tên hoặc mã voucher..."
-                className="pl-10 pr-4 py-2 w-full border rounded-[6px]"
+                className="pl-10 pr-4 py-2 w-full border rounded-md"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -275,10 +275,10 @@ export default function VouchersPage() {
       </Card>
 
       {isLoading ? (
-        <div className="bg-white rounded-[6px] shadow-sm p-4 space-y-4">
+        <div className="bg-white rounded-md shadow-sm p-4 space-y-4">
           {[...Array(5)].map((_, index) => (
             <div key={index} className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded-[6px]" />
+              <Skeleton className="h-12 w-12 rounded-md" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-[250px]" />
                 <Skeleton className="h-4 w-[200px]" />
@@ -287,7 +287,7 @@ export default function VouchersPage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="bg-white rounded-[6px] shadow-sm p-4 text-center">
+        <div className="bg-white rounded-md shadow-sm p-4 text-center">
           <p className="text-red-500">Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau.</p>
           <Button
             variant="outline"
@@ -298,7 +298,7 @@ export default function VouchersPage() {
           </Button>
         </div>
       ) : (
-        <div className="bg-white rounded-[6px] shadow-sm overflow-hidden">
+        <div className="bg-white rounded-md shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -402,7 +402,7 @@ export default function VouchersPage() {
               </Button>
               {[...Array(data.data.pagination.totalPages)].map((_, index) => {
                 const page = index + 1;
-                
+
                 if (
                   page === 1 ||
                   page === data.data.pagination.totalPages ||
@@ -450,7 +450,7 @@ export default function VouchersPage() {
         </div>
       )}
 
-      {}
+
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -479,7 +479,7 @@ export default function VouchersPage() {
         </DialogContent>
       </Dialog>
 
-      {}
+
       <Dialog open={isNotifyDialogOpen} onOpenChange={setIsNotifyDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -507,7 +507,7 @@ export default function VouchersPage() {
         </DialogContent>
       </Dialog>
 
-      {}
+
       <Dialog open={isValidateDialogOpen} onOpenChange={resetValidateDialog}>
         <DialogContent className="sm:max-w-4xl">
           <DialogHeader>
@@ -539,9 +539,9 @@ export default function VouchersPage() {
                 placeholder="Nhập giá trị đơn hàng"
               />
             </div>
-            
+
             {validationResult && (
-              <div className="border rounded-[6px] p-4 mt-2">
+              <div className="border rounded-md p-4 mt-2">
                 <h4 className="text-md font-semibold mb-2">Kết quả kiểm tra:</h4>
                 <div className="space-y-2">
                   <div className="flex justify-between">

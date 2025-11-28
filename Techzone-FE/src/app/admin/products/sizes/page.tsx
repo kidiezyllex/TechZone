@@ -31,7 +31,7 @@ export default function SizesPage() {
         const numericQuery = Number(query);
         return data.data.filter(size => {
             const sizeLabel = getSizeLabel(size.value);
-            
+
             return (
                 !isNaN(numericQuery) ? size.value === numericQuery : String(size.value).includes(query)
             ) || sizeLabel.toLowerCase().includes(query);
@@ -39,13 +39,13 @@ export default function SizesPage() {
     }, [data?.data, searchQuery]);
 
     const handleDeleteSize = async (sizeId: string) => {
-        
+
         if (!sizeId) {
             console.error('sizeId is undefined, null or empty:', sizeId);
             toast.error('Lỗi: Không tìm thấy ID kích cỡ');
             return;
         }
-        
+
         try {
             await deleteSizeMutation.mutateAsync(sizeId, {
                 onSuccess: () => {
@@ -106,7 +106,7 @@ export default function SizesPage() {
             </Dialog>
 
             {isLoading ? (
-                <div className="bg-white rounded-[6px] shadow-sm overflow-visible">
+                <div className="bg-white rounded-md shadow-sm overflow-visible">
                     <div className="overflow-x-auto">
                         <Table>
                             <TableHeader>
@@ -151,7 +151,7 @@ export default function SizesPage() {
                     <p className="text-red-500">Đã xảy ra lỗi khi tải dữ liệu.</p>
                 </div>
             ) : (
-                <div className="bg-white rounded-[6px] shadow-sm overflow-visible">
+                <div className="bg-white rounded-md shadow-sm overflow-visible">
                     <div className="p-4 border-b">
                         <div className="flex flex-col sm:flex-row gap-4">
                             <div className="flex-1">
@@ -185,7 +185,7 @@ export default function SizesPage() {
                                             </TableCell>
                                             <TableCell className="px-4 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <div className="h-8 w-12 rounded-[6px] bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+                                                    <div className="h-8 w-12 rounded-md bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
                                                         <span className="text-sm font-bold">{getSizeLabel(size.value)}</span>
                                                     </div>
                                                 </div>
@@ -206,7 +206,7 @@ export default function SizesPage() {
                                             </TableCell>
                                             <TableCell className="px-4 py-4 whitespace-nowrap text-right">
                                                 <div className="flex items-center justify-end space-x-2">
-                                                    <DeleteSizeDialog 
+                                                    <DeleteSizeDialog
                                                         size={size}
                                                         onDelete={() => {
                                                             handleDeleteSize((size as any)?.id);
@@ -268,8 +268,8 @@ function DeleteSizeDialog({ size, onDelete, isDeleting }: DeleteSizeDialogProps)
                     <DialogClose asChild>
                         <Button variant="outline" disabled={isDeleting}>Hủy</Button>
                     </DialogClose>
-                    <Button 
-                        variant="destructive" 
+                    <Button
+                        variant="destructive"
                         onClick={handleDelete}
                         disabled={isDeleting}
                     >
@@ -358,7 +358,7 @@ function CreateSizeDialog({ isOpen, onClose }: CreateSizeDialogProps) {
         }
     };
 
-    
+
     const getCurrentSizeLabel = () => {
         if (formData.value > 0) {
             return getSizeLabel(formData.value);

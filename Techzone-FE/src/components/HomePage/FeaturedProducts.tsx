@@ -62,7 +62,7 @@ const ProductCard = ({ product, index }: { product: typeof featuredProducts[0], 
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -10 }}
-      className="group bg-white dark:bg-gray-800 rounded-[6px] shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+      className="group bg-white dark:bg-gray-800 rounded-md shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
     >
       <div className="relative">
         <div className="overflow-hidden aspect-square">

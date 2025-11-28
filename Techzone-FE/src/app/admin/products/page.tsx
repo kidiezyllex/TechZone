@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
- 
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@mdi/react';
@@ -45,16 +45,16 @@ export default function ProductsPage() {
 
   const { data: brandsData } = useBrands();
   const { data: categoriesData } = useCategories();
-  
+
   const data = useMemo(() => {
     if (!rawData || !rawData.data || !rawData.data.products) return rawData;
-    
+
     let products = [...rawData.data.products];
-    
+
     if (promotionsData?.data?.promotions) {
       products = applyPromotionsToProducts(products, promotionsData.data.promotions);
-    } 
-    
+    }
+
     return {
       ...rawData,
       data: {
@@ -165,7 +165,7 @@ export default function ProductsPage() {
             <Icon path={mdiPlus} size={0.7} />
             Thêm sản phẩm mới
           </Button>
-          
+
         </a>
       </div>
 
@@ -181,7 +181,7 @@ export default function ProductsPage() {
               <Input
                 type="text"
                 placeholder="Tìm kiếm theo tên sản phẩm..."
-                className="pl-10 py-2 w-full border rounded-[6px]"
+                className="pl-10 py-2 w-full border rounded-md"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -213,7 +213,7 @@ export default function ProductsPage() {
                     <Select value={filters.brand || 'all'} onValueChange={(value) => handleFilterChange('brand', value === 'all' ? undefined : value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Tất cả thương hiệu">
-                          {filters.brand 
+                          {filters.brand
                             ? (brandsData?.data || []).find(brand => brand.id.toString() === filters.brand?.toString())?.name || 'Tất cả thương hiệu'
                             : 'Tất cả thương hiệu'
                           }
@@ -234,7 +234,7 @@ export default function ProductsPage() {
                     <Select value={filters.category || 'all'} onValueChange={(value) => handleFilterChange('category', value === 'all' ? undefined : value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Tất cả danh mục">
-                          {filters.category 
+                          {filters.category
                             ? (categoriesData?.data || []).find(category => category.id.toString() === filters.category?.toString())?.name || 'Tất cả danh mục'
                             : 'Tất cả danh mục'
                           }
@@ -255,11 +255,11 @@ export default function ProductsPage() {
                     <Select value={filters.status || 'all'} onValueChange={(value) => handleFilterChange('status', value === 'all' ? undefined : value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Tất cả trạng thái">
-                          {filters.status === 'ACTIVE' 
-                            ? 'Hoạt động' 
-                            : filters.status === 'INACTIVE' 
-                            ? 'Không hoạt động' 
-                            : 'Tất cả trạng thái'
+                          {filters.status === 'ACTIVE'
+                            ? 'Hoạt động'
+                            : filters.status === 'INACTIVE'
+                              ? 'Không hoạt động'
+                              : 'Tất cả trạng thái'
                           }
                         </SelectValue>
                       </SelectTrigger>
@@ -278,10 +278,10 @@ export default function ProductsPage() {
       </Card>
 
       {isLoading ? (
-        <div className="bg-white rounded-[6px] shadow-sm p-4 space-y-4">
+        <div className="bg-white rounded-md shadow-sm p-4 space-y-4">
           {[...Array(5)].map((_, index) => (
             <div key={index} className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded-[6px]" />
+              <Skeleton className="h-12 w-12 rounded-md" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-[250px]" />
                 <Skeleton className="h-4 w-[200px]" />
@@ -290,7 +290,7 @@ export default function ProductsPage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="bg-white rounded-[6px] shadow-sm p-4 text-center">
+        <div className="bg-white rounded-md shadow-sm p-4 text-center">
           <p className="text-red-500">Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau.</p>
           <Button
             variant="outline"
@@ -301,9 +301,9 @@ export default function ProductsPage() {
           </Button>
         </div>
       ) : (
-        <div className="bg-white rounded-[6px] shadow-sm overflow-visible">
-          <div className="overflow-x-auto" style={{ 
-            width: '100%', 
+        <div className="bg-white rounded-md shadow-sm overflow-visible">
+          <div className="overflow-x-auto" style={{
+            width: '100%',
             display: 'block',
             overflowX: 'auto',
             whiteSpace: 'nowrap',
@@ -330,7 +330,7 @@ export default function ProductsPage() {
                     <TableRow key={product.id} className="hover:bg-gray-50">
                       <TableCell className="px-4 py-4 whitespace-nowrap">
                         <div
-                          className="relative h-12 w-12 rounded-[6px] overflow-hidden bg-gray-100 cursor-pointer group"
+                          className="relative h-12 w-12 rounded-md overflow-hidden bg-gray-100 cursor-pointer group"
                           onClick={() => handleOpenLightbox(product, 0, 0)}
                           title="Xem ảnh lớn"
                         >
@@ -356,10 +356,10 @@ export default function ProductsPage() {
                       <TableCell className="px-4 py-4 whitespace-nowrap text-sm">
                         {(() => {
                           const basePrice = product.variants[0]?.price || 0;
-                          const discount = promotionsData?.data?.promotions 
+                          const discount = promotionsData?.data?.promotions
                             ? calculateProductDiscount(product.id, basePrice, promotionsData.data.promotions)
                             : { originalPrice: basePrice, discountedPrice: basePrice, discountPercent: 0 };
-                          
+
                           return (
                             <div className="space-y-1">
                               <div className={`font-medium ${discount.discountPercent > 0 ? 'text-primary' : 'text-maintext'}`}>

@@ -8,8 +8,6 @@ export const RippleDemo: React.FC = () => {
   return (
     <div className="p-8 space-y-4 bg-gray-50 rounded-lg">
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">Ripple Effect Demo</h2>
-      
-      {}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-700">Buttons with Ripple Effect</h3>
         <div className="flex gap-4 flex-wrap">
@@ -24,8 +22,6 @@ export const RippleDemo: React.FC = () => {
           </Button>
         </div>
       </div>
-
-      {}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-700">Custom Ripple Cards</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -40,7 +36,6 @@ export const RippleDemo: React.FC = () => {
               <p className="text-orange-600 text-sm">Click me!</p>
             </div>
           </RippleEffect>
-
           <RippleEffect
             rippleColor="rgba(34, 197, 94, 0.3)"
             duration={500}
@@ -52,7 +47,6 @@ export const RippleDemo: React.FC = () => {
               <p className="text-green-600 text-sm">Click me!</p>
             </div>
           </RippleEffect>
-
           <RippleEffect
             rippleColor="rgba(239, 68, 68, 0.3)"
             duration={700}
@@ -66,8 +60,6 @@ export const RippleDemo: React.FC = () => {
           </RippleEffect>
         </div>
       </div>
-
-      {}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-700">Navigation Items</h3>
         <div className="bg-gray-800 rounded-lg p-4 space-y-2">

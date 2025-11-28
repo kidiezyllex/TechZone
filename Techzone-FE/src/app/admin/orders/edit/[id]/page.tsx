@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
- 
+
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -46,7 +46,7 @@ export default function EditOrderPage() {
       const order = orderData.data;
       setOrderStatus(order.orderStatus);
       setPaymentStatus(order.paymentStatus);
-      
+
       if (order.shippingAddress) {
         setFormData({
           shippingAddress: {
@@ -65,26 +65,26 @@ export default function EditOrderPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
-      
+
       if (Object.keys(formData).length > 0) {
         await updateOrder.mutateAsync({
           orderId: id as string,
           payload: formData
         });
       }
-      
-      
+
+
       if (orderStatus && orderStatus !== orderData?.data.orderStatus) {
         await updateOrderStatus.mutateAsync({
           orderId: id as string,
           payload: { status: orderStatus as any }
         });
       }
-      
+
       toast.success('Cập nhật đơn hàng thành công');
       navigate('/admin/orders');
     } catch (error) {
@@ -196,55 +196,55 @@ export default function EditOrderPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="province">Tỉnh/Thành phố</Label>
-                    <Select 
-                      value={formData.shippingAddress?.provinceId || ''} 
+                    <Select
+                      value={formData.shippingAddress?.provinceId || ''}
                       onValueChange={(value) => handleInputChange('provinceId', value)}
                     >
                       <SelectTrigger id="province">
                         <SelectValue placeholder="Chọn Tỉnh/Thành phố" />
                       </SelectTrigger>
                       <SelectContent>
-                        {}
+
                         <SelectItem value={order.shippingAddress?.provinceId || ''}>
                           {order.shippingAddress?.provinceName || 'Không có dữ liệu'}
                         </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="district">Quận/Huyện</Label>
-                    <Select 
-                      value={formData.shippingAddress?.districtId || ''} 
+                    <Select
+                      value={formData.shippingAddress?.districtId || ''}
                       onValueChange={(value) => handleInputChange('districtId', value)}
                     >
                       <SelectTrigger id="district">
                         <SelectValue placeholder="Chọn Quận/Huyện" />
                       </SelectTrigger>
                       <SelectContent>
-                        {}
+
                         <SelectItem value={order.shippingAddress?.districtId || ''}>
                           {order.shippingAddress?.districtName || 'Không có dữ liệu'}
                         </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="ward">Phường/Xã</Label>
-                    <Select 
-                      value={formData.shippingAddress?.wardId || ''} 
+                    <Select
+                      value={formData.shippingAddress?.wardId || ''}
                       onValueChange={(value) => handleInputChange('wardId', value)}
                     >
                       <SelectTrigger id="ward">
                         <SelectValue placeholder="Chọn Phường/Xã" />
                       </SelectTrigger>
                       <SelectContent>
-                        {}
+
                         <SelectItem value={order.shippingAddress?.wardId || ''}>
                           {order.shippingAddress?.wardName || 'Không có dữ liệu'}
                         </SelectItem>
@@ -252,7 +252,7 @@ export default function EditOrderPage() {
                     </Select>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="specificAddress">Địa chỉ cụ thể</Label>
                   <Input
@@ -264,13 +264,13 @@ export default function EditOrderPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Các sản phẩm trong đơn hàng</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="border rounded-[6px]">
+                <div className="border rounded-md">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
@@ -295,10 +295,10 @@ export default function EditOrderPage() {
                             <div className="flex items-center space-x-4">
                               {item.product.imageUrl && (
                                 <div className="flex-shrink-0 h-10 w-10">
-                                  <img 
-                                    className="h-10 w-10 rounded-[6px] object-cover" 
-                                    src={item.product.imageUrl} 
-                                    alt={item.product.name} 
+                                  <img
+                                    className="h-10 w-10 rounded-md object-cover"
+                                    src={item.product.imageUrl}
+                                    alt={item.product.name}
                                   />
                                 </div>
                               )}
@@ -308,7 +308,7 @@ export default function EditOrderPage() {
                                 </div>
                                 {item.variant && (
                                   <div className="text-sm text-maintext">
-                                    {item.variant.colorName && item.variant.sizeName && 
+                                    {item.variant.colorName && item.variant.sizeName &&
                                       `${item.variant.colorName} / ${item.variant.sizeName}`
                                     }
                                   </div>
@@ -330,7 +330,7 @@ export default function EditOrderPage() {
                     </tbody>
                   </table>
                 </div>
-                
+
                 <div className="mt-4 space-y-2 border-t pt-4">
                   <div className="flex justify-between">
                     <span className="text-sm">Tổng tiền sản phẩm:</span>
@@ -350,7 +350,7 @@ export default function EditOrderPage() {
               </CardContent>
             </Card>
           </div>
-          
+
           <div className="space-y-4">
             <Card>
               <CardHeader>
@@ -361,14 +361,14 @@ export default function EditOrderPage() {
                   <Label htmlFor="orderNumber">Mã đơn hàng</Label>
                   <Input id="orderNumber" value={order.orderNumber} disabled />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="createdAt">Ngày tạo</Label>
                   <Input id="createdAt" value={formatDate(order.createdAt)} disabled />
                 </div>
-                
+
                 <Separator className="my-4" />
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="orderStatus">Trạng thái đơn hàng</Label>
                   <Select value={orderStatus} onValueChange={setOrderStatus}>
@@ -385,7 +385,7 @@ export default function EditOrderPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="paymentStatus">Trạng thái thanh toán</Label>
                   <Select value={paymentStatus} onValueChange={setPaymentStatus}>
@@ -399,36 +399,36 @@ export default function EditOrderPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="paymentMethod">Phương thức thanh toán</Label>
-                  <Input 
-                    id="paymentMethod" 
+                  <Input
+                    id="paymentMethod"
                     value={
                       order.paymentMethod === 'CASH' ? 'Tiền mặt' :
-                      order.paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản ngân hàng' :
-                      order.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' :
-                      order.paymentMethod === 'MIXED' ? 'Thanh toán nhiều phương thức' :
-                      'Không xác định'
-                    } 
-                    disabled 
+                        order.paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản ngân hàng' :
+                          order.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' :
+                            order.paymentMethod === 'MIXED' ? 'Thanh toán nhiều phương thức' :
+                              'Không xác định'
+                    }
+                    disabled
                   />
                 </div>
-                
+
                 <Separator className="my-4" />
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="customer">Khách hàng</Label>
-                  <Input 
-                    id="customer" 
-                    value={`${order.customer.fullName} (${order.customer.phoneNumber})`} 
-                    disabled 
+                  <Input
+                    id="customer"
+                    value={`${order.customer.fullName} (${order.customer.phoneNumber})`}
+                    disabled
                   />
                 </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full mt-6" 
+
+                <Button
+                  type="submit"
+                  className="w-full mt-6"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (

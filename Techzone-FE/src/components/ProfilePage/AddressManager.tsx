@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
- 
+
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -100,7 +100,7 @@ export default function AddressManager() {
 
   const handleDelete = async () => {
     if (!deleteId) return
-    
+
     setIsDeleting(true)
     try {
       await deleteAddressMutation.mutateAsync(deleteId)
@@ -148,7 +148,7 @@ export default function AddressManager() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-medium">Địa chỉ của tôi</h2>
           <DialogTrigger asChild>
-            <Button 
+            <Button
               className="bg-primary hover:bg-secondary transition-all duration-300 flex items-center gap-2"
               onClick={resetForm}
             >
@@ -159,13 +159,13 @@ export default function AddressManager() {
         </div>
 
         {addresses.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-300 dark:border-gray-700 rounded-[6px]">
+          <div className="flex flex-col items-center justify-center p-12 border border-dashed border-gray-300 dark:border-gray-700 rounded-md">
             <Icon path={mdiMapMarker} size={3} className="text-maintext mb-4" />
             <p className="text-maintext dark:text-maintext mb-4">
               Bạn chưa có địa chỉ nào
             </p>
             <DialogTrigger asChild>
-              <Button 
+              <Button
                 className="bg-primary hover:bg-secondary transition-all duration-300"
                 onClick={resetForm}
               >
@@ -247,12 +247,12 @@ export default function AddressManager() {
           <DialogHeader>
             <DialogTitle>{isEditMode ? "Chỉnh sửa địa chỉ" : "Thêm địa chỉ mới"}</DialogTitle>
             <DialogDescription>
-              {isEditMode 
-                ? "Cập nhật thông tin địa chỉ của bạn" 
+              {isEditMode
+                ? "Cập nhật thông tin địa chỉ của bạn"
                 : "Điền đầy đủ thông tin để thêm địa chỉ mới"}
             </DialogDescription>
           </DialogHeader>
-          
+
           <ScrollArea className="max-h-[70vh]">
             <div className="p-1">
               <Form {...form}>
@@ -264,8 +264,8 @@ export default function AddressManager() {
                       <FormItem>
                         <FormLabel>Tên địa chỉ</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Ví dụ: Nhà riêng, Văn phòng..." 
+                          <Input
+                            placeholder="Ví dụ: Nhà riêng, Văn phòng..."
                             {...field}
                           />
                         </FormControl>
@@ -273,7 +273,7 @@ export default function AddressManager() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -282,8 +282,8 @@ export default function AddressManager() {
                         <FormItem>
                           <FormLabel>Họ tên người nhận</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Nhập họ tên người nhận" 
+                            <Input
+                              placeholder="Nhập họ tên người nhận"
                               {...field}
                             />
                           </FormControl>
@@ -291,7 +291,7 @@ export default function AddressManager() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="phoneNumber"
@@ -299,8 +299,8 @@ export default function AddressManager() {
                         <FormItem>
                           <FormLabel>Số điện thoại</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Nhập số điện thoại" 
+                            <Input
+                              placeholder="Nhập số điện thoại"
                               {...field}
                             />
                           </FormControl>
@@ -309,7 +309,7 @@ export default function AddressManager() {
                       )}
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
@@ -317,8 +317,8 @@ export default function AddressManager() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Tỉnh/Thành phố</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
@@ -332,14 +332,14 @@ export default function AddressManager() {
                               <SelectItem value="Đà Nẵng">Đà Nẵng</SelectItem>
                               <SelectItem value="Hải Phòng">Hải Phòng</SelectItem>
                               <SelectItem value="Cần Thơ">Cần Thơ</SelectItem>
-                              {}
+
                             </SelectContent>
                           </Select>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="district"
@@ -347,8 +347,8 @@ export default function AddressManager() {
                         <FormItem>
                           <FormLabel>Quận/Huyện</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Nhập quận/huyện" 
+                            <Input
+                              placeholder="Nhập quận/huyện"
                               {...field}
                             />
                           </FormControl>
@@ -356,7 +356,7 @@ export default function AddressManager() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="ward"
@@ -364,8 +364,8 @@ export default function AddressManager() {
                         <FormItem>
                           <FormLabel>Phường/Xã</FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Nhập phường/xã" 
+                            <Input
+                              placeholder="Nhập phường/xã"
                               {...field}
                             />
                           </FormControl>
@@ -374,7 +374,7 @@ export default function AddressManager() {
                       )}
                     />
                   </div>
-                  
+
                   <FormField
                     control={form.control}
                     name="addressDetail"
@@ -382,8 +382,8 @@ export default function AddressManager() {
                       <FormItem>
                         <FormLabel>Địa chỉ chi tiết</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="Số nhà, tên đường..." 
+                          <Textarea
+                            placeholder="Số nhà, tên đường..."
                             {...field}
                             className="min-h-[80px]"
                           />
@@ -392,12 +392,12 @@ export default function AddressManager() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="isDefault"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center space-x-4 space-y-0 rounded-[6px] border p-4">
+                      <FormItem className="flex flex-row items-center space-x-4 space-y-0 rounded-md border p-4">
                         <FormControl>
                           <Input
                             type="checkbox"
@@ -415,7 +415,7 @@ export default function AddressManager() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <DialogFooter className="mt-6">
                     <Button
                       type="button"
@@ -424,7 +424,7 @@ export default function AddressManager() {
                     >
                       Hủy
                     </Button>
-                    <Button 
+                    <Button
                       type="submit"
                       className="bg-primary hover:bg-secondary"
                       disabled={addAddressMutation.isPending || updateAddressMutation.isPending}
@@ -448,7 +448,7 @@ export default function AddressManager() {
         </DialogContent>
       </Dialog>
 
-      {}
+
       <Dialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>

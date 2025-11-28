@@ -27,7 +27,7 @@ const Tab = ({ text, selected, setSelected }: TabProps) => {
             className={`${selected
                 ? 'text-white'
                 : 'text-maintext hover:text-maintext dark:hover:text-gray-100'
-                } relative rounded-[6px] px-3 py-1.5 text-sm font-medium transition-colors`}
+                } relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors`}
         >
             <span className="relative z-10">{text}</span>
             {selected && (
@@ -57,7 +57,7 @@ export const NavigationBar = () => {
     }, []);
 
     return (
-        <header className="sticky top-0 z-50 bg-white shadow-sm py-4">
+        <header className="sticky top-0 z-50 bg-white shadow-sm py-3">
             <div className="container mx-auto flex items-center justify-between">
                 <a href="/" className="flex items-center">
                     <img
@@ -66,7 +66,7 @@ export const NavigationBar = () => {
                         alt="logo"
                         width={100}
                         height={100}
-                        className="w-auto mx-auto h-10 select-none cursor-pointer"
+                        className="w-auto mx-auto h-12 select-none cursor-pointer"
                     />
                 </a>
 

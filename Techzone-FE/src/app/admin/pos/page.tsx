@@ -129,7 +129,7 @@ const QRCodeComponent = ({ value, size = 200 }: { value: string; size?: number }
 
 
 const CardSkeleton = () => (
-  <div className="bg-white rounded-[6px] border border-border shadow-sm overflow-hidden">
+  <div className="bg-white rounded-md border border-border shadow-sm overflow-hidden">
     <Skeleton className="h-48 w-full" />
     <div className="p-4">
       <Skeleton className="h-4 w-3/4 mb-2" />
@@ -149,66 +149,66 @@ const CardSkeleton = () => (
 
 interface ApiVariant {
   id: string;
-  colorId?: { id: string; name: string; code: string; images?: string[] };  
-  sizeId?: { id: string; name: string; value?: string; };                   
-  price: number;                                                            
-  stock: number;                                                            
-  images?: string[];                                                        
-  sku?: string;                                                            
-  actualSizeId?: string;                                                   
+  colorId?: { id: string; name: string; code: string; images?: string[] };
+  sizeId?: { id: string; name: string; value?: string; };
+  price: number;
+  stock: number;
+  images?: string[];
+  sku?: string;
+  actualSizeId?: string;
 }
 
 
 interface ApiProduct {
-  id: string;                                                              
-  name: string;                                                            
-  brand: { id: string; name: string; } | string;                          
-  category: { id: string; name: string; } | string;                       
-  description?: string;                                                    
-  variants: ApiVariant[];                                                  
-  status?: string;                                                         
-  createdAt: string;                                                       
+  id: string;
+  name: string;
+  brand: { id: string; name: string; } | string;
+  category: { id: string; name: string; } | string;
+  description?: string;
+  variants: ApiVariant[];
+  status?: string;
+  createdAt: string;
 }
 
 
 interface InvoiceShopInfo {
-  name: string;                                                            
-  address: string;                                                         
-  phone: string;                                                          
-  email: string;                                                          
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
 }
 
 
 interface InvoiceCustomerInfo {
-  name: string;                                                           
-  phone: string;                                                          
+  name: string;
+  phone: string;
 }
 
 
 interface InvoiceItem {
-  name: string;                                                           
-  quantity: number;                                                       
-  price: number;                                                          
-  total: number;                                                          
-  color: string;                                                         
-  size: string;                                                          
+  name: string;
+  quantity: number;
+  price: number;
+  total: number;
+  color: string;
+  size: string;
 }
 
 
 interface InvoiceData {
-  shopInfo: InvoiceShopInfo;                                             
-  customerInfo: InvoiceCustomerInfo;                                     
-  orderId: string;                                                       
-  employee: string;                                                      
-  createdAt: string;                                                     
-  items: InvoiceItem[];                                                  
-  subTotal: number;                                                      
-  discount: number;                                                      
-  voucherCode?: string;                                                  
-  total: number;                                                         
-  cashReceived: number;                                                   
-  changeGiven: number;                                                   
-  paymentMethod: string;                                                 
+  shopInfo: InvoiceShopInfo;
+  customerInfo: InvoiceCustomerInfo;
+  orderId: string;
+  employee: string;
+  createdAt: string;
+  items: InvoiceItem[];
+  subTotal: number;
+  discount: number;
+  voucherCode?: string;
+  total: number;
+  cashReceived: number;
+  changeGiven: number;
+  paymentMethod: string;
 }
 
 
@@ -217,7 +217,7 @@ const getVariantImageUrl = (variant: any) => {
     return '/images/white-image.png';
   }
 
-  
+
   const firstImage = variant.images[0];
   if (typeof firstImage === 'string') {
     return firstImage;
@@ -232,7 +232,7 @@ const getVariantImageUrl = (variant: any) => {
 
 
 const convertVariantToApiVariant = (variant: any): ApiVariant => {
-  
+
   if (!variant) {
     return {
       id: '',
@@ -242,10 +242,10 @@ const convertVariantToApiVariant = (variant: any): ApiVariant => {
     };
   }
 
-  
+
   let colorData = undefined;
   if (variant.color) {
-    
+
     colorData = {
       id: variant.color.id?.toString() || '',
       name: variant.color.name || 'N/A',
@@ -253,7 +253,7 @@ const convertVariantToApiVariant = (variant: any): ApiVariant => {
       images: variant.color.images || []
     };
   } else if (variant.colorId) {
-    
+
     if (typeof variant.colorId === 'object') {
       colorData = {
         id: variant.colorId.id?.toString() || '',
@@ -271,17 +271,17 @@ const convertVariantToApiVariant = (variant: any): ApiVariant => {
     }
   }
 
-  
+
   let sizeData = undefined;
   if (variant.size) {
-    
+
     sizeData = {
       id: variant.size.id?.toString() || '',
       name: variant.size.name || (variant.size.value ? getSizeLabel(Number(variant.size.value)) : 'N/A'),
       value: variant.size.value?.toString()
     };
   } else if (variant.sizeId) {
-    
+
     if (typeof variant.sizeId === 'object') {
       sizeData = {
         id: variant.sizeId.id?.toString() || '',
@@ -297,7 +297,7 @@ const convertVariantToApiVariant = (variant: any): ApiVariant => {
     }
   }
 
-  
+
   return {
     id: variant.id?.toString() || variant._id?.toString() || '',
     colorId: colorData,
@@ -337,27 +337,27 @@ const convertProductToApiProduct = (product: any): ApiProduct => {
 
 
 export default function POSPage() {
-  
+
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedProduct, setSelectedProduct] = useState<ApiProduct | null>(null);
   const [selectedApiVariant, setSelectedApiVariant] = useState<ApiVariant | null>(null);
 
-  
+
   const {
-    carts: pendingCarts,              
-    activeCartId,                     
-    createNewCart,                    
-    deleteCart,                       
-    setActiveCart,                    
-    addItemToCart: addItemToPendingCart,  
-    removeItemFromCart: removeItemFromPendingCart,  
-    updateItemQuantityInCart: updateItemQuantityInPendingCart,  
-    clearCartItems: clearPendingCartItems,  
-    setCartDiscount: setPendingCartDiscount,  
-    getActiveCart,                    
+    carts: pendingCarts,
+    activeCartId,
+    createNewCart,
+    deleteCart,
+    setActiveCart,
+    addItemToCart: addItemToPendingCart,
+    removeItemFromCart: removeItemFromPendingCart,
+    updateItemQuantityInCart: updateItemQuantityInPendingCart,
+    clearCartItems: clearPendingCartItems,
+    setCartDiscount: setPendingCartDiscount,
+    getActiveCart,
   } = usePendingCartsStore();
 
-  
+
   const activeCart = getActiveCart();
   const cartItems = activeCart?.items || [];
   const appliedDiscount = activeCart?.appliedDiscount || 0;
@@ -423,39 +423,39 @@ export default function POSPage() {
 
   const { data: usersData, isLoading: isLoadingUsers } = useAccounts(accountsParams);
 
-  
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setIsSearching(searchQuery.trim().length > 0);
-    }, 300); 
+    }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
-  
+
   useEffect(() => {
     setFilters(prevFilters => {
       const isAllProducts = activeCategoryName === 'Tất cả sản phẩm';
 
       if (isAllProducts) {
-        
+
         const { categories, ...restFilters } = prevFilters;
         return categories ? restFilters : prevFilters;
       } else {
-        
+
         const newCategories = [activeCategoryName];
         if (prevFilters.categories?.[0] === activeCategoryName) {
-          return prevFilters; 
+          return prevFilters;
         }
         return { ...prevFilters, categories: newCategories };
       }
     });
 
-    
+
     setPagination(prev => ({ ...prev, page: 1 }));
   }, [activeCategoryName]);
 
-  
+
   const productsHookParams: IProductFilter = useMemo(() => ({
     ...pagination,
     ...filters,
@@ -463,7 +463,7 @@ export default function POSPage() {
 
   const productsQuery = useProducts(productsHookParams);
 
-  
+
   const searchQueryParams = useMemo(() => {
     if (!isSearching) return { keyword: '' };
     return {
@@ -483,10 +483,10 @@ export default function POSPage() {
     isError: apiIsError,
   } = isSearching ? searchQueryHook : productsQuery;
 
-  
+
   const promotionsParams = useMemo(() => ({ status: 'ACTIVE' as const }), []);
   const { data: promotionsData } = usePromotions(promotionsParams);
-  
+
   const dataWithPromotions = useMemo(() => {
     if (!rawData?.data?.products) return rawData;
 
@@ -506,17 +506,17 @@ export default function POSPage() {
     };
   }, [rawData?.data?.products, promotionsData?.data?.promotions]);
 
-  
+
   const processedProducts = useMemo(() => {
     const products = dataWithPromotions?.data?.products;
     if (!products?.length) return [];
 
-    
+
     if (sortOption === 'default' || sortOption === 'newest') {
       return products;
     }
 
-    
+
     return [...products].sort((a, b) => {
       const priceA = (a as any).hasDiscount ? (a as any).discountedPrice : (a.variants[0]?.price || 0);
       const priceB = (b as any).hasDiscount ? (b as any).discountedPrice : (b.variants[0]?.price || 0);
@@ -532,7 +532,7 @@ export default function POSPage() {
     });
   }, [dataWithPromotions?.data?.products, sortOption]);
 
-  
+
   const dynamicCategories = useMemo(() => {
     const baseCategories = [{ id: 'all', name: 'Tất cả sản phẩm' }];
     const products = dataWithPromotions?.data?.products;
@@ -554,15 +554,15 @@ export default function POSPage() {
     return [...baseCategories, ...Array.from(uniqueCatObjects.values())];
   }, [dataWithPromotions?.data?.products?.length]);
 
-  
+
   const handleProductSelect = (product: any) => {
-    
+
     const productWithPromotion = { ...product };
 
-    
+
     const convertedProduct = convertProductToApiProduct(product);
 
-    
+
     if ((product as any).hasDiscount) {
       (convertedProduct as any).hasDiscount = (product as any).hasDiscount;
       (convertedProduct as any).discountedPrice = (product as any).discountedPrice;
@@ -574,7 +574,7 @@ export default function POSPage() {
     setSelectedProduct(convertedProduct);
 
     if (convertedProduct.variants && convertedProduct.variants.length > 0) {
-      
+
       const variantWithStock = convertedProduct.variants.find(v => v.stock > 0);
       const selectedVariant = variantWithStock || convertedProduct.variants[0];
       setSelectedApiVariant(selectedVariant);
@@ -588,30 +588,30 @@ export default function POSPage() {
     }
   };
 
-  
+
   const handleColorSelectFromDetail = (colorId: string) => {
     if (!selectedProduct) return;
 
-    
+
     const variantsWithThisColor = selectedProduct.variants.filter(v => v.colorId?.id === colorId);
     if (variantsWithThisColor.length === 0) return;
 
-    
+
     const variantWithStock = variantsWithThisColor.find(v => v.stock > 0);
     if (variantWithStock) {
       setSelectedApiVariant(variantWithStock);
     } else {
-      
+
       setSelectedApiVariant(variantsWithThisColor[0]);
       toast.warn("Màu này đã hết hàng.");
     }
   };
 
-  
+
   const handleSizeSelectFromDetail = (sizeId: string) => {
     if (!selectedProduct || !selectedApiVariant?.colorId) return;
 
-    
+
     const variantWithThisSizeAndColor = selectedProduct.variants.find(v =>
       v.colorId?.id === selectedApiVariant.colorId?.id && v.sizeId?.id === sizeId
     );
@@ -624,30 +624,30 @@ export default function POSPage() {
     }
   };
 
-  
+
   const addItemToCorrectCart = (product: any, variant: any, isAlreadyConverted = false) => {
-    
+
     const convertedProduct = isAlreadyConverted ? product : convertProductToApiProduct(product);
     const convertedVariant = isAlreadyConverted ? variant : convertVariantToApiVariant(variant);
 
-    
+
     const cartItemId = `${convertedProduct.id}-${convertedVariant.id}`;
 
-    
+
     let finalPrice = convertedVariant.price;
     let originalPrice = undefined;
     let discountPercent = undefined;
     let hasDiscount = false;
 
-    
+
     if ((product as any).hasDiscount) {
-      
+
       finalPrice = (product as any).discountedPrice;
       originalPrice = (product as any).originalPrice;
       discountPercent = (product as any).discountPercent;
       hasDiscount = true;
     } else if (promotionsData?.data?.promotions?.length > 0) {
-      
+
       const activePromotions = filterActivePromotions(promotionsData.data.promotions);
       const productWithPromotions = applyPromotionsToProducts([convertedProduct], activePromotions);
       const promotedProduct = productWithPromotions[0];
@@ -660,7 +660,7 @@ export default function POSPage() {
       }
     }
 
-    
+
     const newItem: POSCartItem = {
       id: cartItemId,
       productId: convertedProduct.id,
@@ -681,12 +681,12 @@ export default function POSPage() {
     };
 
     if (activeCartId) {
-      
+
       const existingItem = cartItems.find(item => item.id === cartItemId);
       const activeCartName = pendingCarts.find(cart => cart.id === activeCartId)?.name || 'Giỏ hàng';
 
       if (existingItem) {
-        
+
         if (existingItem.quantity < convertedVariant.stock) {
           updateItemQuantityInPendingCart(activeCartId, cartItemId, 1);
           toast.success(`Đã cập nhật số lượng sản phẩm trong ${activeCartName}.`);
@@ -694,12 +694,12 @@ export default function POSPage() {
           toast.warn('Số lượng sản phẩm trong kho không đủ.');
         }
       } else {
-        
+
         addItemToPendingCart(activeCartId, newItem);
         toast.success(`Đã thêm sản phẩm vào ${activeCartName}`);
       }
     } else {
-      
+
       const existingItem = mainCartItems.find(item => item.id === cartItemId);
       if (existingItem) {
         if (existingItem.quantity < convertedVariant.stock) {
@@ -715,7 +715,7 @@ export default function POSPage() {
     }
   };
 
-  
+
   const addToCart = () => {
     if (!selectedProduct || !selectedApiVariant) {
       toast.error('Vui lòng chọn sản phẩm và biến thể.');
@@ -730,7 +730,7 @@ export default function POSPage() {
     addItemToCorrectCart(selectedProduct, selectedApiVariant, true);
   };
 
-  
+
   const updateCartItemQuantity = (id: string, amount: number) => {
     const item = cartItems.find(item => item.id === id);
     if (!item) return;
@@ -756,30 +756,30 @@ export default function POSPage() {
     if (activeCartId) {
       updateItemQuantityInPendingCart(activeCartId, id, amount);
     } else {
-      updateQuantityStore(id, amount); 
+      updateQuantityStore(id, amount);
     }
   };
 
-  
+
   const removeCartItem = (id: string) => {
     if (activeCartId) {
       removeItemFromPendingCart(activeCartId, id);
       const cartName = pendingCarts.find(cart => cart.id === activeCartId)?.name || 'Giỏ hàng';
       toast.success(`Đã xóa sản phẩm khỏi ${cartName}`);
     } else {
-      removeFromCartStore(id); 
+      removeFromCartStore(id);
       toast.success('Đã xóa sản phẩm khỏi giỏ hàng');
     }
   };
 
-  
+
   const removeItemFromSpecificCart = (cartId: string, itemId: string) => {
     removeItemFromPendingCart(cartId, itemId);
     const cartName = pendingCarts.find(cart => cart.id === cartId)?.name || 'Giỏ hàng';
     toast.success(`Đã xóa sản phẩm khỏi ${cartName}`);
   };
 
-  
+
   const applyCoupon = async () => {
     if (!couponCode.trim()) {
       toast.error('Vui lòng nhập mã giảm giá');
@@ -787,7 +787,7 @@ export default function POSPage() {
     }
 
     try {
-      const response = await getAllVouchers({ status: 'ACTIVE' }); 
+      const response = await getAllVouchers({ status: 'ACTIVE' });
       const vouchers = response.data.vouchers;
 
       const validVoucher = vouchers.find(v =>
@@ -795,7 +795,7 @@ export default function POSPage() {
         v.status === 'ACTIVE' &&
         new Date(v.startDate) <= new Date() &&
         new Date(v.endDate) >= new Date() &&
-        v.quantity > v.usedCount 
+        v.quantity > v.usedCount
       );
 
       if (!validVoucher) {
@@ -803,16 +803,16 @@ export default function POSPage() {
         return;
       }
 
-      
+
       if (activeCartId) {
         const cart = pendingCarts.find(c => c.id === activeCartId);
         if (cart) {
           const cartName = cart.name || 'Giỏ hàng';
-          setPendingCartDiscount(activeCartId, validVoucher.discountValue); 
+          setPendingCartDiscount(activeCartId, validVoucher.discountValue);
           toast.success(`Đã áp dụng mã giảm giá cho ${cartName}`);
         }
       } else {
-        setVoucher(validVoucher); 
+        setVoucher(validVoucher);
         toast.success('Đã áp dụng mã giảm giá');
       }
     } catch (error) {
@@ -840,33 +840,33 @@ export default function POSPage() {
   };
 
   const handleCheckout = async () => {
-    
+
     if (cartItems.length === 0) {
       toast.error('Giỏ hàng đang trống');
       return;
     }
 
-    
+
     const totalAmount = calculateCartTotal();
     const cashReceivedNum = parseFloat(cashReceived.toString());
 
-    
+
     if (paymentMethod === 'cash' && (isNaN(cashReceivedNum) || cashReceivedNum < totalAmount)) {
       toast.error('Số tiền khách đưa không đủ hoặc không hợp lệ.');
       return;
     }
 
-    
+
     setCheckoutIsLoading(true);
 
-    
+
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     const generatedOrderId = `POS${hours}${minutes}${seconds}`;
 
-    
+
     const orderPayload: IPOSOrderCreateRequest = {
       orderId: generatedOrderId,
       customer: customerName || 'Khách tại quầy',
@@ -896,17 +896,17 @@ export default function POSPage() {
     };
 
     try {
-      
+
       const orderResponse = await createOrderMutation.mutateAsync(orderPayload);
 
       if (orderResponse.success && orderResponse.data) {
-        
+
         const orderCode = orderResponse.data.orderNumber || `POS-${Math.floor(1000 + Math.random() * 9000)}`;
 
-        
+
         updateStatsOnCheckout(totalAmount);
 
-        
+
         const newTransaction = {
           id: orderCode,
           customer: customerName || 'Khách vãng lai',
@@ -916,10 +916,10 @@ export default function POSPage() {
         };
         setRecentTransactions([newTransaction, ...recentTransactions.slice(0, 2)]);
 
-        
+
         toast.success(`Đã tạo đơn hàng ${orderCode} và thanh toán thành công!`);
 
-        
+
         if (appliedVoucher) {
           incrementVoucherUsageMutation(
             appliedVoucher.id,
@@ -934,10 +934,10 @@ export default function POSPage() {
           );
         }
 
-        
+
         const currentChangeDue = paymentMethod === 'cash' && !isNaN(cashReceivedNum) && cashReceivedNum >= totalAmount ? cashReceivedNum - totalAmount : 0;
 
-        
+
         const invoiceData: InvoiceData = {
           shopInfo: {
             name: 'TechZone',
@@ -969,11 +969,11 @@ export default function POSPage() {
           paymentMethod: paymentMethod === 'cash' ? 'Tiền mặt' : 'Chuyển khoản',
         };
 
-        
+
         setCurrentInvoiceData(invoiceData);
         setShowInvoiceDialog(true);
 
-        
+
         clearCartStore();
         if (activeCartId) {
           clearPendingCartItems(activeCartId);
@@ -987,14 +987,14 @@ export default function POSPage() {
         setShowCheckoutDialog(false);
 
       } else {
-        
+
         toast.error((orderResponse as any).message || 'Không thể tạo đơn hàng. Vui lòng thử lại.');
       }
     } catch (error: any) {
-      
+
       toast.error(error.response?.data?.message || error.message || 'Có lỗi xảy ra trong quá trình thanh toán.');
     } finally {
-      
+
       setCheckoutIsLoading(false);
     }
   };
@@ -1059,7 +1059,7 @@ export default function POSPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [cartItems, appliedVoucher, handleProceedToCheckout]);
 
-  
+
   const uniqueColorsForSelectedProduct = useMemo(() => {
     if (!selectedProduct?.variants?.length) return [];
     const colorMap = new Map<string, ApiVariant['colorId']>();
@@ -1088,33 +1088,33 @@ export default function POSPage() {
     return Array.from(sizeMap.values()).filter(Boolean) as NonNullable<ApiVariant['sizeId']>[];
   }, [selectedProduct?.id, selectedApiVariant?.colorId?.id]);
 
-  
+
   const cartCalculations = useMemo(() => {
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const total = Math.max(0, subtotal - appliedDiscount);
     return { subtotal, total };
   }, [cartItems, appliedDiscount]);
 
-  
+
   const calculateCartSubtotal = () => cartCalculations.subtotal;
   const calculateCartTotal = () => cartCalculations.total;
 
   const totalAmount = cartCalculations.total;
   const cashReceivedNum = parseFloat(cashReceived.toString());
 
-  
+
   const changeDue = useMemo(() => {
     if (paymentMethod !== 'cash' || !cashReceived) return 0;
     const cashReceivedNum = parseFloat(cashReceived.toString());
     return !isNaN(cashReceivedNum) && cashReceivedNum >= totalAmount ? cashReceivedNum - totalAmount : 0;
   }, [paymentMethod, cashReceived, totalAmount]);
 
-  
+
   const getBrandName = useCallback((brand: ApiProduct['brand']) =>
     typeof brand === 'object' ? brand.name : brand, []
   );
 
-  
+
   const getColorInfo = useCallback((colorId: any) => {
     if (!colorId) return null;
     if (typeof colorId === 'object' && colorId.id) {
@@ -1123,7 +1123,7 @@ export default function POSPage() {
     return null;
   }, []);
 
-  
+
   const getUniqueColors = useCallback((variants: any[]) => {
     if (!variants?.length) return [];
     const colorMap = new Map();
@@ -1138,7 +1138,7 @@ export default function POSPage() {
     return Array.from(colorMap.values());
   }, [getColorInfo]);
 
-  
+
   const handleCreateNewCart = () => {
     const newCartId = createNewCart();
     if (!newCartId) {
@@ -1148,13 +1148,13 @@ export default function POSPage() {
     toast.success(`Đã tạo giỏ hàng mới: Giỏ hàng ${pendingCarts.length + 1}`);
   };
 
-  
+
   const handleDeleteCart = (cartId: string) => {
     setCartToDelete(cartId);
     setShowDeleteCartDialog(true);
   };
 
-  
+
   const confirmDeleteCart = () => {
     if (cartToDelete) {
       const cartToDeleteData = pendingCarts.find(cart => cart.id === cartToDelete);
@@ -1167,13 +1167,13 @@ export default function POSPage() {
     }
   };
 
-  
+
   const cancelDeleteCart = () => {
     setCartToDelete(null);
     setShowDeleteCartDialog(false);
   };
 
-  
+
   const handleSwitchCart = (cartId: string) => {
     setActiveCart(cartId);
     const cart = pendingCarts.find(c => c.id === cartId);
@@ -1182,40 +1182,40 @@ export default function POSPage() {
     }
   };
 
-  
+
   const syncActiveCartToMainCart = () => {
     if (activeCart) {
-      
+
       clearCartStore();
 
-      
+
       activeCart.items.forEach(item => {
         addToCartStore(item);
       });
 
-      
+
       setDiscount(activeCart.appliedDiscount);
       setVoucher(activeCart.appliedVoucher);
       setCouponCode(activeCart.couponCode);
     }
   };
 
-  
+
   const handleViewCartItems = (cartId: string) => {
     setSelectedCartForView(cartId);
     setShowCartItemsDialog(true);
   };
 
-  
+
   const closeCartItemsDialog = () => {
     setShowCartItemsDialog(false);
     setSelectedCartForView(null);
   };
 
-  
+
   return (
     <div className="h-full">
-      {}
+
       <div className="mb-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <Breadcrumb>
@@ -1232,8 +1232,8 @@ export default function POSPage() {
         </div>
       </div>
 
-      {}
-      <div className='bg-white rounded-[6px] p-4 mb-4 shadow-sm border border-border'>
+
+      <div className='bg-white rounded-md p-4 mb-4 shadow-sm border border-border'>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-maintext flex items-center gap-2">
             <Icon path={mdiCart} size={1} className="text-primary" />
@@ -1248,7 +1248,7 @@ export default function POSPage() {
           </Button>
         </div>
 
-        {}
+
         {pendingCarts.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-2">
             {pendingCarts.slice(0, 5).map((cart, index) => (
@@ -1265,7 +1265,7 @@ export default function POSPage() {
                 )}
                 onClick={() => handleSwitchCart(cart.id)}
               >
-                {}
+
                 <div className="flex items-center gap-1 flex-1">
                   <div className={cn(
                     'w-2 h-2 rounded-full',
@@ -1277,7 +1277,7 @@ export default function POSPage() {
                     </span>
                   </span>
                 </div>
-                {}
+
                 <button
                   className="opacity-0 group-hover:opacity-100 transition-opacity border border-red-500/70 p-1 hover:bg-red-400 bg-red-400 rounded-full hover:!text-white text-white"
                   onClick={(e) => {
@@ -1290,7 +1290,7 @@ export default function POSPage() {
               </motion.button>
             ))}
 
-            {}
+
             {pendingCarts.length > 5 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1336,12 +1336,12 @@ export default function POSPage() {
         )}
       </div>
 
-      {}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {}
+
         <div className="lg:col-span-2 overflow-hidden flex flex-col">
-          {}
-          <div className="bg-white rounded-[6px] p-4 mb-4 shadow-sm border border-border hover:shadow-md transition-shadow duration-300">
+
+          <div className="bg-white rounded-md p-4 mb-4 shadow-sm border border-border hover:shadow-md transition-shadow duration-300">
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
               <div className="relative flex-1">
                 <Icon path={mdiMagnify} size={1} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-maintext" />
@@ -1349,20 +1349,20 @@ export default function POSPage() {
                   id="product-search"
                   type="text"
                   placeholder="Tìm kiếm sản phẩm..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-[6px] border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
 
-            {}
+
             <div className="flex overflow-x-auto pb-2 scrollbar-thin gap-2">
               {dynamicCategories.map((category) => (
                 <button
                   key={category.id}
                   className={cn(
-                    'whitespace-nowrap px-4 py-2 rounded-[6px] text-sm font-medium transition-all duration-200',
+                    'whitespace-nowrap px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
                     activeCategoryName === category.name
                       ? 'bg-primary text-white shadow-sm'
                       : 'bg-gray-50 text-maintext hover:bg-gray-100 hover:text-primary'
@@ -1379,9 +1379,9 @@ export default function POSPage() {
             </div>
           </div>
 
-          {}
+
           <div className="bg-white rounded-xl p-4 flex-1 shadow-lg border border-border/50 hover:shadow-xl transition-all duration-300 min-h-[400px]">
-            {}
+
             {selectedProduct && <div className='w-full flex items-center justify-between mb-4'>
               <motion.button
                 className="text-sm text-primary font-medium flex items-center gap-2 hover:text-primary/80 transition-colors bg-primary/5 px-4 py-2 rounded-full border border-primary/50"
@@ -1397,9 +1397,9 @@ export default function POSPage() {
               </motion.button>
             </div>}
 
-            {}
+
             {selectedProduct && selectedApiVariant ? (
-              
+
               <div className="mb-4">
                 <div className="flex flex-col lg:flex-row gap-8">
                   <motion.div
@@ -1434,14 +1434,14 @@ export default function POSPage() {
                     )}
                   </motion.div>
 
-                  {}
+
                   <motion.div
                     className="lg:w-1/2 space-y-8"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
                   >
-                    {}
+
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
@@ -1487,7 +1487,7 @@ export default function POSPage() {
                         )}
                       </motion.div>
                     </div>
-                    {}
+
                     {uniqueColorsForSelectedProduct.length > 0 && (
                       <motion.div
                         className="mt-8"
@@ -1532,7 +1532,7 @@ export default function POSPage() {
                         </div>
                       </motion.div>
                     )}
-                    {}
+
                     {availableSizesForSelectedColor.length > 0 && selectedApiVariant?.colorId && (
                       <div className="space-y-4">
                         <div className="flex items-center gap-2">
@@ -1593,7 +1593,7 @@ export default function POSPage() {
                 </div>
               </div>
             ) : (
-              
+
               <Tabs defaultValue="grid" className="w-full">
                 <div className="flex justify-between items-center mb-4">
                   <TabsList>
@@ -1635,7 +1635,7 @@ export default function POSPage() {
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.3 }}
-                              className="bg-white rounded-[6px] border border-border shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group"
+                              className="bg-white rounded-md border border-border shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group"
                             >
                               <div
                                 className="relative h-48 w-full bg-gray-50 overflow-hidden cursor-pointer"
@@ -1708,7 +1708,7 @@ export default function POSPage() {
                     </TabsContent>
 
                     <TabsContent value="table" className="mt-0">
-                      <div className="border border-border rounded-[6px] overflow-hidden">
+                      <div className="border border-border rounded-md overflow-hidden">
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="bg-muted/50">
@@ -1733,7 +1733,7 @@ export default function POSPage() {
                                 >
                                   <td className="py-3 px-4" onClick={() => handleProductSelect(product)}>
                                     <div className="flex items-center gap-2">
-                                      <div className="relative h-10 w-10 rounded-[6px] overflow-hidden bg-gray-50">
+                                      <div className="relative h-10 w-10 rounded-md overflow-hidden bg-gray-50">
                                         <img
                                           src={checkImageUrl(getVariantImageUrl(firstVariant))}
                                           alt={product.name}
@@ -1813,7 +1813,7 @@ export default function POSPage() {
                                               disabled={product.variants.every(v => v.stock === 0)}
                                               onClick={(e) => {
                                                 e.stopPropagation();
-                                                
+
                                                 const firstAvailableVariant = product.variants.find((v: any) => v.stock > 0);
                                                 if (firstAvailableVariant) {
                                                   addItemToCorrectCart(product, firstAvailableVariant, false);
