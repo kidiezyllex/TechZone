@@ -318,8 +318,8 @@ CREATE TABLE promotions (
     discount_value DECIMAL(10, 2) NOT NULL,
     min_purchase DECIMAL(15, 2) DEFAULT 0,
     max_discount DECIMAL(15, 2) NULL,
-    start_date TIMESTAMP NOT NULL,
-    end_date TIMESTAMP NOT NULL,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -344,8 +344,8 @@ CREATE TABLE vouchers (
     max_discount DECIMAL(15, 2) NULL,
     usage_limit INT DEFAULT 1 COMMENT 'Số lần sử dụng tối đa',
     used_count INT DEFAULT 0,
-    start_date TIMESTAMP NOT NULL,
-    end_date TIMESTAMP NOT NULL,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

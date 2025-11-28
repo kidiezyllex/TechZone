@@ -6,9 +6,6 @@ import { generateOTP, saveOTP, verifyOTP } from '../services/otp.service.js';
 import { sendOTPEmail, sendWelcomeEmail } from '../services/email.service.js';
 import { verifyClerkToken, findOrCreateUserFromClerk } from '../services/clerk.service.js';
 
-// ============================================
-// ĐĂNG KÝ TÀI KHOẢN (Bước 1: Gửi OTP)
-// ============================================
 export const requestRegisterOTP = async (req, res, next) => {
   try {
     const { email, full_name } = req.body;
@@ -41,9 +38,6 @@ export const requestRegisterOTP = async (req, res, next) => {
   }
 };
 
-// ============================================
-// ĐĂNG KÝ TÀI KHOẢN (Bước 2: Verify OTP & Tạo tài khoản hoặc Clerk OAuth)
-// ============================================
 export const register = async (req, res, next) => {
   try {
     const { email, password, full_name, phone, code, clerk_token, via_oauth } = req.body;

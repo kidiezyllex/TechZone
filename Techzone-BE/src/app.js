@@ -98,12 +98,10 @@ const startServer = async () => {
     }
     
     app.listen(PORT, '0.0.0.0', () => {
-      console.log('\n🚀 ============================================');
       console.log(`🌟 Techzone API Server đang chạy`);
       console.log(`📍 URL: http://localhost:${PORT}`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`⏰ Started at: ${new Date().toLocaleString('vi-VN')}`);
-      console.log('============================================\n');
     });
   } catch (error) {
     console.error('❌ Cannot start server:', error);

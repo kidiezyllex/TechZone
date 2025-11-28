@@ -4,36 +4,63 @@ USE techzone;
 -- Disable foreign key checks temporarily
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Clear existing data
-TRUNCATE TABLE voucher_usage;
-TRUNCATE TABLE vouchers;
-TRUNCATE TABLE promotion_products;
-TRUNCATE TABLE promotions;
-TRUNCATE TABLE return_items;
-TRUNCATE TABLE returns;
-TRUNCATE TABLE reviews;
-TRUNCATE TABLE order_items;
-TRUNCATE TABLE orders;
-TRUNCATE TABLE cart_items;
-TRUNCATE TABLE carts;
-TRUNCATE TABLE customers;
-TRUNCATE TABLE purchase_order_items;
-TRUNCATE TABLE purchase_orders;
-TRUNCATE TABLE stock_movements;
-TRUNCATE TABLE inventory;
-TRUNCATE TABLE product_images;
-TRUNCATE TABLE products;
-TRUNCATE TABLE brands;
-TRUNCATE TABLE categories;
-TRUNCATE TABLE staff_shifts;
-TRUNCATE TABLE user_login_logs;
-TRUNCATE TABLE stores;
-TRUNCATE TABLE otp_codes;
-TRUNCATE TABLE users;
-TRUNCATE TABLE roles;
-TRUNCATE TABLE daily_stats;
+-- Use DELETE statements because MySQL does not allow TRUNCATE on tables referenced by FKs
+DELETE FROM voucher_usage;
+DELETE FROM vouchers;
+DELETE FROM promotion_products;
+DELETE FROM promotions;
+DELETE FROM return_items;
+DELETE FROM returns;
+DELETE FROM reviews;
+DELETE FROM order_items;
+DELETE FROM orders;
+DELETE FROM cart_items;
+DELETE FROM carts;
+DELETE FROM customers;
+DELETE FROM purchase_order_items;
+DELETE FROM purchase_orders;
+DELETE FROM stock_movements;
+DELETE FROM inventory;
+DELETE FROM product_images;
+DELETE FROM products;
+DELETE FROM brands;
+DELETE FROM categories;
+DELETE FROM staff_shifts;
+DELETE FROM user_login_logs;
+DELETE FROM stores;
+DELETE FROM otp_codes;
+DELETE FROM users;
+DELETE FROM roles;
+DELETE FROM daily_stats;
 
-SET FOREIGN_KEY_CHECKS = 1;
+-- Reset AUTO_INCREMENT counters to mimic TRUNCATE behavior
+ALTER TABLE voucher_usage AUTO_INCREMENT = 1;
+ALTER TABLE vouchers AUTO_INCREMENT = 1;
+ALTER TABLE promotion_products AUTO_INCREMENT = 1;
+ALTER TABLE promotions AUTO_INCREMENT = 1;
+ALTER TABLE return_items AUTO_INCREMENT = 1;
+ALTER TABLE returns AUTO_INCREMENT = 1;
+ALTER TABLE reviews AUTO_INCREMENT = 1;
+ALTER TABLE order_items AUTO_INCREMENT = 1;
+ALTER TABLE orders AUTO_INCREMENT = 1;
+ALTER TABLE cart_items AUTO_INCREMENT = 1;
+ALTER TABLE carts AUTO_INCREMENT = 1;
+ALTER TABLE customers AUTO_INCREMENT = 1;
+ALTER TABLE purchase_order_items AUTO_INCREMENT = 1;
+ALTER TABLE purchase_orders AUTO_INCREMENT = 1;
+ALTER TABLE stock_movements AUTO_INCREMENT = 1;
+ALTER TABLE inventory AUTO_INCREMENT = 1;
+ALTER TABLE product_images AUTO_INCREMENT = 1;
+ALTER TABLE products AUTO_INCREMENT = 1;
+ALTER TABLE brands AUTO_INCREMENT = 1;
+ALTER TABLE categories AUTO_INCREMENT = 1;
+ALTER TABLE staff_shifts AUTO_INCREMENT = 1;
+ALTER TABLE user_login_logs AUTO_INCREMENT = 1;
+ALTER TABLE stores AUTO_INCREMENT = 1;
+ALTER TABLE otp_codes AUTO_INCREMENT = 1;
+ALTER TABLE users AUTO_INCREMENT = 1;
+ALTER TABLE roles AUTO_INCREMENT = 1;
+ALTER TABLE daily_stats AUTO_INCREMENT = 1;
 
 -- =============================================
 -- Roles
@@ -262,10 +289,10 @@ INSERT INTO promotions (name, description, discount_type, discount_value, min_pu
 ('Khuyến mãi Laptop', 'Giảm giá 10% cho tất cả laptop', 'percent', 10, 10000000, '2024-11-01', '2024-12-31', TRUE),
 ('Sale Gaming', 'Giảm 2 triệu cho sản phẩm gaming', 'fixed', 2000000, 15000000, '2024-11-15', '2024-11-30', TRUE);
 
-INSERT INTO vouchers (code, name, description, discount_type, discount_value, min_purchase, usage_limit, start_date, end_date, is_active) VALUES
-('WELCOME2024', 'Chào mừng khách hàng mới', 'percent', 5, 5000000, 100, '2024-11-01', '2024-12-31', TRUE),
-('BLACKFRIDAY', 'Black Friday Sale', 'fixed', 1000000, 20000000, 50, '2024-11-20', '2024-11-30', TRUE),
-('FREESHIP', 'Miễn phí vận chuyển', 'fixed', 50000, 2000000, 200, '2024-11-01', '2024-12-31', TRUE);
+INSERT INTO vouchers (code, name, description, discount_type, discount_value, min_purchase, max_discount, usage_limit, used_count, start_date, end_date, is_active) VALUES
+('WELCOME2024', 'Chào mừng khách hàng mới', 'Ưu đãi chào mừng khách mới', 'percent', 5, 5000000, NULL, 100, 0, '2024-11-01', '2024-12-31', TRUE),
+('BLACKFRIDAY', 'Black Friday Sale', 'Giảm giá sự kiện Black Friday', 'fixed', 1000000, 20000000, NULL, 50, 0, '2024-11-20', '2024-11-30', TRUE),
+('FREESHIP', 'Miễn phí vận chuyển', 'Miễn phí ship cho đơn đủ điều kiện', 'fixed', 50000, 2000000, NULL, 200, 0, '2024-11-01', '2024-12-31', TRUE);
 
 -- =============================================
 -- Sample Orders
@@ -298,5 +325,7 @@ INSERT INTO reviews (product_id, user_id, order_id, rating, comment, is_verified
 INSERT INTO reviews (product_id, user_id, order_id, rating, comment, is_verified) VALUES
 (1, 11, 1, 4, 'Sản phẩm ổn, giao hàng nhanh', FALSE),
 (5, 12, 2, 5, 'Laptop gaming giá rẻ chất lượng tốt', FALSE);
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 COMMIT;
