@@ -20,58 +20,86 @@ export const getProducts = async (req, res, next) => {
     
     const offset = (page - 1) * limit;
     
+    // Base SQL với WHERE conditions
+    let whereConditions = ['p.is_active = TRUE'];
+    const params = [];
+    
+    if (category_id) {
+      whereConditions.push('p.category_id = ?');
+      params.push(category_id);
+    }
+    if (brand_id) {
+      whereConditions.push('p.brand_id = ?');
+      params.push(brand_id);
+    }
+    if (min_price) {
+      whereConditions.push('p.selling_price >= ?');
+      params.push(min_price);
+    }
+    if (max_price) {
+      whereConditions.push('p.selling_price <= ?');
+      params.push(max_price);
+    }
+    if (search) {
+      whereConditions.push('(p.name LIKE ? OR p.description LIKE ? OR p.sku LIKE ?)');
+      const searchTerm = `%${search}%`;
+      params.push(searchTerm, searchTerm, searchTerm);
+    }
+    if (is_featured === 'true') {
+      whereConditions.push('p.is_featured = TRUE');
+    }
+    if (in_stock === 'true') {
+      whereConditions.push('(SELECT SUM(quantity) FROM inventory WHERE product_id = p.id) > 0');
+    }
+    
+    const whereClause = whereConditions.join(' AND ');
+    
+    const countSql = `
+      SELECT COUNT(*) as total 
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN brands b ON p.brand_id = b.id
+      WHERE ${whereClause}
+    `;
+    
+    // Main query với SELECT đầy đủ
     let sql = `
       SELECT p.*, c.name as category_name, b.name as brand_name,
              (SELECT SUM(quantity) FROM inventory WHERE product_id = p.id) as total_stock
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN brands b ON p.brand_id = b.id
-      WHERE p.is_active = TRUE
+      WHERE ${whereClause}
     `;
     
-    const params = [];
+    const countResult = await query(countSql, params);
+    const total = Number(countResult[0]?.total ?? 0);
     
-    if (category_id) {
-      sql += ' AND p.category_id = ?';
-      params.push(category_id);
-    }
-    if (brand_id) {
-      sql += ' AND p.brand_id = ?';
-      params.push(brand_id);
-    }
-    if (min_price) {
-      sql += ' AND p.price >= ?';
-      params.push(min_price);
-    }
-    if (max_price) {
-      sql += ' AND p.price <= ?';
-      params.push(max_price);
-    }
-    if (search) {
-      sql += ' AND (p.name LIKE ? OR p.description LIKE ? OR p.sku LIKE ?)';
-      const searchTerm = `%${search}%`;
-      params.push(searchTerm, searchTerm, searchTerm);
-    }
-    if (is_featured === 'true') {
-      sql += ' AND p.is_featured = TRUE';
-    }
-    if (in_stock === 'true') {
-      sql += ' AND (SELECT SUM(quantity) FROM inventory WHERE product_id = p.id) > 0';
-    }
-    
-    // Count total
-    const countSql = sql.replace(/SELECT .+ FROM/, 'SELECT COUNT(*) as total FROM');
-    const [{ total }] = await query(countSql, params);
-    
-    // Add sorting và pagination
-    const validSortBy = ['name', 'price', 'created_at', 'sold_count'];
-    const sortField = validSortBy.includes(sort_by) ? sort_by : 'created_at';
+    const validSortBy = ['name', 'price', 'selling_price', 'created_at', 'sold_count'];
+    const mappedSortBy = sort_by === 'price' ? 'selling_price' : sort_by;
+    const sortField = validSortBy.includes(mappedSortBy) ? mappedSortBy : 'created_at';
     const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
     
     sql += ` ORDER BY p.${sortField} ${sortOrder} LIMIT ? OFFSET ?`;
-    params.push(parseInt(limit), offset);
+    const queryParams = [...params, parseInt(limit), offset];
     
-    const products = await query(sql, params);
+    const products = await query(sql, queryParams);
+    
+    if (products.length > 0) {
+      const productIds = products.map(p => p.id);
+      const placeholders = productIds.map(() => '?').join(',');
+      
+      const allImages = await query(
+        `SELECT * FROM product_images 
+         WHERE product_id IN (${placeholders}) 
+         ORDER BY product_id, display_order`,
+        productIds
+      );
+      
+      products.forEach(product => {
+        product.images = allImages.filter(img => img.product_id === product.id);
+      });
+    }
     
     return paginatedResponse(res, products, page, limit, total, 'Lấy danh sách sản phẩm thành công');
   } catch (error) {

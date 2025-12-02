@@ -22,15 +22,20 @@ export const errorResponse = (res, message = 'Error occurred', statusCode = 500,
 };
 
 export const paginatedResponse = (res, data, page, limit, total, message = 'Success') => {
+  // Đảm bảo total là số hợp lệ
+  const totalCount = parseInt(total) || 0;
+  const pageNum = parseInt(page) || 1;
+  const limitNum = parseInt(limit) || 10;
+  
   return res.status(200).json({
     success: true,
     message,
     data,
     pagination: {
-      page: parseInt(page),
-      limit: parseInt(limit),
-      total,
-      totalPages: Math.ceil(total / limit)
+      page: pageNum,
+      limit: limitNum,
+      total: totalCount,
+      totalPages: limitNum > 0 ? Math.ceil(totalCount / limitNum) : 0
     }
   });
 };
