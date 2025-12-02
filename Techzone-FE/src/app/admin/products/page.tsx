@@ -47,21 +47,37 @@ export default function ProductsPage() {
   const { data: categoriesData } = useCategories();
 
   const data = useMemo(() => {
-    if (!rawData || !rawData.data || !rawData.data.products) return rawData;
+    if (!rawData || !rawData.data) return rawData;
 
-    let products = [...rawData.data.products];
+    // Handle both structures: data as array directly or data.products
+    const productsArray = Array.isArray(rawData.data)
+      ? rawData.data
+      : (rawData.data?.products || []);
+
+    if (!Array.isArray(productsArray)) return rawData;
+
+    let products = [...productsArray];
 
     if (promotionsData?.data?.promotions) {
       products = applyPromotionsToProducts(products, promotionsData.data.promotions);
     }
 
-    return {
-      ...rawData,
-      data: {
-        ...rawData.data,
-        products,
-      },
-    };
+    // Preserve structure - if data is array, return array; otherwise return nested structure
+    if (Array.isArray(rawData.data)) {
+      return {
+        ...rawData,
+        data: products,
+        pagination: (rawData as any).pagination || rawData.data?.pagination,
+      } as any;
+    } else {
+      return {
+        ...rawData,
+        data: {
+          ...rawData.data,
+          products,
+        },
+      };
+    }
   }, [rawData, promotionsData]);
 
   useEffect(() => {
@@ -126,9 +142,9 @@ export default function ProductsPage() {
     if (product.images && Array.isArray(product.images)) {
       // New structure: images array directly on product
       slides = product.images.map((img: any) => ({
-        src: checkImageUrl(img.image_url || img.imageUrl),
+        src: checkImageUrl(img.image_url || img.imageUrl || ''),
         alt: product.name,
-        download: checkImageUrl(img.image_url || img.imageUrl),
+        download: checkImageUrl(img.image_url || img.imageUrl || ''),
       }));
     } else if (product.variants && Array.isArray(product.variants)) {
       // Old structure: images in variants
@@ -329,8 +345,19 @@ export default function ProductsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data?.data.products.length ? (
-                  data.data.products.map((product) => (
+                {(() => {
+                  // Handle both structures: data as array or data.products
+                  const productsList = Array.isArray(data?.data)
+                    ? data.data
+                    : (data?.data?.products || []);
+                  return productsList.length > 0;
+                })() ? (
+                  (() => {
+                    const productsList = Array.isArray(data?.data)
+                      ? data.data
+                      : (data?.data?.products || []);
+                    return productsList;
+                  })().map((product: any) => (
                     <TableRow key={product.id} className="hover:bg-gray-50">
                       <TableCell className="p-2 px-4 whitespace-nowrap">
                         <div
@@ -340,7 +367,7 @@ export default function ProductsPage() {
                         >
                           <img
                             src={checkImageUrl(
-                              product.images?.[0]?.imageUrl ||
+                              product.images?.[0]?.image_url || product.images?.[0]?.imageUrl ||
                               product.variants?.[0]?.images?.[0]?.imageUrl ||
                               ''
                             )}
@@ -352,26 +379,32 @@ export default function ProductsPage() {
                       <TableCell className="px-4 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-maintext">{product.name}</div>
                         <div className="text-xs text-maintext">
-                          SKU: {product.code || 'N/A'}
+                          SKU: {product.sku || product.code || 'N/A'}
                         </div>
-                        {product.totalStock !== undefined && (
+                        {(product.total_stock !== undefined || product.totalStock !== undefined) && (
                           <div className="text-xs text-maintext">
-                            Tồn kho: {product.totalStock}
+                            Tồn kho: {product.total_stock || product.totalStock}
                           </div>
                         )}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-maintext">
-                        {typeof product.brand === 'string' ? product.brand : product.brand?.name || 'N/A'}
+                        {product.brand_name || (typeof product.brand === 'string' ? product.brand : product.brand?.name || 'N/A')}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-maintext">
-                        {typeof product.category === 'string' ? product.category : product.category?.name || 'N/A'}
+                        {product.category_name || (typeof product.category === 'string' ? product.category : product.category?.name || 'N/A')}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-sm">
                         {(() => {
+                          // Handle both snake_case and camelCase properties
+                          const discountPrice = product.discount_price || product.discountPrice;
+                          const sellingPrice = product.selling_price || product.sellingPrice;
+                          const basePrice = product.base_price || product.basePrice;
+                          const price = product.price || 0;
+
                           // Use discount_price if available, otherwise selling_price, fallback to basePrice
-                          const displayPrice = product.discountPrice || product.sellingPrice || product.basePrice || product.price || 0;
-                          const originalPrice = product.sellingPrice || product.basePrice || product.price || 0;
-                          const hasDiscount = product.discountPrice && product.discountPrice < originalPrice;
+                          const displayPrice = discountPrice || sellingPrice || basePrice || price || 0;
+                          const originalPrice = sellingPrice || basePrice || price || 0;
+                          const hasDiscount = discountPrice && discountPrice < originalPrice;
                           const discountPercent = hasDiscount
                             ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100)
                             : 0;
@@ -396,15 +429,15 @@ export default function ProductsPage() {
                         })()}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs rounded-full ${product.status === 'ACTIVE' || (product as any).is_active === 1
+                        <span className={`px-2 py-1 text-xs rounded-full ${product.status === 'ACTIVE' || product.is_active === 1
                           ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
                           }`}>
-                          {product.status === 'ACTIVE' || (product as any).is_active === 1 ? 'Hoạt động' : 'Không hoạt động'}
+                          {product.status === 'ACTIVE' || product.is_active === 1 ? 'Hoạt động' : 'Không hoạt động'}
                         </span>
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-maintext">
-                        {formatDate(product.updatedAt || (product as any).updated_at)}
+                        {formatDate(product.updated_at || product.updatedAt || '')}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end space-x-2">
@@ -468,49 +501,58 @@ export default function ProductsPage() {
             </Table>
           </div>
 
-          {data?.data.pagination && data.data.pagination.totalPages > 1 && (
-            <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
-              <div className="hidden sm:block">
-                <p className="text-sm text-maintext">
-                  Trang <span className="font-medium">{data.data.pagination.currentPage}</span> / <span className="font-medium">{data.data.pagination.totalPages}</span>
-                  {data.data.pagination.totalItems && (
-                    <> - Tổng <span className="font-medium">{data.data.pagination.totalItems}</span> sản phẩm</>
-                  )}
-                </p>
-              </div>
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleChangePage(data.data.pagination.currentPage - 1)}
-                  disabled={data.data.pagination.currentPage === 1}
-                >
-                  Trước
-                </Button>
-                {[...Array(data.data.pagination.totalPages)].map((_, i) => (
+          {(() => {
+            const paginationData = (data as any)?.pagination || (data as any)?.data?.pagination;
+            if (!paginationData || paginationData.totalPages <= 1) return null;
+
+            const currentPage = paginationData.page || paginationData.currentPage || 1;
+            const totalPages = paginationData.totalPages || 1;
+            const totalItems = paginationData.total || paginationData.totalItems;
+
+            return (
+              <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
+                <div className="hidden sm:block">
+                  <p className="text-sm text-maintext">
+                    Trang <span className="font-medium">{currentPage}</span> / <span className="font-medium">{totalPages}</span>
+                    {totalItems && (
+                      <> - Tổng <span className="font-medium">{totalItems}</span> sản phẩm</>
+                    )}
+                  </p>
+                </div>
+                <div className="flex space-x-2">
                   <Button
-                    key={i}
-                    variant={data.data.pagination.currentPage === i + 1 ? "default" : "outline"}
+                    variant="outline"
                     size="sm"
-                    onClick={() => handleChangePage(i + 1)}
+                    onClick={() => handleChangePage(currentPage - 1)}
+                    disabled={currentPage === 1}
                   >
-                    {i + 1}
+                    Trước
                   </Button>
-                )).slice(
-                  Math.max(0, data.data.pagination.currentPage - 3),
-                  Math.min(data.data.pagination.totalPages, data.data.pagination.currentPage + 2)
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleChangePage(data.data.pagination.currentPage + 1)}
-                  disabled={data.data.pagination.currentPage === data.data.pagination.totalPages}
-                >
-                  Sau
-                </Button>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <Button
+                      key={i}
+                      variant={currentPage === i + 1 ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handleChangePage(i + 1)}
+                    >
+                      {i + 1}
+                    </Button>
+                  )).slice(
+                    Math.max(0, currentPage - 3),
+                    Math.min(totalPages, currentPage + 2)
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleChangePage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Sau
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       )}
 
