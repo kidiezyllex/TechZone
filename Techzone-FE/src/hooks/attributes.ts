@@ -26,8 +26,9 @@ import {
 import {
   IBrandResponse, IBrandsResponse,
   ICategoryResponse, ICategoriesResponse,
-  IActionResponse
 } from "@/interface/response/attributes";
+
+import { IActionResponse } from "@/interface/response/product";
 
 export const useBrands = (params: IBrandFilter = {}): UseQueryResult<IBrandsResponse, Error> => {
   return useQuery<IBrandsResponse, Error>({

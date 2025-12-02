@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
- 
+
 import { IProductVariant } from '@/interface/request/product';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,9 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Icon } from '@mdi/react';
 import { mdiAutoFix } from '@mdi/js';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
-import { useColors, useSizes } from '@/hooks/attributes';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getSizeLabel } from '@/utils/sizeMapping';
+
 interface VariantGeneratorProps {
   baseVariant: IProductVariant;
   onGenerate: (variants: IProductVariant[]) => void;
@@ -23,9 +22,6 @@ interface VariantGeneratorProps {
 interface GeneratedVariant extends IProductVariant {
   id: string;
   selected: boolean;
-  colorName: string;
-  sizeName: string;
-  sizeValue: number;
 }
 
 const VariantGenerator: React.FC<VariantGeneratorProps> = ({
@@ -33,58 +29,10 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
   onGenerate,
   onClose
 }) => {
-  const { data: colorsData } = useColors();
-  const { data: sizesData } = useSizes();
   const [generatedVariants, setGeneratedVariants] = useState<GeneratedVariant[]>([]);
 
-  
-  const calculatePriceBySize = (basePrice: number, sizeValue: number): number => {
-    const baseSizeValue = 38; 
-    const priceMultiplier = 1 + ((sizeValue - baseSizeValue) * 0.02); 
-    return Math.round(basePrice * priceMultiplier / 1000) * 1000; 
-  };
-
-  useEffect(() => {
-    if (colorsData?.data && sizesData?.data && baseVariant.price > 0) {
-      const variants: GeneratedVariant[] = [];
-      
-      colorsData.data.forEach(color => {
-        sizesData.data.forEach(size => {
-          const calculatedPrice = calculatePriceBySize(baseVariant.price, size.value);
-          variants.push({
-            id: `${color.id}-${size.id}`,
-            colorId: color.id,
-            sizeId: size.id,
-            price: calculatedPrice,
-            stock: 10, 
-            images: baseVariant.images ? [...baseVariant.images] : [], 
-            selected: true, 
-            colorName: color.name,
-            sizeName: getSizeLabel(size.value),
-            sizeValue: size.value
-          });
-        });
-      });
-
-      
-      variants.sort((a, b) => {
-        if (a.sizeValue !== b.sizeValue) {
-          return a.sizeValue - b.sizeValue;
-        }
-        return a.colorName.localeCompare(b.colorName);
-      });
-
-      
-      if (variants.length > 0) {
-        variants[0].stock = baseVariant.stock ?? 0;
-      }
-
-      setGeneratedVariants(variants);
-    }
-  }, [colorsData, sizesData, baseVariant.price, baseVariant.stock, baseVariant.colorId, baseVariant.sizeId, baseVariant.images]);
-
   const handleSelectAll = (checked: boolean) => {
-    setGeneratedVariants(prev => 
+    setGeneratedVariants(prev =>
       prev.map(variant => ({ ...variant, selected: checked }))
     );
   };
@@ -130,10 +78,6 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
     }).format(price);
   };
 
-  const getColorById = (colorId: string) => {
-    return colorsData?.data?.find(c => c.id === colorId);
-  };
-
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden p-0">
@@ -160,15 +104,13 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
                   </Label>
                 </div>
                 <div className="text-sm text-maintext">
-                  Giá được tính tự động theo size (size lớn hơn = giá cao hơn)
+                  Chọn các biến thể bạn muốn tạo
                 </div>
               </div>
 
               <div className="grid gap-4">
                 <AnimatePresence>
                   {generatedVariants.map((variant, index) => {
-                    const color = getColorById(variant.colorId);
-                    
                     return (
                       <motion.div
                         key={variant.id}
@@ -184,28 +126,12 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
                         <div className="flex items-center gap-4">
                           <Checkbox
                             checked={variant.selected}
-                            onCheckedChange={(checked) => 
+                            onCheckedChange={(checked) =>
                               handleVariantSelect(variant.id, checked as boolean)
                             }
                           />
-                          
+
                           <div className="flex items-center gap-4 flex-1">
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-6 h-6 rounded-full border border-gray-300"
-                                style={{ backgroundColor: color?.code || '#000' }}
-                              />
-                              <span className="font-medium">{variant.colorName}</span>
-                            </div>
-                            
-                            <div className="text-maintext">•</div>
-                            
-                            <div className="font-medium">
-                              Size {variant.sizeValue}
-                            </div>
-                            
-                            <div className="text-maintext">•</div>
-                            
                             <div className="font-semibold text-primary">
                               {formatPrice(variant.price)}
                             </div>
@@ -220,7 +146,7 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
                               type="number"
                               min="0"
                               value={variant.stock || ''}
-                              onChange={(e) => 
+                              onChange={(e) =>
                                 handleStockChange(variant.id, parseInt(e.target.value) || 0)
                               }
                               className="w-20"
@@ -246,7 +172,7 @@ const VariantGenerator: React.FC<VariantGeneratorProps> = ({
                   Hủy
                 </Button>
               </DialogClose>
-              <Button 
+              <Button
                 onClick={handleGenerate}
                 disabled={selectedCount === 0}
                 className="flex items-center gap-2"

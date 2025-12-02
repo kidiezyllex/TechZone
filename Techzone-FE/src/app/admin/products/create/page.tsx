@@ -22,7 +22,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import ProductVariantForm from '@/components/ProductPage/ProductVariantForm';
 import VariantGenerator from '@/components/ProductPage/VariantGenerator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useBrands, useCategories, useColors, useMaterials, useSizes } from '@/hooks/attributes';
+import { useBrands, useCategories } from '@/hooks/attributes';
 
 const initialProduct: IProductCreate = {
   name: '',
@@ -60,8 +60,6 @@ export default function CreateProductPage() {
   };
   const { data: brandsData } = useBrands();
   const { data: categoriesData } = useCategories();
-
-  const { data: materialsData } = useMaterials();
   const handleAddVariant = () => {
     setProduct({
       ...product,
@@ -296,25 +294,14 @@ export default function CreateProductPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="material">Chất liệu <span className="text-red-500">*</span></Label>
-                    <Select
+                    <Input
+                      id="material"
+                      name="material"
                       value={product.material}
-                      onValueChange={value => setProduct({ ...product, material: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn chất liệu">
-                          {product.material
-                            ? (materialsData?.data || []).find(material => material.id.toString() === product.material?.toString())?.name || 'Chọn chất liệu'
-                            : 'Chọn chất liệu'
-                          }
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(materialsData?.data || []).map(material => (
-                          <SelectItem key={material.id} value={material.id.toString()}>
-                            {material.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={handleInputChange}
+                      placeholder="Nhập chất liệu"
+                      required
+                    />
                   </div>
 
                   <div className="space-y-2">

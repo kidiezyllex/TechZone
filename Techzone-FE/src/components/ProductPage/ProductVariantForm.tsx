@@ -11,7 +11,6 @@ import { mdiUpload, mdiLoading, mdiTrashCanOutline, mdiImageOutline, mdiTransfer
 import { checkImageUrl } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useColors, useSizes } from '@/hooks/attributes';
 import { getSizeLabel } from '@/utils/sizeMapping';
 
 interface ProductVariantFormProps {
@@ -30,8 +29,6 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
   uploading
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { data: colorsData } = useColors();
-  const { data: sizesData } = useSizes();
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -88,61 +85,26 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor={`colorId-${variant.colorId}`}>Màu sắc <span className="text-red-500">*</span></Label>
-          <Select
-            value={variant.colorId}
-            onValueChange={handleColorChange}
+          <Input
+            id={`colorId-${variant.colorId}`}
+            name="colorId"
+            value={variant.colorId || ''}
+            onChange={handleInputChange}
+            placeholder="Nhập ID màu sắc"
             required
-          >
-            <SelectTrigger id={`colorId-${variant.colorId}`} className="w-full">
-              <SelectValue placeholder="Chọn màu sắc">
-                {variant.colorId
-                  ? (colorsData?.data || []).find(color => color.id.toString() === variant.colorId?.toString())?.name || 'Chọn màu sắc'
-                  : 'Chọn màu sắc'
-                }
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {(colorsData?.data || []).map(color => (
-                <SelectItem key={color.id} value={color.id.toString()}>
-                  <div className="flex items-center justify-between w-full">
-                    <span>{color.name}</span>
-                    <div
-                      className="w-4 h-4 rounded-full border border-gray-300 ml-2"
-                      style={{ backgroundColor: color.code }}
-                    />
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor={`sizeId-${variant.sizeId}`}>Kích thước <span className="text-red-500">*</span></Label>
-          <Select
-            value={variant.sizeId}
-            onValueChange={handleSizeChange}
+          <Input
+            id={`sizeId-${variant.sizeId}`}
+            name="sizeId"
+            value={variant.sizeId || ''}
+            onChange={handleInputChange}
+            placeholder="Nhập ID kích thước"
             required
-          >
-            <SelectTrigger id={`sizeId-${variant.sizeId}`} className="w-full">
-              <SelectValue placeholder="Chọn kích thước">
-                {variant.sizeId
-                  ? (() => {
-                    const foundSize = (sizesData?.data || []).find(size => size.id.toString() === variant.sizeId?.toString());
-                    return foundSize ? getSizeLabel(foundSize.value) : 'Chọn kích thước';
-                  })()
-                  : 'Chọn kích thước'
-                }
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {(sizesData?.data || []).map(size => (
-                <SelectItem key={size.id} value={size.id.toString()}>
-                  {getSizeLabel(size.value)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
 
         <div className="space-y-2">
