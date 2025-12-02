@@ -41,7 +41,7 @@ const BreadcrumbLink = React.forwardRef<
 >(({ asChild, className, ...props }, ref) => {
 	const Comp = asChild ? Slot : "a";
 
-	return <Comp ref={ref} className={cn("transition-colors flex items-center hover:text-foreground", className)} {...props} />;
+	return <Comp ref={ref} className={cn("transition-colors flex items-center text-white/90 hover:text-white/90", className)} {...props} />;
 });
 BreadcrumbLink.displayName = "BreadcrumbLink";
 
@@ -52,7 +52,7 @@ const BreadcrumbPage = React.forwardRef<HTMLSpanElement, React.ComponentPropsWit
 			role="link"
 			aria-disabled="true"
 			aria-current="page"
-			className={cn("text-foreground font-semibold text-mainTextV1", className)}
+			className={cn("text-foreground font-semibold text-white", className)}
 			{...props}
 		/>
 	),
