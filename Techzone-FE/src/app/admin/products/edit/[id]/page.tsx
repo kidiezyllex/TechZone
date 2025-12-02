@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProductDetail, useUpdateProduct, useUpdateProductStatus, useUpdateProductStock, useUpdateProductImages } from '@/hooks/product';
 import { useUploadImage } from '@/hooks/upload';
-import { IProductUpdate, IProductVariant, IProductStockUpdate, IProductStatusUpdate, IProductImageUpdate } from '@/interface/request/product';
+import { IProductUpdate, IProductStockUpdate, IProductStatusUpdate, IProductImageUpdate } from '@/interface/request/product';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +19,17 @@ import { createFormData } from '@/utils/cloudinary';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Icon } from '@mdi/react';
-import { mdiPlus, mdiTrashCanOutline, mdiArrowLeft, mdiLoading, mdiUpload, mdiImageOutline } from '@mdi/js';
+import {
+  mdiPlus,
+  mdiTrashCanOutline,
+  mdiArrowLeft,
+  mdiLoading,
+  mdiUpload,
+  mdiImageOutline,
+  mdiTagMultiple,
+  mdiStoreOutline,
+  mdiTextBoxOutline,
+} from '@mdi/js';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -29,6 +39,8 @@ export default function EditProductPage() {
   const { id } = params;
   const [activeTab, setActiveTab] = useState('info');
   const [uploading, setUploading] = useState(false);
+  const [uploadingProductImage, setUploadingProductImage] = useState(false);
+  const [imageLinks, setImageLinks] = useState('');
 
   const { data: productData, isLoading, isError } = useProductDetail(id);
   const updateProduct = useUpdateProduct();
@@ -47,7 +59,6 @@ export default function EditProductPage() {
         name: product.name,
         brand: typeof product.brand === 'string' ? product.brand : product.brand.name,
         category: typeof product.category === 'string' ? product.category : product.category.name,
-        material: typeof product.material === 'string' ? product.material : product.material.name,
         description: product.description,
         weight: product.weight,
         status: product.status
@@ -62,11 +73,6 @@ export default function EditProductPage() {
     } else {
       setProductUpdate({ ...productUpdate, [name]: value });
     }
-  };
-
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setProductUpdate({ ...productUpdate, [name]: value });
   };
 
   const handleStatusChange = async (checked: boolean) => {
@@ -166,6 +172,151 @@ export default function EditProductPage() {
       );
     } catch (error) {
       toast.error('Cập nhật hình ảnh thất bại');
+    }
+  };
+
+  const handleUploadProductImage = async (file: File) => {
+    try {
+      setUploadingProductImage(true);
+      const formData = createFormData(file);
+      const result = await uploadImage.mutateAsync(formData);
+
+      if (!productData?.data.images) {
+        toast.error('Không tìm thấy dữ liệu sản phẩm');
+        return;
+      }
+
+      const currentImages = productData.data.images.map(img => img.imageUrl);
+      const newImages = [...currentImages, result?.data?.imageUrl];
+
+      const payload: any = {
+        images: newImages
+      };
+
+      await updateProductImages.mutateAsync(
+        { productId: id, payload: payload as IProductImageUpdate },
+        {
+          onSuccess: () => {
+            toast.success('Cập nhật hình ảnh sản phẩm thành công');
+          }
+        }
+      );
+    } catch (error) {
+      toast.error('Upload hình ảnh thất bại');
+    } finally {
+      setUploadingProductImage(false);
+    }
+  };
+
+  const handleRemoveProductImage = async (imageIndex: number) => {
+    try {
+      if (!productData?.data.images) {
+        toast.error('Không tìm thấy dữ liệu sản phẩm');
+        return;
+      }
+
+      const newImages = productData.data.images
+        .filter((_, i) => i !== imageIndex)
+        .map(img => img.imageUrl);
+
+      const payload: any = {
+        images: newImages
+      };
+
+      await updateProductImages.mutateAsync(
+        { productId: id, payload: payload as IProductImageUpdate },
+        {
+          onSuccess: () => {
+            toast.success('Xóa hình ảnh thành công');
+          }
+        }
+      );
+    } catch (error) {
+      toast.error('Xóa hình ảnh thất bại');
+    }
+  };
+
+  const parseImageLinks = (text: string): string[] => {
+    // Tách các link bằng dấu xuống dòng, dấu phẩy, hoặc khoảng trắng
+    const links = text
+      .split(/[\n,\s]+/)
+      .map(link => link.trim())
+      .filter(link => {
+        // Validate URL
+        try {
+          const url = new URL(link);
+          return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch {
+          return false;
+        }
+      });
+    return links;
+  };
+
+  const handleUpdateImagesFromLinks = async () => {
+    try {
+      if (!imageLinks.trim()) {
+        toast.error('Vui lòng nhập ít nhất một link hình ảnh');
+        return;
+      }
+
+      const parsedLinks = parseImageLinks(imageLinks);
+
+      if (parsedLinks.length === 0) {
+        toast.error('Không tìm thấy link hình ảnh hợp lệ. Vui lòng kiểm tra lại.');
+        return;
+      }
+
+      const currentImages = productData?.data.images?.map(img => img.imageUrl) || [];
+      const newImages = [...currentImages, ...parsedLinks];
+
+      const payload: any = {
+        images: newImages
+      };
+
+      await updateProductImages.mutateAsync(
+        { productId: id, payload: payload as IProductImageUpdate },
+        {
+          onSuccess: () => {
+            toast.success(`Đã cập nhật ${parsedLinks.length} hình ảnh thành công`);
+            setImageLinks('');
+          }
+        }
+      );
+    } catch (error) {
+      toast.error('Cập nhật hình ảnh từ link thất bại');
+    }
+  };
+
+  const handleReplaceImagesFromLinks = async () => {
+    try {
+      if (!imageLinks.trim()) {
+        toast.error('Vui lòng nhập ít nhất một link hình ảnh');
+        return;
+      }
+
+      const parsedLinks = parseImageLinks(imageLinks);
+
+      if (parsedLinks.length === 0) {
+        toast.error('Không tìm thấy link hình ảnh hợp lệ. Vui lòng kiểm tra lại.');
+        return;
+      }
+
+      const payload: any = {
+        images: parsedLinks
+      };
+
+      await updateProductImages.mutateAsync(
+        { productId: id, payload: payload as IProductImageUpdate },
+        {
+          onSuccess: () => {
+            toast.success(`Đã thay thế bằng ${parsedLinks.length} hình ảnh thành công`);
+            setImageLinks(''); // Clear textarea sau khi thành công
+          }
+        }
+      );
+    } catch (error) {
+      toast.error('Thay thế hình ảnh từ link thất bại');
     }
   };
 
@@ -270,6 +421,14 @@ export default function EditProductPage() {
 
   const product = productData.data;
 
+  const parsedSpecifications = (() => {
+    try {
+      return product.specifications ? JSON.parse(product.specifications || '{}') : {};
+    } catch {
+      return {};
+    }
+  })();
+
   return (
     <div className="space-y-4">
       <div className='flex justify-between items-start'>
@@ -298,16 +457,18 @@ export default function EditProductPage() {
         </Button>
       </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full md:w-[500px] grid-cols-3">
+        <TabsList className="grid w-full md:w-[650px] grid-cols-2">
           <TabsTrigger value="info">Thông tin cơ bản</TabsTrigger>
-          <TabsTrigger value="variants">Biến thể</TabsTrigger>
-          <TabsTrigger value="status">Trạng thái</TabsTrigger>
+          <TabsTrigger value="inventory">Tồn kho</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info" className="space-y-4 text-maintext">
           <Card className="mb-4">
             <CardHeader>
-              <CardTitle>Thông tin cơ bản</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Icon path={mdiTextBoxOutline} size={0.9} />
+                Thông tin cơ bản
+              </CardTitle>
             </CardHeader>
             <form onSubmit={handleUpdateInfo}>
               <CardContent className="space-y-4 text-maintext">
@@ -362,25 +523,6 @@ export default function EditProductPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="material">Chất liệu/Vỏ máy</Label>
-                    <Select
-                      value={productUpdate.material || ''}
-                      onValueChange={(value) => setProductUpdate({ ...productUpdate, material: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Chọn chất liệu" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {['Nhôm', 'Nhựa cao cấp', 'Carbon Fiber', 'Magnesium Alloy', 'Kim loại'].map(material => (
-                          <SelectItem key={material} value={material}>
-                            {material}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
                     <Label htmlFor="weight">Trọng lượng (gram)</Label>
                     <Input
                       id="weight"
@@ -405,6 +547,23 @@ export default function EditProductPage() {
                     rows={5}
                   />
                 </div>
+
+                <div className="flex items-center justify-between px-4 py-3 border rounded-md bg-gray-50/50">
+                  <div>
+                    <h3 className="font-medium text-maintext">Trạng thái hoạt động</h3>
+                    <p className="text-sm text-maintext/70">
+                      {productUpdate.status === 'ACTIVE'
+                        ? 'Sản phẩm đang được hiển thị và có thể mua'
+                        : 'Sản phẩm đang bị ẩn và không thể mua'}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={productUpdate.status === 'ACTIVE'}
+                    onCheckedChange={handleStatusChange}
+                    disabled={updateProductStatus.isPending}
+                    className="data-[state=checked]:bg-green-600"
+                  />
+                </div>
               </CardContent>
               <CardFooter className="flex justify-end">
                 <Button
@@ -424,6 +583,335 @@ export default function EditProductPage() {
               </CardFooter>
             </form>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon path={mdiImageOutline} size={0.9} />
+                Hình ảnh sản phẩm
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Input
+                  type="file"
+                  id="product-image-upload"
+                  onChange={(e) => {
+                    const files = e.target.files;
+                    if (files && files.length > 0) {
+                      handleUploadProductImage(files[0]);
+                      e.target.value = '';
+                    }
+                  }}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('product-image-upload')?.click()}
+                  disabled={uploadingProductImage || updateProductImages.isPending}
+                  className="flex items-center gap-2"
+                >
+                  {uploadingProductImage ? (
+                    <>
+                      <Icon path={mdiLoading} size={0.7} className="animate-spin" />
+                      Đang tải...
+                    </>
+                  ) : (
+                    <>
+                      <Icon path={mdiUpload} size={0.7} />
+                      Tải lên hình ảnh
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="image-links">Hoặc dán các link hình ảnh (mỗi link một dòng hoặc cách nhau bởi dấu phẩy)</Label>
+                <Textarea
+                  id="image-links"
+                  value={imageLinks}
+                  onChange={(e) => setImageLinks(e.target.value)}
+                  placeholder="https://example.com/image1.jpg
+https://example.com/image2.jpg
+https://example.com/image3.jpg"
+                  rows={4}
+                  className="font-mono text-sm"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleUpdateImagesFromLinks}
+                    disabled={updateProductImages.isPending || !imageLinks.trim()}
+                    className="flex items-center gap-2"
+                  >
+                    {updateProductImages.isPending ? (
+                      <>
+                        <Icon path={mdiLoading} size={0.7} className="animate-spin" />
+                        Đang cập nhật...
+                      </>
+                    ) : (
+                      <>
+                        <Icon path={mdiPlus} size={0.7} />
+                        Thêm hình ảnh từ link
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleReplaceImagesFromLinks}
+                    disabled={updateProductImages.isPending || !imageLinks.trim()}
+                    className="flex items-center gap-2"
+                  >
+                    {updateProductImages.isPending ? (
+                      <>
+                        <Icon path={mdiLoading} size={0.7} className="animate-spin" />
+                        Đang thay thế...
+                      </>
+                    ) : (
+                      <>
+                        <Icon path={mdiImageOutline} size={0.7} />
+                        Thay thế tất cả hình ảnh
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {product.images && product.images.length > 0 ? (
+                <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                  {product.images.map((image, index) => (
+                    <div
+                      key={image.id || index}
+                      className="relative group rounded-md overflow-hidden border border-gray-200"
+                      style={{ aspectRatio: '1/1' }}
+                    >
+                      <img
+                        src={image.imageUrl}
+                        alt={`Product image ${index + 1}`}
+                        className="object-cover w-full h-full"
+                      />
+                      {image.id === product.images?.[0]?.id && (
+                        <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
+                          Chính
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleRemoveProductImage(index)}
+                          disabled={updateProductImages.isPending}
+                        >
+                          {updateProductImages.isPending ? (
+                            <Icon path={mdiLoading} size={0.7} className="animate-spin" />
+                          ) : (
+                            <Icon path={mdiTrashCanOutline} size={0.7} />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 px-4 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">
+                  <Icon path={mdiImageOutline} size={2} className="text-maintext/30 mb-2" />
+                  <p className="text-sm text-maintext/70 italic text-center">
+                    Chưa có hình ảnh cho sản phẩm này.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon path={mdiTagMultiple} size={0.9} />
+                  Thông tin giá bán
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Giá nhập</Label>
+                    <Input
+                      value={
+                        product.basePrice
+                          ? new Intl.NumberFormat('vi-VN').format(product.basePrice)
+                          : ''
+                      }
+                      readOnly
+                      className="bg-gray-50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Giá bán</Label>
+                    <Input
+                      value={
+                        product.sellingPrice
+                          ? new Intl.NumberFormat('vi-VN').format(product.sellingPrice)
+                          : ''
+                      }
+                      readOnly
+                      className="bg-gray-50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Giá khuyến mãi</Label>
+                    <Input
+                      value={
+                        product.discountPrice
+                          ? new Intl.NumberFormat('vi-VN').format(product.discountPrice)
+                          : ''
+                      }
+                      readOnly
+                      className="bg-gray-50"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-maintext/70">
+                  Các giá trị trên được lấy từ API hiện tại. Việc chỉnh sửa sẽ được hỗ trợ trong bước sau khi backend sẵn sàng.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon path={mdiTextBoxOutline} size={0.9} />
+                  Thông số kỹ thuật
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {product.specifications ? (
+                  <div className="space-y-3">
+                    {Object.entries(parsedSpecifications as Record<string, any>).map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="group relative overflow-hidden rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50/50 p-4 shadow-sm transition-all hover:shadow-md hover:border-primary/20"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <div className="h-1.5 w-1.5 rounded-full bg-primary/60"></div>
+                              <span className="text-xs font-semibold uppercase tracking-wider text-maintext/60">
+                                {key}
+                              </span>
+                            </div>
+                            <p className="text-sm font-semibold text-maintext leading-relaxed break-words">
+                              {String(value)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 px-4 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">
+                    <Icon path={mdiTextBoxOutline} size={2} className="text-maintext/30 mb-2" />
+                    <p className="text-sm text-maintext/70 italic text-center">
+                      Chưa có thông số kỹ thuật cho sản phẩm này.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="inventory" className="space-y-4 text-maintext">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon path={mdiStoreOutline} size={0.9} />
+                Tồn kho & chi nhánh
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="rounded-xl bg-primary/5 border border-primary/10 p-3">
+                  <p className="text-xs font-semibold text-maintext/70">Tổng tồn kho (total_stock)</p>
+                  <p className="mt-1 text-2xl font-bold text-primary">
+                    {product.totalStock ?? product.variants.reduce((sum, v) => sum + (v.stock || 0), 0)}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                  <p className="text-xs font-semibold text-maintext/70">Số chi nhánh</p>
+                  <p className="mt-1 text-2xl font-bold text-maintext">
+                    {product.inventory?.length ?? 0}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                  <p className="text-xs font-semibold text-maintext/70">Đã bán (nếu có)</p>
+                  <p className="mt-1 text-2xl font-bold text-maintext">
+                    {/* placeholder cho future field */}
+                    -
+                  </p>
+                </div>
+                <div className="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                  <p className="text-xs font-semibold text-maintext/70">Lượt xem (nếu có)</p>
+                  <p className="mt-1 text-2xl font-bold text-maintext">
+                    -
+                  </p>
+                </div>
+              </div>
+
+              {product.inventory && product.inventory.length > 0 ? (
+                <div className="overflow-hidden rounded-lg border border-gray-100">
+                  <table className="min-w-full divide-y divide-gray-100 text-sm">
+                    <thead className="bg-gray-50/80">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-semibold uppercase text-maintext/70">
+                          Chi nhánh
+                        </th>
+                        <th className="px-4 py-2 text-right text-xs font-semibold uppercase text-maintext/70">
+                          Số lượng
+                        </th>
+                        <th className="px-4 py-2 text-right text-xs font-semibold uppercase text-maintext/70">
+                          Đã giữ
+                        </th>
+                        <th className="px-4 py-2 text-right text-xs font-semibold uppercase text-maintext/70">
+                          Cập nhật
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 bg-white">
+                      {product.inventory.map((item) => (
+                        <tr key={item.storeId}>
+                          <td className="px-4 py-2">
+                            <p className="font-medium text-maintext">{item.storeName}</p>
+                          </td>
+                          <td className="px-4 py-2 text-right font-semibold text-maintext">
+                            {item.quantity}
+                          </td>
+                          <td className="px-4 py-2 text-right text-maintext">
+                            {item.reservedQuantity}
+                          </td>
+                          <td className="px-4 py-2 text-right text-xs text-maintext/60">
+                            {item.updatedAt
+                              ? new Date(item.updatedAt).toLocaleString('vi-VN')
+                              : '-'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-maintext/70 italic">
+                  Chưa có dữ liệu tồn kho theo chi nhánh từ API.
+                </p>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="variants" className="space-y-4 text-maintext">
@@ -433,11 +921,7 @@ export default function EditProductPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <AnimatePresence>
-                {product.variants.map((variant) => {
-                  const colorId = variant.colorId;
-                  const sizeId = variant.sizeId;
-                  const colorName = typeof colorId === 'object' && colorId !== null ? colorId.name : (colorId ? String(colorId) : '');
-                  const sizeName = typeof sizeId === 'object' && sizeId !== null ? sizeId.name : (sizeId ? String(sizeId) : '');
+                {product.variants.map((variant, index) => {
                   return (
                     <motion.div
                       key={variant.id}
@@ -449,7 +933,7 @@ export default function EditProductPage() {
                       <div className="flex justify-between items-center mb-4">
                         <div>
                           <h3 className="text-lg font-medium">
-                            {colorName} - {sizeName}
+                            Biến thể #{index + 1}
                           </h3>
                           <p className="text-sm text-maintext">
                             Giá: {new Intl.NumberFormat('vi-VN', {
@@ -528,7 +1012,7 @@ export default function EditProductPage() {
                             </Button>
                           </div>
 
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+                          <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mt-2">
                             {variant.images.length > 0 ? (
                               variant.images.map((image, index) => (
                                 <div
@@ -581,31 +1065,6 @@ export default function EditProductPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="status" className="space-y-4 text-maintext">
-          <Card className="mb-4">
-            <CardHeader>
-              <CardTitle>Trạng thái sản phẩm</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between px-4 py-3 border rounded-md">
-                <div>
-                  <h3 className="font-medium text-maintext">Trạng thái hoạt động</h3>
-                  <p className="text-sm text-maintext">
-                    {productUpdate.status === 'ACTIVE'
-                      ? 'Sản phẩm đang được hiển thị và có thể mua'
-                      : 'Sản phẩm đang bị ẩn và không thể mua'}
-                  </p>
-                </div>
-                <Switch
-                  checked={productUpdate.status === 'ACTIVE'}
-                  onCheckedChange={handleStatusChange}
-                  disabled={updateProductStatus.isPending}
-                  className="data-[state=checked]:bg-green-600"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );

@@ -216,7 +216,7 @@ const SidebarLayout = memo(function SidebarLayout({ children }: SidebarLayoutPro
         </div>
       </div>
 
-      <div className="w-full flex-1 flex flex-col bg-[#1C2B38]">
+      <div className="w-full flex-1 flex flex-col bg-slate-800">
         <AdminHeader />
         <main className="p-4 min-h-[calc(100vh-66px)]">
           <div style={{ position: 'relative', zIndex: 2 }}>

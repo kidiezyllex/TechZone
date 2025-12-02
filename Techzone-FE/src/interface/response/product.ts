@@ -33,6 +33,14 @@ export interface IProductImage {
   imageUrl: string;
 }
 
+export interface IInventoryItem {
+  storeId: string;
+  storeName: string;
+  quantity: number;
+  reservedQuantity: number;
+  updatedAt: string;
+}
+
 export interface IPopulatedProductVariant {
   id: string;
   colorId: string;
@@ -58,6 +66,15 @@ export interface IProduct {
   createdAt: string;
   updatedAt: string;
   price: number;
+  specifications?: string;
+  basePrice?: number;
+  sellingPrice?: number;
+  discountPrice?: number;
+  totalStock?: number;
+  images?: IProductImage[];
+  inventory?: IInventoryItem[];
+  avgRating?: number;
+  reviewCount?: number;
 }
 
 export interface IProductResponse {

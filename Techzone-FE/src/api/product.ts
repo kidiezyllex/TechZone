@@ -15,21 +15,52 @@ import {
   IProductFiltersResponse,
   IProduct,
   IPopulatedProductVariant,
+  IProductImage,
 } from "@/interface/response/product";
 
 import { sendGet, sendPost, sendPut, sendPatch, sendDelete } from "./axios";
 
 const mapApiProductToProduct = (p: any): IProduct => {
+  const basePrice = p.base_price ? Number(p.base_price) : 0;
   const sellingPrice = p.selling_price ? Number(p.selling_price) : 0;
+  const discountPrice = p.discount_price ? Number(p.discount_price) : 0;
+
+  const images: IProductImage[] = Array.isArray(p.images)
+    ? p.images.map((img: any) => ({
+        id: img.id ?? 0,
+        imageUrl: img.image_url ?? img.imageUrl ?? "",
+      }))
+    : [];
+
+  const totalStock =
+    p.total_stock != null
+      ? Number(p.total_stock)
+      : Array.isArray(p.inventory)
+      ? p.inventory.reduce(
+          (sum: number, item: any) => sum + (Number(item.quantity) || 0),
+          0
+        )
+      : 0;
+
+  const inventory = Array.isArray(p.inventory)
+    ? p.inventory.map((item: any) => ({
+        storeId: item.store_id?.toString() ?? "",
+        storeName: item.store_name ?? "",
+        quantity: Number(item.quantity) || 0,
+        reservedQuantity: Number(item.reserved_quantity) || 0,
+        updatedAt: item.updated_at ?? "",
+      }))
+    : [];
+
   const variant: IPopulatedProductVariant = {
     id: p.id?.toString() ?? "",
     colorId: "",
     sizeId: "",
     color: { id: "", name: "", code: "" },
     size: { id: "", value: 0 },
-    price: sellingPrice,
-    stock: p.total_stock != null ? Number(p.total_stock) : 0,
-    images: [],
+    price: sellingPrice || basePrice,
+    stock: totalStock,
+    images,
   };
 
   return {
@@ -45,7 +76,16 @@ const mapApiProductToProduct = (p: any): IProduct => {
     status: p.is_active === 1 ? "ACTIVE" : "INACTIVE",
     createdAt: p.created_at ?? "",
     updatedAt: p.updated_at ?? "",
-    price: sellingPrice,
+    price: sellingPrice || basePrice,
+    specifications: p.specifications ?? "",
+    basePrice,
+    sellingPrice,
+    discountPrice,
+    totalStock,
+    images,
+    inventory,
+    avgRating: p.avg_rating ? Number(p.avg_rating) : undefined,
+    reviewCount: p.review_count != null ? Number(p.review_count) : undefined,
   };
 };
 
@@ -99,7 +139,13 @@ export const getAllProducts = async (params: IProductFilter): Promise<IProductsR
 
 export const getProductById = async (productId: string): Promise<IProductResponse> => {
   const res = await sendGet(`/products/${productId}`);
-  return res as IProductResponse;
+  const product = res?.data ? mapApiProductToProduct(res.data) : (null as any);
+
+  return {
+    success: !!res.success,
+    message: res.message ?? "",
+    data: product,
+  };
 };
 
 export const createProduct = async (payload: IProductCreate): Promise<IProductResponse> => {
