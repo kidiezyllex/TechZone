@@ -30,7 +30,6 @@ export const authenticate = async (req, res, next) => {
       return errorResponse(res, 'Người dùng không tồn tại hoặc đã bị khóa', 401);
     }
     
-    // Gắn thông tin user vào request
     req.user = user;
     next();
   } catch (error) {
@@ -38,14 +37,18 @@ export const authenticate = async (req, res, next) => {
   }
 };
 
-// Middleware kiểm tra quyền theo role
 export const authorize = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
       return errorResponse(res, 'Chưa xác thực', 401);
     }
     
-    if (!allowedRoles.includes(req.user.role_name)) {
+    const rolesArray = allowedRoles.flat().filter(role => typeof role === 'string');
+    
+    const userRole = req.user.role_name?.toLowerCase();
+    const normalizedAllowedRoles = rolesArray.map(role => role.toLowerCase());
+    
+    if (!normalizedAllowedRoles.includes(userRole)) {
       return errorResponse(res, 'Bạn không có quyền truy cập', 403);
     }
     
@@ -53,17 +56,15 @@ export const authorize = (...allowedRoles) => {
   };
 };
 
-// Middleware kiểm tra quyền sở hữu (user chỉ có thể truy cập dữ liệu của mình)
 export const checkOwnership = (userIdField = 'user_id') => {
   return (req, res, next) => {
     const resourceUserId = req.params[userIdField] || req.body[userIdField];
     
-    // Admin có thể truy cập mọi thứ
-    if (req.user.role_name === 'admin') {
+    // So sánh case-insensitive
+    if (req.user.role_name?.toLowerCase() === 'admin') {
       return next();
     }
     
-    // User khác chỉ có thể truy cập dữ liệu của mình
     if (parseInt(resourceUserId) !== parseInt(req.user.id)) {
       return errorResponse(res, 'Bạn không có quyền truy cập tài nguyên này', 403);
     }

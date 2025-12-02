@@ -174,12 +174,14 @@ export const createProduct = async (req, res, next) => {
   }
 };
 
-// CẬP NHẬT SẢN PHẨM
 export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
     const {
-      name, description, category_id, brand_id, price, cost_price, discount_percentage, warranty_period, is_featured, is_active
+      name, description, category_id, brand_id, 
+      base_price, selling_price, discount_price,
+      specifications, images,
+      is_featured, is_new, is_active
     } = req.body;
     
     const [product] = await query('SELECT id FROM products WHERE id = ?', [id]);
@@ -191,24 +193,56 @@ export const updateProduct = async (req, res, next) => {
     const values = [];
     
     if (name) { updates.push('name = ?'); values.push(name); }
-    if (description) { updates.push('description = ?'); values.push(description); }
+    if (description !== undefined) { updates.push('description = ?'); values.push(description); }
     if (category_id) { updates.push('category_id = ?'); values.push(category_id); }
     if (brand_id) { updates.push('brand_id = ?'); values.push(brand_id); }
-    if (price) { updates.push('price = ?'); values.push(price); }
-    if (cost_price !== undefined) { updates.push('cost_price = ?'); values.push(cost_price); }
-    if (discount_percentage !== undefined) { updates.push('discount_percentage = ?'); values.push(discount_percentage); }
-    if (warranty_period) { updates.push('warranty_period = ?'); values.push(warranty_period); }
+    if (base_price !== undefined) { updates.push('base_price = ?'); values.push(base_price); }
+    if (selling_price !== undefined) { updates.push('selling_price = ?'); values.push(selling_price); }
+    if (discount_price !== undefined) { updates.push('discount_price = ?'); values.push(discount_price); }
+    if (specifications !== undefined) {
+      const specValue = typeof specifications === 'string' ? specifications : JSON.stringify(specifications);
+      updates.push('specifications = ?');
+      values.push(specValue);
+    }
     if (is_featured !== undefined) { updates.push('is_featured = ?'); values.push(is_featured); }
+    if (is_new !== undefined) { updates.push('is_new = ?'); values.push(is_new); }
     if (is_active !== undefined) { updates.push('is_active = ?'); values.push(is_active); }
     
-    if (updates.length === 0) {
-      return errorResponse(res, 'Không có thông tin cần cập nhật', 400);
+    // Cập nhật thông tin sản phẩm nếu có
+    if (updates.length > 0) {
+      values.push(id);
+      await query(`UPDATE products SET ${updates.join(', ')}, updated_at = NOW() WHERE id = ?`, values);
     }
     
-    values.push(id);
-    await query(`UPDATE products SET ${updates.join(', ')}, updated_at = NOW() WHERE id = ?`, values);
+    // Cập nhật hình ảnh nếu có
+    if (images !== undefined && Array.isArray(images)) {
+      // Xóa tất cả hình ảnh cũ
+      await query('DELETE FROM product_images WHERE product_id = ?', [id]);
+      
+      // Thêm hình ảnh mới
+      if (images.length > 0) {
+        for (let i = 0; i < images.length; i++) {
+          // Hỗ trợ cả mảng string và mảng object
+          const imageUrl = typeof images[i] === 'string' ? images[i] : images[i].image_url || images[i].url;
+          const isPrimary = i === 0; // Ảnh đầu tiên là primary
+          
+          await query(
+            'INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES (?, ?, ?, ?)',
+            [id, imageUrl, isPrimary, i]
+          );
+        }
+      }
+    }
     
+    // Lấy thông tin sản phẩm đã cập nhật
     const [updated] = await query('SELECT * FROM products WHERE id = ?', [id]);
+    
+    // Lấy hình ảnh sản phẩm
+    const productImages = await query(
+      'SELECT * FROM product_images WHERE product_id = ? ORDER BY display_order',
+      [id]
+    );
+    updated.images = productImages;
     
     return successResponse(res, updated, 'Cập nhật sản phẩm thành công');
   } catch (error) {

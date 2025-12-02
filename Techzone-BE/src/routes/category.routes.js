@@ -27,6 +27,18 @@ router.get('/', getAllCategories);
 
 /**
  * @swagger
+ * /api/categories/brands/all:
+ *   get:
+ *     summary: Lấy danh sách tất cả thương hiệu
+ *     tags: [2. Products - Quản lý Danh Mục]
+ *     responses:
+ *       200:
+ *         description: Danh sách thương hiệu
+ */
+router.get('/brands/all', getAllBrands);
+
+/**
+ * @swagger
  * /api/categories/{id}:
  *   get:
  *     summary: Lấy chi tiết danh mục
@@ -42,18 +54,6 @@ router.get('/', getAllCategories);
  *         description: Chi tiết danh mục
  */
 router.get('/:id', getCategoryById);
-
-/**
- * @swagger
- * /api/categories/brands/all:
- *   get:
- *     summary: Lấy danh sách tất cả thương hiệu
- *     tags: [2. Products - Quản lý Danh Mục]
- *     responses:
- *       200:
- *         description: Danh sách thương hiệu
- */
-router.get('/brands/all', getAllBrands);
 
 /**
  * @swagger
