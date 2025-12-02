@@ -1,6 +1,5 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 const dbConfig = {
@@ -16,17 +15,8 @@ const dbConfig = {
   keepAliveInitialDelay: 0
 };
 
-// Nếu có socket, sử dụng socket thay vì host/port
-if (process.env.DB_SOCKET) {
-  dbConfig.socketPath = process.env.DB_SOCKET;
-  delete dbConfig.host;
-  delete dbConfig.port;
-}
-
-// Tạo connection pool
 const pool = mysql.createPool(dbConfig);
 
-// Test connection
 export const testConnection = async () => {
   try {
     const connection = await pool.getConnection();

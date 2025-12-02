@@ -82,7 +82,7 @@ INSERT INTO stores (id, name, address, city, phone, email, google_maps_url, is_a
 -- Users (Admin: admin@techzone.vn / Admin@123)
 -- =============================================
 INSERT INTO users (id, email, password_hash, full_name, phone, role_id, is_active, is_verified, store_id) VALUES
-(1, 'admin@techzone.vn', '$2b$10$rGfJvxKZ7Q3N9XL5yJ0zEO5J.mwxQZ3zJ0zEO5J.mwxQZ3zJ0zEO5J', 'Nguyễn Văn Admin', '0901234567', 1, TRUE, TRUE, NULL),
+(1, 'admin@techzone.vn', '$2b$10$5tZlV.nbUqVKkXRMFiXbwuTChNkC1G/1mcnDNzBi41/NnFIYkUtDe', 'Nguyễn Văn Admin', '0901234567', 1, TRUE, TRUE, NULL),
 (2, 'staff1@techzone.vn', '$2b$10$rGfJvxKZ7Q3N9XL5yJ0zEO5J.mwxQZ3zJ0zEO5J.mwxQZ3zJ0zEO5J', 'Trần Thị Hoa', '0902345678', 2, TRUE, TRUE, 1),
 (3, 'staff2@techzone.vn', '$2b$10$rGfJvxKZ7Q3N9XL5yJ0zEO5J.mwxQZ3zJ0zEO5J.mwxQZ3zJ0zEO5J', 'Lê Văn Nam', '0903456789', 2, TRUE, TRUE, 2),
 (4, 'staff3@techzone.vn', '$2b$10$rGfJvxKZ7Q3N9XL5yJ0zEO5J.mwxQZ3zJ0zEO5J.mwxQZ3zJ0zEO5J', 'Phạm Thị Lan', '0904567890', 2, TRUE, TRUE, 3),

@@ -18,34 +18,28 @@ import staffRoutes from './routes/staff.routes.js';
 import storeRoutes from './routes/store.routes.js';
 import customerRoutes from './routes/customer.routes.js';
 import statsRoutes from './routes/stats.routes.js';
-
 dotenv.config();
-
 const app = express();
 
-// Security middleware
 app.use(helmet());
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5000',
-  credentials: true
+  origin: true,
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
 
-// Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Compression middleware
 app.use(compression());
 
-// Logging middleware
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Trust proxy
 app.set('trust proxy', 1);
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
     success: true, 
@@ -54,7 +48,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Swagger Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
   swaggerOptions: {
     url: '/swagger.json'
@@ -78,18 +71,14 @@ app.use('/api/stores', storeRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/stats', statsRoutes);
 
-// 404 handler
 app.use(notFound);
 
-// Global error handler
 app.use(errorHandler);
 
-// Start server
 const PORT = parseInt(process.env.PORT || '8000');
 
 const startServer = async () => {
   try {
-    // Test database connection
     const dbConnected = await testConnection();
     
     if (!dbConnected) {

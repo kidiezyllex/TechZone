@@ -87,8 +87,8 @@ export const getProductById = async (req, res, next) => {
     const [product] = await query(
       `SELECT p.*, c.name as category_name, b.name as brand_name,
               (SELECT SUM(quantity) FROM inventory WHERE product_id = p.id) as total_stock,
-              (SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id) as avg_rating,
-              (SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id) as review_count
+              (SELECT AVG(rating) FROM reviews WHERE product_id = p.id) as avg_rating,
+              (SELECT COUNT(*) FROM reviews WHERE product_id = p.id) as review_count
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
        LEFT JOIN brands b ON p.brand_id = b.id
@@ -106,13 +106,6 @@ export const getProductById = async (req, res, next) => {
       [id]
     );
     product.images = images;
-    
-    // Lấy specifications
-    const specifications = await query(
-      'SELECT * FROM product_specifications WHERE product_id = ?',
-      [id]
-    );
-    product.specifications = specifications;
     
     // Lấy tồn kho theo chi nhánh
     const inventory = await query(
