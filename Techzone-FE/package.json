@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/charts": "^2.2.7",
     "@clerk/clerk-react": "^5.56.2",
+    "@clerk/localizations": "^3.28.5",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@headlessui/react": "^1.7.19",
     "@heroicons/react": "^2.2.0",

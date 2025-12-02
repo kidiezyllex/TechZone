@@ -16,37 +16,16 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
-  getAllMaterials,
-  getMaterialById,
-  createMaterial,
-  updateMaterial,
-  deleteMaterial,
-  getAllColors,
-  getColorById,
-  createColor,
-  updateColor,
-  deleteColor,
-  getAllSizes,
-  getSizeById,
-  createSize,
-  updateSize,
-  deleteSize
 } from "@/api/attributes";
 
 import {
   IBrandFilter, IBrandCreate, IBrandUpdate,
   ICategoryFilter, ICategoryCreate, ICategoryUpdate,
-  IMaterialFilter, IMaterialCreate, IMaterialUpdate,
-  IColorFilter, IColorCreate, IColorUpdate,
-  ISizeFilter, ISizeCreate, ISizeUpdate
 } from "@/interface/request/attributes";
 
 import {
   IBrandResponse, IBrandsResponse,
   ICategoryResponse, ICategoriesResponse,
-  IMaterialResponse, IMaterialsResponse,
-  IColorResponse, IColorsResponse,
-  ISizeResponse, ISizesResponse,
   IActionResponse
 } from "@/interface/response/attributes";
 
@@ -121,116 +100,5 @@ export const useUpdateCategory = (): UseMutationResult<
 export const useDeleteCategory = (): UseMutationResult<IActionResponse, Error, string> => {
   return useMutation<IActionResponse, Error, string>({
     mutationFn: (categoryId) => deleteCategory(categoryId),
-  });
-};
-
-export const useMaterials = (params: IMaterialFilter = {}): UseQueryResult<IMaterialsResponse, Error> => {
-  return useQuery<IMaterialsResponse, Error>({
-    queryKey: ["materials", params],
-    queryFn: () => getAllMaterials(params),
-  });
-};
-
-export const useMaterialDetail = (materialId: string): UseQueryResult<IMaterialResponse, Error> => {
-  return useQuery<IMaterialResponse, Error>({
-    queryKey: ["material", materialId],
-    queryFn: () => getMaterialById(materialId),
-    enabled: !!materialId,
-  });
-};
-
-export const useCreateMaterial = (): UseMutationResult<IMaterialResponse, Error, IMaterialCreate> => {
-  return useMutation<IMaterialResponse, Error, IMaterialCreate>({
-    mutationFn: (payload) => createMaterial(payload),
-  });
-};
-
-export const useUpdateMaterial = (): UseMutationResult<
-  IMaterialResponse,
-  Error,
-  { materialId: string; payload: IMaterialUpdate }
-> => {
-  return useMutation<IMaterialResponse, Error, { materialId: string; payload: IMaterialUpdate }>({
-    mutationFn: ({ materialId, payload }) => updateMaterial(materialId, payload),
-  });
-};
-
-export const useDeleteMaterial = (): UseMutationResult<IActionResponse, Error, string> => {
-  return useMutation<IActionResponse, Error, string>({
-    mutationFn: (materialId) => deleteMaterial(materialId),
-  });
-};
-
-export const useColors = (params: IColorFilter = {}): UseQueryResult<IColorsResponse, Error> => {
-  return useQuery<IColorsResponse, Error>({
-    queryKey: ["colors", params],
-    queryFn: () => getAllColors(params),
-  });
-};
-
-export const useColorDetail = (colorId: string): UseQueryResult<IColorResponse, Error> => {
-  return useQuery<IColorResponse, Error>({
-    queryKey: ["color", colorId],
-    queryFn: () => getColorById(colorId),
-    enabled: !!colorId,
-  });
-};
-
-export const useCreateColor = (): UseMutationResult<IColorResponse, Error, IColorCreate> => {
-  return useMutation<IColorResponse, Error, IColorCreate>({
-    mutationFn: (payload) => createColor(payload),
-  });
-};
-
-export const useUpdateColor = (): UseMutationResult<
-  IColorResponse,
-  Error,
-  { colorId: string; payload: IColorUpdate }
-> => {
-  return useMutation<IColorResponse, Error, { colorId: string; payload: IColorUpdate }>({
-    mutationFn: ({ colorId, payload }) => updateColor(colorId, payload),
-  });
-};
-
-export const useDeleteColor = (): UseMutationResult<IActionResponse, Error, string> => {
-  return useMutation<IActionResponse, Error, string>({
-    mutationFn: (colorId) => deleteColor(colorId),
-  });
-};
-
-export const useSizes = (params: ISizeFilter = {}): UseQueryResult<ISizesResponse, Error> => {
-  return useQuery<ISizesResponse, Error>({
-    queryKey: ["sizes", params],
-    queryFn: () => getAllSizes(params),
-  });
-};
-
-export const useSizeDetail = (sizeId: string): UseQueryResult<ISizeResponse, Error> => {
-  return useQuery<ISizeResponse, Error>({
-    queryKey: ["size", sizeId],
-    queryFn: () => getSizeById(sizeId),
-    enabled: !!sizeId,
-  });
-};
-
-export const useCreateSize = (): UseMutationResult<ISizeResponse, Error, ISizeCreate> => {
-  return useMutation<ISizeResponse, Error, ISizeCreate>({
-    mutationFn: (payload) => createSize(payload),
-  });
-};
-
-export const useUpdateSize = (): UseMutationResult<
-  ISizeResponse,
-  Error,
-  { sizeId: string; payload: ISizeUpdate }
-> => {
-  return useMutation<ISizeResponse, Error, { sizeId: string; payload: ISizeUpdate }>({
-    mutationFn: ({ sizeId, payload }) => updateSize(sizeId, payload),
-  });
-};
-
-export const useDeleteSize = (): UseMutationResult<IActionResponse, Error, string> => {
-  return useMutation<IActionResponse, Error, string>({
-    mutationFn: (sizeId) => deleteSize(sizeId),
   });
 };

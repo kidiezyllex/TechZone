@@ -49,29 +49,23 @@ export const menuItems: MenuItem[] = [
         name: 'Danh mục',
         path: '/admin/products/categories',
       },
-      {
-        id: 'products-materials',
-        name: 'Chất liệu',
-        path: '/admin/products/materials',
-      },
-      {
-        id: 'products-colors',
-        name: 'Màu sắc',
-        path: '/admin/products/colors',
-      },
-      {
-        id: 'products-sizes',
-        name: 'Kích thước',
-        path: '/admin/products/sizes',
-      },
+      // {
+      //   id: 'products-materials',
+      //   name: 'Chất liệu',
+      //   path: '/admin/products/materials',
+      // },
+      // {
+      //   id: 'products-colors',
+      //   name: 'Màu sắc',
+      //   path: '/admin/products/colors',
+      // },
+      // {
+      //   id: 'products-sizes',
+      //   name: 'Kích thước',
+      //   path: '/admin/products/sizes',
+      // },
     ],
   },
-  
-  
-  
-  
-  
-  
   {
     id: 'discounts',
     name: 'Giảm giá',
