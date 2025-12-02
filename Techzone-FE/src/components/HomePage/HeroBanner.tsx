@@ -5,7 +5,7 @@ import { mdiSale, mdiArrowRightThin, mdiStar, mdiHeart, mdiTrendingUp, mdiShield
 import { InteractiveHoverButton } from '../Common/InteractiveHoverButton';
 export const HeroBanner = () => {
     return (
-        <main className='max-w-[1400px] mx-auto'>
+        <main className='max-w-full w-full mx-auto'>
             <div className="relative w-full overflow-hidden bg-gradient-to-br from-[#FAFBF8] to-[#FCFCF9]">
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute h-20 w-20 rounded-full bg-primary/70 top-12 left-[10%]"></div>
