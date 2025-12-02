@@ -1,8 +1,8 @@
-'use client'; 
+'use client';
 
-import { useState } from 'react'; 
-import { useNavigate } from 'react-router-dom'; 
-import { IAccountCreate } from '@/interface/request/account'; 
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IAccountCreate } from '@/interface/request/account';
 
 
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
@@ -11,80 +11,80 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'react-toastify'; 
-import 'react-toastify/dist/ReactToastify.css'; 
-import { Icon } from '@mdi/react'; 
-import { mdiArrowLeft, mdiLoading } from '@mdi/js'; 
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'; 
-import { useRegister } from '@/hooks/authentication'; 
-import { Eye, EyeOff } from 'lucide-react'; 
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Icon } from '@mdi/react';
+import { mdiArrowLeft, mdiLoading } from '@mdi/js';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useCreateAccount } from '@/hooks/account';
+import { Eye, EyeOff } from 'lucide-react';
 
 
 const initialAccount: IAccountCreate = {
-  fullName: '', 
-  email: '', 
-  password: '', 
-  phoneNumber: '', 
-  role: 'CUSTOMER', 
-  gender: 'male', 
-  birthday: '', 
-  citizenId: '' 
+  fullName: '',
+  email: '',
+  password: '',
+  phoneNumber: '',
+  role: 'CUSTOMER',
+  gender: 'male',
+  birthday: '',
+  citizenId: ''
 };
 
 
 export default function CreateAccountPage() {
-  const navigate = useNavigate(); 
-  const [account, setAccount] = useState<IAccountCreate>(initialAccount); 
-  const [confirmPassword, setConfirmPassword] = useState(''); 
-  const createAccount = useRegister(); 
-  const [showPassword, setShowPassword] = useState(false); 
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
+  const navigate = useNavigate();
+  const [account, setAccount] = useState<IAccountCreate>(initialAccount);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const createAccount = useCreateAccount();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target; 
-    setAccount({ ...account, [name]: value }); 
+    const { name, value } = e.target;
+    setAccount({ ...account, [name]: value });
   };
 
-  
+
   const handleSelectChange = (name: string, value: string) => {
     setAccount({ ...account, [name]: value });
   };
 
-  
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  
+
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); 
 
-    
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+
     if (!account.fullName || !account.email || !account.password || !account.phoneNumber) {
       toast.error('Vui lòng điền đầy đủ thông tin bắt buộc');
       return;
     }
 
-    
+
     if (account.password !== confirmPassword) {
       toast.error('Mật khẩu xác nhận không khớp');
       return;
     }
 
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(account.email)) {
       toast.error('Email không hợp lệ');
       return;
     }
 
-    
+
     const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
     if (!phoneRegex.test(account.phoneNumber)) {
       toast.error('Số điện thoại không hợp lệ');
@@ -92,7 +92,6 @@ export default function CreateAccountPage() {
     }
 
     try {
-      
       await createAccount.mutateAsync({
         ...account,
         birthday: account.birthday ? new Date(account.birthday) : undefined,
@@ -117,10 +116,10 @@ export default function CreateAccountPage() {
     }
   };
 
-  
+
   return (
-    <div className="space-y-4"> {}
-      <div className='flex justify-between items-start'> {}
+    <div className="space-y-4"> { }
+      <div className='flex justify-between items-start'> { }
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -146,13 +145,13 @@ export default function CreateAccountPage() {
         </Button>
       </div>
 
-      <form onSubmit={handleSubmit}> {}
+      <form onSubmit={handleSubmit}> { }
         <Card>
           <CardHeader>
             <CardTitle>Thông tin tài khoản</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-maintext">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> { }
               <div className="space-y-2">
                 <Label htmlFor="fullName">Họ và tên <span className="text-red-500">*</span></Label>
                 <Input
@@ -290,7 +289,7 @@ export default function CreateAccountPage() {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-end space-x-4"> {}
+          <CardFooter className="flex justify-end space-x-4"> { }
             <Button variant="outline" type="button" onClick={() => navigate(-1)}>
               Hủy
             </Button>

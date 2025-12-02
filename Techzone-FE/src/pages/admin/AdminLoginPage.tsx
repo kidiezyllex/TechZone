@@ -61,7 +61,6 @@ const AdminLoginPage: React.FC = () => {
                     return;
                 }
 
-                // Token đã được lưu trong useLogin hook, chỉ cần login user
                 loginUser(account, response.data.token);
                 toast.success("Đăng nhập Admin thành công");
                 navigate("/admin/statistics");

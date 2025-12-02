@@ -84,14 +84,18 @@ export const NavigationBar = () => {
                 <div className="flex items-center gap-2">
                     {!isAuthenticated ? (
                         <div className="hidden md:flex items-center gap-2">
-                            <a href="/auth/login" className="border border-primary text-primary hover:text-primary/80 rounded-sm">
-                                <Button variant="outline" size="sm" className='border border-primary text-primary hover:text-primary/80 rounded-sm'>
-                                    Đăng nhập
-                                </Button>
-                            </a>
-                            <a href="/auth/register" className="rounded-sm bg-primary/80">
-                                <Button size="sm" className='rounded-sm bg-primary/80'>Đăng ký</Button>
-                            </a>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => window.location.href = '/auth/login'}
+                            >
+                                <img
+                                    src="https://logos-world.net/wp-content/uploads/2025/08/Google-Logo-New.png"
+                                    alt="Google"
+                                    className="h-4 w-auto"
+                                />
+                                Đăng nhập với Google
+                            </Button>
                         </div>
                     ) : (
                         <div className="hidden md:flex items-center gap-2">
@@ -107,7 +111,7 @@ export const NavigationBar = () => {
                                 {totalItems}
                             </span>
                         </button>
-                        <AccountDropdown />
+                        {isAuthenticated && <AccountDropdown />}
                     </div>
                 </div>
             </div>

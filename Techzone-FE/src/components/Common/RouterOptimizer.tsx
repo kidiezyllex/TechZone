@@ -22,7 +22,6 @@ const routeImports: Record<string, () => Promise<any>> = {
   '/checkout/shipping': () => import('@/pages/CheckoutShippingPage'),
   '/checkout/success': () => import('@/pages/CheckoutSuccessPage'),
   '/auth/login': () => import('@/pages/auth/LoginPage'),
-  '/auth/register': () => import('@/pages/auth/RegisterPage'),
   '/admin': () => import('@/pages/admin/AdminDashboardPage'),
   '/admin/products': () => import('@/pages/admin/AdminProductsPage'),
   '/admin/orders': () => import('@/pages/admin/AdminOrdersPage'),
@@ -45,7 +44,7 @@ const preloadRoute = async (routePath: string): Promise<void> => {
       const importPromise = importFn();
       routeCache.set(routePath, importPromise);
     }
-    
+
     await routeCache.get(routePath);
     preloadedRoutes.add(routePath);
   } catch (error) {
@@ -56,7 +55,7 @@ const preloadRoute = async (routePath: string): Promise<void> => {
 
 const preloadRoutes = async (routes: string[], priority: 'high' | 'medium' | 'low' = 'medium'): Promise<void> => {
   const delay = priority === 'high' ? 0 : priority === 'medium' ? 100 : 500;
-  
+
   for (const route of routes) {
     await new Promise(resolve => setTimeout(resolve, delay));
     preloadRoute(route);
@@ -66,11 +65,11 @@ const preloadRoutes = async (routes: string[], priority: 'high' | 'medium' | 'lo
 
 const useIntelligentPreloading = () => {
   const location = useLocation();
-  
+
   useEffect(() => {
     const currentPath = location.pathname;
-    
-    
+
+
     const getRelatedRoutes = (path: string): string[] => {
       if (path === '/') {
         return ['/products', '/about-us', '/auth/login'];
@@ -79,7 +78,7 @@ const useIntelligentPreloading = () => {
         return ['/auth/login', '/checkout/shipping'];
       }
       if (path === '/auth/login') {
-        return ['/auth/register', '/profile'];
+        return ['/profile'];
       }
       if (path.startsWith('/admin')) {
         return ['/admin/products', '/admin/orders', '/admin/statistics'];
@@ -89,7 +88,7 @@ const useIntelligentPreloading = () => {
 
     const relatedRoutes = getRelatedRoutes(currentPath);
     if (relatedRoutes.length > 0) {
-      
+
       setTimeout(() => {
         preloadRoutes(relatedRoutes, 'low');
       }, 1000);
@@ -106,7 +105,7 @@ const useLinkPreloading = () => {
           if (entry.isIntersecting) {
             const link = entry.target as HTMLAnchorElement;
             const href = link.getAttribute('href');
-            
+
             if (href && routeImports[href]) {
               preloadRoute(href);
             }
@@ -119,7 +118,7 @@ const useLinkPreloading = () => {
       }
     );
 
-    
+
     const links = document.querySelectorAll('a[href^="/"]');
     links.forEach((link) => observer.observe(link));
 
@@ -132,17 +131,17 @@ export const RouterOptimizer: React.FC<RouterOptimizerProps> = ({
   preloadRoutes: initialPreloadRoutes = [],
   enablePrefetch = true,
 }) => {
-  
+
   useEffect(() => {
     if (initialPreloadRoutes.length > 0) {
       preloadRoutes(initialPreloadRoutes, 'high');
     }
   }, []);
 
-  
+
   useIntelligentPreloading();
-  
-  
+
+
   if (enablePrefetch) {
     useLinkPreloading();
   }
@@ -171,7 +170,7 @@ export const withRouteOptimization = <P extends object>(
 ) => {
   return React.memo((props: P) => {
     const { preload } = useRoutePreloader();
-    
+
     useEffect(() => {
       if (relatedRoutes.length > 0) {
         setTimeout(() => preload(relatedRoutes), 500);
@@ -191,7 +190,7 @@ export const OptimizedLink: React.FC<{
   onMouseEnter?: () => void;
 }> = ({ to, children, className, preload = true, onMouseEnter, ...props }) => {
   const navigate = useNavigate();
-  
+
   const handleMouseEnter = useCallback(() => {
     if (preload) {
       preloadRoute(to);

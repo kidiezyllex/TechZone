@@ -17,7 +17,6 @@ const AccountPage = React.lazy(() => import('@/pages/AccountPage'))
 
 
 const LoginPage = React.lazy(() => import('@/pages/auth/LoginPage'))
-const RegisterPage = React.lazy(() => import('@/pages/auth/RegisterPage'))
 
 
 const ProductsPage = React.lazy(() => import('@/pages/ProductsPage'))
@@ -162,11 +161,6 @@ function App() {
             <Route path="auth/login" element={
               <LazyComponentLoader fallback={<PageLoader />}>
                 <LoginPage />
-              </LazyComponentLoader>
-            } />
-            <Route path="auth/register" element={
-              <LazyComponentLoader fallback={<PageLoader />}>
-                <RegisterPage />
               </LazyComponentLoader>
             } />
 

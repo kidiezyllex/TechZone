@@ -1,6 +1,5 @@
 import {
-  ISignIn,
-  IRegister
+  ISignIn
 } from "@/interface/request/authentication";
 
 import {
@@ -9,16 +8,6 @@ import {
 } from "@/interface/response/authentication";
 
 import { sendGet, sendPost } from "./axios";
-
-export const requestRegisterOTP = async (email: string): Promise<any> => {
-  const res = await sendPost("auth/request-register-otp", { email });
-  return res;
-};
-
-export const register = async (payload: any): Promise<IAuthResponse> => {
-  const res = await sendPost("auth/register", payload);
-  return res as IAuthResponse;
-};
 
 export const login = async (payload: ISignIn): Promise<IAuthResponse> => {
   const res = await sendPost("auth/login", payload);

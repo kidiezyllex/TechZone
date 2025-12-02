@@ -1,13 +1,11 @@
 import {
   login,
-  register,
   logout,
   getCurrentUser,
   refreshToken
 } from "@/api/authentication";
 import type {
   ISignIn,
-  IRegister,
 } from "@/interface/request/authentication";
 import type {
   IAuthResponse,
@@ -41,25 +39,6 @@ export const useLogin = (): UseMutationResult<
     },
     onError: (error: any) => {
       toastService.error(error?.response?.data?.message || 'Đăng nhập thất bại')
-    }
-  });
-};
-
-export const useRegister = (): UseMutationResult<
-  IAuthResponse,
-  Error,
-  IRegister
-> => {
-  return useMutation<IAuthResponse, Error, IRegister>({
-    mutationFn: (params: IRegister) => register(params),
-    onSuccess: (result: IAuthResponse) => {
-      if (result.success) {
-        toastService.success('Đăng ký thành công')
-      }
-      return result;
-    },
-    onError: (error: any) => {
-      toastService.error(error?.response?.data?.message || 'Đăng ký thất bại')
     }
   });
 };
