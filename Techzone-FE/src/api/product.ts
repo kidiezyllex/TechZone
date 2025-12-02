@@ -109,23 +109,22 @@ export const getAllProducts = async (params: IProductFilter): Promise<IProductsR
   const formattedParams = convertParamsToQueryString(params);
   const res = await sendGet("/products", formattedParams);
 
-  // Handle new API structure: data is directly an array, pagination is at root level
-  const products = Array.isArray(res.data) ? res.data.map(mapApiProductToProduct) : [];
+  const rawProducts = Array.isArray(res.data) ? res.data : [];
+  const products = rawProducts.map(mapApiProductToProduct);
   const pagination = res.pagination || {};
 
   const currentPage = pagination.page ?? params.page ?? 1;
   const limit = pagination.limit ?? params.limit ?? 10;
-  // Handle null totalPages - if null, calculate from products length and limit
   const totalPages = pagination.totalPages != null && pagination.totalPages !== null 
     ? pagination.totalPages 
-    : Math.ceil(products.length / limit) || 1;
-  const totalItems = pagination.totalItems ?? products.length;
+    : Math.ceil(rawProducts.length / limit) || 1;
+  const totalItems = pagination.total ?? rawProducts.length;
 
   return {
     success: !!res.success,
     message: res.message ?? "",
     data: {
-      products,
+      products: rawProducts,
       pagination: {
         totalItems,
         totalPages,

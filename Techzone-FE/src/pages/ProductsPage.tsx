@@ -96,9 +96,12 @@ export default function ProductsPage() {
   const { data: promotionsData } = usePromotions({ status: "ACTIVE" });
   console.log(promotionsData)
   const data = useMemo(() => {
-    // Handle new API structure: data is an array directly
-    if (!rawData || !rawData.data || !Array.isArray(rawData.data)) return rawData
-    let filteredProducts = [...rawData.data]
+    if (!rawData || !rawData.data) return rawData
+    const productsArray = Array.isArray(rawData.data)
+      ? rawData.data
+      : (rawData.data?.products || [])
+    if (!Array.isArray(productsArray)) return rawData
+    let filteredProducts = [...productsArray]
     if (promotionsData?.data?.promotions) {
       filteredProducts = applyPromotionsToProducts(filteredProducts, promotionsData.data.promotions)
     }
@@ -214,9 +217,20 @@ export default function ProductsPage() {
     }
 
 
-    return {
-      ...rawData,
-      data: filteredProducts,
+    // Preserve the original structure
+    if (Array.isArray(rawData.data)) {
+      return {
+        ...rawData,
+        data: filteredProducts,
+      }
+    } else {
+      return {
+        ...rawData,
+        data: {
+          ...rawData.data,
+          products: filteredProducts,
+        },
+      }
     }
   }, [rawData, filters, sortOption, pagination, promotionsData])
 
@@ -334,8 +348,15 @@ export default function ProductsPage() {
   }
 
   const filteredProducts = useMemo(() => {
-    if (!data || !data.data || !Array.isArray(data.data)) return []
-    return data.data
+    if (!data || !data.data) return []
+    // Handle both structures: array directly or nested in products property
+    if (Array.isArray(data.data)) {
+      return data.data
+    }
+    if (data.data?.products && Array.isArray(data.data.products)) {
+      return data.data.products
+    }
+    return []
   }, [data])
 
   return (
@@ -382,9 +403,9 @@ export default function ProductsPage() {
             <h2 className="font-medium mb-4">Bộ lọc sản phẩm</h2>
             <ProductFilters filters={filters} onChange={handleFilterChange} />
 
-            {data && data.data && Array.isArray(data.data) && data.data.length > 0 && (
+            {filteredProducts.length > 0 && (
               <VoucherForm
-                orderValue={data.data.reduce((sum, product) => {
+                orderValue={filteredProducts.reduce((sum, product) => {
                   const price = parseFloat(product.discount_price || product.selling_price || product.base_price || 0)
                   return sum + price
                 }, 0)}
@@ -478,109 +499,114 @@ export default function ProductsPage() {
               <div className="flex justify-center mt-8">
                 <Pagination>
                   <PaginationContent>
-                    {(rawData as any)?.pagination?.page > 1 ? (
-                      <PaginationPrevious
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handlePageChange(((rawData as any)?.pagination?.page || 1) - 1)
-                        }}
-                      />
-                    ) : (
-                      <PaginationPrevious href="#" className="pointer-events-none opacity-50" />
-                    )}
                     {(() => {
-                      const pages = []
-                      const totalPages = (rawData as any)?.pagination?.totalPages || 1
-                      const currentPage = (rawData as any)?.pagination?.page || 1
-
-
-                      if (totalPages > 0) {
-                        pages.push(
-                          <PaginationItem key={1}>
-                            <PaginationLink
+                      const paginationData = (rawData as any)?.pagination || (rawData as any)?.data?.pagination || {}
+                      const currentPage = paginationData.page || paginationData.currentPage || 1
+                      const totalPages = paginationData.totalPages || 1
+                      return (
+                        <>
+                          {currentPage > 1 ? (
+                            <PaginationPrevious
                               href="#"
-                              isActive={currentPage === 1}
                               onClick={(e) => {
                                 e.preventDefault()
-                                handlePageChange(1)
+                                handlePageChange(currentPage - 1)
                               }}
-                            >
-                              1
-                            </PaginationLink>
-                          </PaginationItem>,
-                        )
-                      }
+                            />
+                          ) : (
+                            <PaginationPrevious href="#" className="pointer-events-none opacity-50" />
+                          )}
+                          {(() => {
+                            const pages = []
 
 
-                      if (currentPage > 3) {
-                        pages.push(
-                          <PaginationItem key="start-ellipsis">
-                            <PaginationEllipsis />
-                          </PaginationItem>,
-                        )
-                      }
+                            if (totalPages > 0) {
+                              pages.push(
+                                <PaginationItem key={1}>
+                                  <PaginationLink
+                                    href="#"
+                                    isActive={currentPage === 1}
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      handlePageChange(1)
+                                    }}
+                                  >
+                                    1
+                                  </PaginationLink>
+                                </PaginationItem>,
+                              )
+                            }
 
 
-                      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-                        if (i !== 1 && i !== totalPages) {
-                          pages.push(
-                            <PaginationItem key={i}>
-                              <PaginationLink
-                                href="#"
-                                isActive={currentPage === i}
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  handlePageChange(i)
-                                }}
-                              >
-                                {i}
-                              </PaginationLink>
-                            </PaginationItem>,
-                          )
-                        }
-                      }
+                            if (currentPage > 3) {
+                              pages.push(
+                                <PaginationItem key="start-ellipsis">
+                                  <PaginationEllipsis />
+                                </PaginationItem>,
+                              )
+                            }
 
-                      if (currentPage < totalPages - 2) {
-                        pages.push(
-                          <PaginationItem key="end-ellipsis">
-                            <PaginationEllipsis />
-                          </PaginationItem>,
-                        )
-                      }
 
-                      if (totalPages > 1) {
-                        pages.push(
-                          <PaginationItem key={totalPages}>
-                            <PaginationLink
+                            for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+                              if (i !== 1 && i !== totalPages) {
+                                pages.push(
+                                  <PaginationItem key={i}>
+                                    <PaginationLink
+                                      href="#"
+                                      isActive={currentPage === i}
+                                      onClick={(e) => {
+                                        e.preventDefault()
+                                        handlePageChange(i)
+                                      }}
+                                    >
+                                      {i}
+                                    </PaginationLink>
+                                  </PaginationItem>,
+                                )
+                              }
+                            }
+
+                            if (currentPage < totalPages - 2) {
+                              pages.push(
+                                <PaginationItem key="end-ellipsis">
+                                  <PaginationEllipsis />
+                                </PaginationItem>,
+                              )
+                            }
+
+                            if (totalPages > 1) {
+                              pages.push(
+                                <PaginationItem key={totalPages}>
+                                  <PaginationLink
+                                    href="#"
+                                    isActive={currentPage === totalPages}
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      handlePageChange(totalPages)
+                                    }}
+                                  >
+                                    {totalPages}
+                                  </PaginationLink>
+                                </PaginationItem>,
+                              )
+                            }
+
+                            return pages
+                          })()}
+                          {currentPage < totalPages ? (
+                            <PaginationNext
                               href="#"
-                              isActive={currentPage === totalPages}
                               onClick={(e) => {
                                 e.preventDefault()
-                                handlePageChange(totalPages)
+                                if (currentPage < totalPages) handlePageChange(currentPage + 1)
                               }}
-                            >
-                              {totalPages}
-                            </PaginationLink>
-                          </PaginationItem>,
-                        )
-                      }
-
-                      return pages
+                            />
+                          ) : (
+                            <PaginationNext href="#" className="pointer-events-none opacity-50" />
+                          )}
+                        </>
+                      )
                     })()}
-                    {(rawData as any)?.pagination?.page < ((rawData as any)?.pagination?.totalPages || 1) ? (
-                      <PaginationNext
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          const totalPages = (rawData as any)?.pagination?.totalPages || 1
-                          const currentPage = (rawData as any)?.pagination?.page || 1
-                          if (currentPage < totalPages) handlePageChange(currentPage + 1)
-                        }}
-                      />
-                    ) : (
-                      <PaginationNext href="#" className="pointer-events-none opacity-50" />
-                    )}
                   </PaginationContent>
                 </Pagination>
               </div>
@@ -684,18 +710,16 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
             </div>
           </a>
 
-
-          <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
-            {/* Discount badge */}
+          <div className="absolute top-2 left-2 flex flex-row flex-wrap gap-1 z-20 max-w-[calc(100%-4rem)]">
             {finalDiscountPercent > 0 && (
               <motion.div
                 initial={{ scale: 0, rotate: 180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-gradient-to-r from-green-500 via-emerald-500 to-lime-500 text-white text-xs font-bold px-3 rounded-full shadow-xl border border-white/50 backdrop-blur-sm animate-pulse flex-shrink-0 w-fit flex items-center justify-center gap-1"
+                className="bg-gradient-to-r from-green-500 via-emerald-500 to-lime-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm animate-pulse flex-shrink-0 flex items-center justify-center gap-0.5"
               >
-                💥
-                <span className="text-base">-{finalDiscountPercent}%</span>
+                <span className="text-[10px]">💥</span>
+                <span className="text-[10px]">-{finalDiscountPercent}%</span>
               </motion.div>
             )}
 
@@ -705,7 +729,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xl border-2 border-white/50 backdrop-blur-sm"
+                className="bg-purple-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm"
               >
                 Nổi bật
               </motion.div>
@@ -717,7 +741,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.25 }}
-                className="bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xl border-2 border-white/50 backdrop-blur-sm"
+                className="bg-blue-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm"
               >
                 Mới
               </motion.div>
@@ -729,7 +753,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xl border-2 border-white/50 backdrop-blur-sm"
+                className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm"
               >
                 Hết hàng
               </motion.div>
@@ -738,7 +762,7 @@ const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddT
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xl border-2 border-white/50 backdrop-blur-sm"
+                className="bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm"
               >
                 Sắp hết
               </motion.div>
