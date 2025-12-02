@@ -7,20 +7,21 @@ export interface IBaseResponse<T> {
 }
 
 export interface IAccountData {
-  id: string
-  code: string
-  fullName: string
+  id: number
   email: string
+  full_name: string
+  phone: string | null
+  avatar_url: string | null
+  is_active: number
+  is_verified: number
+  store_id: number | null
   role: string
 }
 
 export interface IAuthData {
-  id: string
-  fullName: string
-  email: string
-  role: string
-  token: string
   account: IAccountData
+  token: string
+  refreshToken: string
 }
 
 export interface IAuthResponse extends IBaseResponse<IAuthData> {}

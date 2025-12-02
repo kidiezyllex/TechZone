@@ -52,16 +52,17 @@ const AdminLoginPage: React.FC = () => {
                 response &&
                 response.success &&
                 response.data?.token &&
-                (response.data as any)?.account
+                response.data?.account
             ) {
-                const account = (response.data as any)?.account;
+                const account = response.data.account;
 
                 if (!account?.role || account.role.toLowerCase() !== "admin") {
                     toast.error("Tài khoản này không có quyền truy cập trang quản trị");
                     return;
                 }
 
-                loginUser(account, response.data?.token);
+                // Token đã được lưu trong useLogin hook, chỉ cần login user
+                loginUser(account, response.data.token);
                 toast.success("Đăng nhập Admin thành công");
                 navigate("/admin/statistics");
             }

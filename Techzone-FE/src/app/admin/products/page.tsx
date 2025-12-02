@@ -120,25 +120,29 @@ export default function ProductsPage() {
     variantIndex: number = 0,
     imageIndex: number = 0
   ) => {
-    const slides = (product.variants as any[]).flatMap((variant: any) =>
-      (variant.images || []).map((img: any) => ({
-        src: checkImageUrl(img.imageUrl),
+    // Handle new structure: images directly on product
+    let slides: any[] = [];
+
+    if (product.images && Array.isArray(product.images)) {
+      // New structure: images array directly on product
+      slides = product.images.map((img: any) => ({
+        src: checkImageUrl(img.image_url || img.imageUrl),
         alt: product.name,
-        download: checkImageUrl(img.imageUrl),
-      }))
-    );
-    let startIndex = 0;
-    let count = 0;
-    for (let i = 0; i < product.variants.length; i++) {
-      const imgs = product.variants[i].images || [];
-      if (i === variantIndex) {
-        startIndex = count + imageIndex;
-        break;
-      }
-      count += imgs.length;
+        download: checkImageUrl(img.image_url || img.imageUrl),
+      }));
+    } else if (product.variants && Array.isArray(product.variants)) {
+      // Old structure: images in variants
+      slides = (product.variants as any[]).flatMap((variant: any) =>
+        (variant.images || []).map((img: any) => ({
+          src: checkImageUrl(img.imageUrl),
+          alt: product.name,
+          download: checkImageUrl(img.imageUrl),
+        }))
+      );
     }
+
     setLightboxSlides(slides);
-    setLightboxIndex(startIndex);
+    setLightboxIndex(imageIndex);
     setLightboxOpen(true);
   };
 
@@ -328,51 +332,63 @@ export default function ProductsPage() {
                 {data?.data.products.length ? (
                   data.data.products.map((product) => (
                     <TableRow key={product.id} className="hover:bg-gray-50">
-                      <TableCell className="px-4 py-4 whitespace-nowrap">
+                      <TableCell className="p-2 px-4 whitespace-nowrap">
                         <div
-                          className="relative h-12 w-12 rounded-md overflow-hidden bg-gray-100 cursor-pointer group"
+                          className="relative h-14 w-14 rounded-md overflow-hidden bg-gray-100 cursor-pointer group"
                           onClick={() => handleOpenLightbox(product, 0, 0)}
                           title="Xem ảnh lớn"
                         >
                           <img
-                            src={checkImageUrl(product.variants[0]?.images?.[0]?.imageUrl)}
+                            src={checkImageUrl(
+                              product.images?.[0]?.imageUrl ||
+                              product.variants?.[0]?.images?.[0]?.imageUrl ||
+                              ''
+                            )}
                             alt={product.name}
-                            className="object-cover group-hover:scale-105 transition-transform duration-200"
+                            className="object-contain group-hover:scale-105 transition-transform duration-200 w-full h-full"
                           />
                         </div>
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-maintext">{product.name}</div>
                         <div className="text-xs text-maintext">
-                          {product.variants.length} biến thể
+                          SKU: {product.code || 'N/A'}
                         </div>
+                        {product.totalStock !== undefined && (
+                          <div className="text-xs text-maintext">
+                            Tồn kho: {product.totalStock}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-maintext">
-                        {typeof product.brand === 'string' ? product.brand : product.brand.name}
+                        {typeof product.brand === 'string' ? product.brand : product.brand?.name || 'N/A'}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-maintext">
-                        {typeof product.category === 'string' ? product.category : product.category.name}
+                        {typeof product.category === 'string' ? product.category : product.category?.name || 'N/A'}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-sm">
                         {(() => {
-                          const basePrice = product.variants[0]?.price || 0;
-                          const discount = promotionsData?.data?.promotions
-                            ? calculateProductDiscount(product.id, basePrice, promotionsData.data.promotions)
-                            : { originalPrice: basePrice, discountedPrice: basePrice, discountPercent: 0 };
+                          // Use discount_price if available, otherwise selling_price, fallback to basePrice
+                          const displayPrice = product.discountPrice || product.sellingPrice || product.basePrice || product.price || 0;
+                          const originalPrice = product.sellingPrice || product.basePrice || product.price || 0;
+                          const hasDiscount = product.discountPrice && product.discountPrice < originalPrice;
+                          const discountPercent = hasDiscount
+                            ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100)
+                            : 0;
 
                           return (
                             <div className="space-y-1">
-                              <div className={`font-medium ${discount.discountPercent > 0 ? 'text-primary' : 'text-maintext'}`}>
-                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discount.discountedPrice)}
+                              <div className={`font-medium ${hasDiscount ? 'text-primary' : 'text-maintext'}`}>
+                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(displayPrice)}
                               </div>
-                              {discount.discountPercent > 0 && (
+                              {hasDiscount && (
                                 <div className="text-xs text-maintext line-through">
-                                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discount.originalPrice)}
+                                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(originalPrice)}
                                 </div>
                               )}
-                              {discount.discountPercent > 0 && (
+                              {hasDiscount && (
                                 <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                  -{discount.discountPercent}% KM
+                                  -{discountPercent}%
                                 </div>
                               )}
                             </div>
@@ -380,15 +396,15 @@ export default function ProductsPage() {
                         })()}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs rounded-full ${product.status === 'ACTIVE'
+                        <span className={`px-2 py-1 text-xs rounded-full ${product.status === 'ACTIVE' || (product as any).is_active === 1
                           ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
                           }`}>
-                          {product.status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
+                          {product.status === 'ACTIVE' || (product as any).is_active === 1 ? 'Hoạt động' : 'Không hoạt động'}
                         </span>
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-sm text-maintext">
-                        {formatDate(product.updatedAt)}
+                        {formatDate(product.updatedAt || (product as any).updated_at)}
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end space-x-2">
@@ -456,9 +472,10 @@ export default function ProductsPage() {
             <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
               <div className="hidden sm:block">
                 <p className="text-sm text-maintext">
-                  Hiển thị <span className="font-medium">{(data.data.pagination.currentPage - 1) * data.data.pagination.limit + 1}</span> đến <span className="font-medium">
-                    {Math.min(data.data.pagination.currentPage * data.data.pagination.limit, data.data.pagination.totalItems)}
-                  </span> của <span className="font-medium">{data.data.pagination.totalItems}</span> sản phẩm
+                  Trang <span className="font-medium">{data.data.pagination.currentPage}</span> / <span className="font-medium">{data.data.pagination.totalPages}</span>
+                  {data.data.pagination.totalItems && (
+                    <> - Tổng <span className="font-medium">{data.data.pagination.totalItems}</span> sản phẩm</>
+                  )}
                 </p>
               </div>
               <div className="flex space-x-2">

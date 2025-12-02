@@ -39,7 +39,6 @@ export default function EditProductPage() {
   const { id } = params;
   const [activeTab, setActiveTab] = useState('info');
   const [uploading, setUploading] = useState(false);
-  const [uploadingProductImage, setUploadingProductImage] = useState(false);
   const [imageLinks, setImageLinks] = useState('');
 
   const { data: productData, isLoading, isError } = useProductDetail(id);
@@ -50,10 +49,13 @@ export default function EditProductPage() {
   const uploadImage = useUploadImage();
 
   const [productUpdate, setProductUpdate] = useState<IProductUpdate>({});
+  const [brandId, setBrandId] = useState<number>(0);
+  const [categoryId, setCategoryId] = useState<number>(0);
 
   useEffect(() => {
     if (productData && productData.data) {
       const product = productData.data;
+      const rawData = (productData as any).data;
 
       setProductUpdate({
         name: product.name,
@@ -63,6 +65,20 @@ export default function EditProductPage() {
         weight: product.weight,
         status: product.status
       });
+
+      // Lưu brand_id và category_id từ raw API response
+      if (rawData.brand_id) {
+        setBrandId(Number(rawData.brand_id));
+      }
+      if (rawData.category_id) {
+        setCategoryId(Number(rawData.category_id));
+      }
+
+      // Khởi tạo imageLinks từ images hiện có của sản phẩm
+      if (product.images && product.images.length > 0) {
+        const imageUrls = product.images.map(img => img.imageUrl).join('\n');
+        setImageLinks(imageUrls);
+      }
     }
   }, [productData]);
 
@@ -175,66 +191,6 @@ export default function EditProductPage() {
     }
   };
 
-  const handleUploadProductImage = async (file: File) => {
-    try {
-      setUploadingProductImage(true);
-      const formData = createFormData(file);
-      const result = await uploadImage.mutateAsync(formData);
-
-      if (!productData?.data.images) {
-        toast.error('Không tìm thấy dữ liệu sản phẩm');
-        return;
-      }
-
-      const currentImages = productData.data.images.map(img => img.imageUrl);
-      const newImages = [...currentImages, result?.data?.imageUrl];
-
-      const payload: any = {
-        images: newImages
-      };
-
-      await updateProductImages.mutateAsync(
-        { productId: id, payload: payload as IProductImageUpdate },
-        {
-          onSuccess: () => {
-            toast.success('Cập nhật hình ảnh sản phẩm thành công');
-          }
-        }
-      );
-    } catch (error) {
-      toast.error('Upload hình ảnh thất bại');
-    } finally {
-      setUploadingProductImage(false);
-    }
-  };
-
-  const handleRemoveProductImage = async (imageIndex: number) => {
-    try {
-      if (!productData?.data.images) {
-        toast.error('Không tìm thấy dữ liệu sản phẩm');
-        return;
-      }
-
-      const newImages = productData.data.images
-        .filter((_, i) => i !== imageIndex)
-        .map(img => img.imageUrl);
-
-      const payload: any = {
-        images: newImages
-      };
-
-      await updateProductImages.mutateAsync(
-        { productId: id, payload: payload as IProductImageUpdate },
-        {
-          onSuccess: () => {
-            toast.success('Xóa hình ảnh thành công');
-          }
-        }
-      );
-    } catch (error) {
-      toast.error('Xóa hình ảnh thất bại');
-    }
-  };
 
   const parseImageLinks = (text: string): string[] => {
     // Tách các link bằng dấu xuống dòng, dấu phẩy, hoặc khoảng trắng
@@ -253,87 +209,67 @@ export default function EditProductPage() {
     return links;
   };
 
-  const handleUpdateImagesFromLinks = async () => {
-    try {
-      if (!imageLinks.trim()) {
-        toast.error('Vui lòng nhập ít nhất một link hình ảnh');
-        return;
-      }
-
-      const parsedLinks = parseImageLinks(imageLinks);
-
-      if (parsedLinks.length === 0) {
-        toast.error('Không tìm thấy link hình ảnh hợp lệ. Vui lòng kiểm tra lại.');
-        return;
-      }
-
-      const currentImages = productData?.data.images?.map(img => img.imageUrl) || [];
-      const newImages = [...currentImages, ...parsedLinks];
-
-      const payload: any = {
-        images: newImages
-      };
-
-      await updateProductImages.mutateAsync(
-        { productId: id, payload: payload as IProductImageUpdate },
-        {
-          onSuccess: () => {
-            toast.success(`Đã cập nhật ${parsedLinks.length} hình ảnh thành công`);
-            setImageLinks('');
-          }
-        }
-      );
-    } catch (error) {
-      toast.error('Cập nhật hình ảnh từ link thất bại');
-    }
-  };
-
-  const handleReplaceImagesFromLinks = async () => {
-    try {
-      if (!imageLinks.trim()) {
-        toast.error('Vui lòng nhập ít nhất một link hình ảnh');
-        return;
-      }
-
-      const parsedLinks = parseImageLinks(imageLinks);
-
-      if (parsedLinks.length === 0) {
-        toast.error('Không tìm thấy link hình ảnh hợp lệ. Vui lòng kiểm tra lại.');
-        return;
-      }
-
-      const payload: any = {
-        images: parsedLinks
-      };
-
-      await updateProductImages.mutateAsync(
-        { productId: id, payload: payload as IProductImageUpdate },
-        {
-          onSuccess: () => {
-            toast.success(`Đã thay thế bằng ${parsedLinks.length} hình ảnh thành công`);
-            setImageLinks(''); // Clear textarea sau khi thành công
-          }
-        }
-      );
-    } catch (error) {
-      toast.error('Thay thế hình ảnh từ link thất bại');
-    }
-  };
 
   const handleUpdateInfo = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!productData?.data) {
+      toast.error('Không tìm thấy dữ liệu sản phẩm');
+      return;
+    }
+
+    const currentProduct = productData.data;
+
+    // Lấy raw data từ API response để có brand_id và category_id
+    const rawProductData = (productData as any).data;
+
     try {
+      // Parse specifications thành object nếu là string JSON
+      let specificationsValue: any = '';
+      if (currentProduct.specifications) {
+        try {
+          specificationsValue = typeof currentProduct.specifications === 'string'
+            ? JSON.parse(currentProduct.specifications)
+            : currentProduct.specifications;
+        } catch {
+          specificationsValue = currentProduct.specifications;
+        }
+      }
+
+      // Parse images từ imageLinks hoặc lấy từ product images hiện có
+      let imagesArray: string[] = [];
+      if (imageLinks.trim()) {
+        imagesArray = parseImageLinks(imageLinks);
+      } else if (currentProduct.images && currentProduct.images.length > 0) {
+        imagesArray = currentProduct.images.map((img: any) => img.imageUrl || img.image_url || '');
+      }
+
+      // Tạo payload theo format backend yêu cầu
+      const payload: any = {
+        name: productUpdate.name || '',
+        description: productUpdate.description || null,
+        category_id: categoryId || rawProductData.category_id || 0,
+        brand_id: brandId || rawProductData.brand_id || 0,
+        base_price: currentProduct.basePrice || 0,
+        selling_price: currentProduct.sellingPrice || 0,
+        discount_price: currentProduct.discountPrice || null,
+        specifications: specificationsValue,
+        images: imagesArray,
+        is_featured: (rawProductData.is_featured ?? 0) === 1 ? 1 : 0,
+        is_new: (rawProductData.is_new ?? 0) === 1 ? 1 : 0,
+        is_active: productUpdate.status === 'ACTIVE' ? 1 : 0,
+      };
+
       await updateProduct.mutateAsync(
-        { productId: id, payload: productUpdate },
+        { productId: id, payload },
         {
           onSuccess: () => {
-            toast.success('Cập nhật thông tin thành công');
+            toast.success('Cập nhật sản phẩm thành công');
           }
         }
       );
     } catch (error) {
-      toast.error('Cập nhật thông tin thất bại');
+      toast.error('Cập nhật sản phẩm thất bại');
     }
   };
 
@@ -565,22 +501,6 @@ export default function EditProductPage() {
                   />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end">
-                <Button
-                  type="submit"
-                  disabled={updateProduct.isPending}
-                  className="flex items-center gap-2"
-                >
-                  {updateProduct.isPending ? (
-                    <>
-                      <Icon path={mdiLoading} size={0.7} className="animate-spin" />
-                      Đang cập nhật...
-                    </>
-                  ) : (
-                    'Cập nhật thông tin'
-                  )}
-                </Button>
-              </CardFooter>
             </form>
           </Card>
 
@@ -592,43 +512,8 @@ export default function EditProductPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Input
-                  type="file"
-                  id="product-image-upload"
-                  onChange={(e) => {
-                    const files = e.target.files;
-                    if (files && files.length > 0) {
-                      handleUploadProductImage(files[0]);
-                      e.target.value = '';
-                    }
-                  }}
-                  accept="image/*"
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => document.getElementById('product-image-upload')?.click()}
-                  disabled={uploadingProductImage || updateProductImages.isPending}
-                  className="flex items-center gap-2"
-                >
-                  {uploadingProductImage ? (
-                    <>
-                      <Icon path={mdiLoading} size={0.7} className="animate-spin" />
-                      Đang tải...
-                    </>
-                  ) : (
-                    <>
-                      <Icon path={mdiUpload} size={0.7} />
-                      Tải lên hình ảnh
-                    </>
-                  )}
-                </Button>
-              </div>
-
               <div className="space-y-2">
-                <Label htmlFor="image-links">Hoặc dán các link hình ảnh (mỗi link một dòng hoặc cách nhau bởi dấu phẩy)</Label>
+                <Label htmlFor="image-links">Dán các link hình ảnh (mỗi link một dòng hoặc cách nhau bởi dấu phẩy)</Label>
                 <Textarea
                   id="image-links"
                   value={imageLinks}
@@ -639,92 +524,71 @@ https://example.com/image3.jpg"
                   rows={4}
                   className="font-mono text-sm"
                 />
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleUpdateImagesFromLinks}
-                    disabled={updateProductImages.isPending || !imageLinks.trim()}
-                    className="flex items-center gap-2"
-                  >
-                    {updateProductImages.isPending ? (
-                      <>
-                        <Icon path={mdiLoading} size={0.7} className="animate-spin" />
-                        Đang cập nhật...
-                      </>
-                    ) : (
-                      <>
-                        <Icon path={mdiPlus} size={0.7} />
-                        Thêm hình ảnh từ link
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleReplaceImagesFromLinks}
-                    disabled={updateProductImages.isPending || !imageLinks.trim()}
-                    className="flex items-center gap-2"
-                  >
-                    {updateProductImages.isPending ? (
-                      <>
-                        <Icon path={mdiLoading} size={0.7} className="animate-spin" />
-                        Đang thay thế...
-                      </>
-                    ) : (
-                      <>
-                        <Icon path={mdiImageOutline} size={0.7} />
-                        Thay thế tất cả hình ảnh
-                      </>
-                    )}
-                  </Button>
-                </div>
               </div>
 
-              {product.images && product.images.length > 0 ? (
-                <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                  {product.images.map((image, index) => (
-                    <div
-                      key={image.id || index}
-                      className="relative group rounded-md overflow-hidden border border-gray-200"
-                      style={{ aspectRatio: '1/1' }}
-                    >
-                      <img
-                        src={image.imageUrl}
-                        alt={`Product image ${index + 1}`}
-                        className="object-cover w-full h-full"
-                      />
-                      {image.id === product.images?.[0]?.id && (
-                        <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
-                          Chính
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleRemoveProductImage(index)}
-                          disabled={updateProductImages.isPending}
+              {/* Chỉ hiển thị một trong hai: Preview từ link hoặc hình ảnh hiện tại */}
+              {imageLinks.trim() ? (() => {
+                const previewLinks = parseImageLinks(imageLinks);
+                return previewLinks.length > 0 ? (
+                  <div className="space-y-2">
+                    <Label className="text-sm text-maintext/70">Preview hình ảnh từ link:</Label>
+                    <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                      {previewLinks.map((link, index) => (
+                        <div
+                          key={index}
+                          className="relative group rounded-md overflow-hidden border border-gray-200 border-dashed"
+                          style={{ aspectRatio: '1/1' }}
                         >
-                          {updateProductImages.isPending ? (
-                            <Icon path={mdiLoading} size={0.7} className="animate-spin" />
-                          ) : (
-                            <Icon path={mdiTrashCanOutline} size={0.7} />
-                          )}
-                        </Button>
-                      </div>
+                          <img
+                            src={link}
+                            alt={`Preview ${index + 1}`}
+                            className="object-cover w-full h-full"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect width="100" height="100" fill="%23f3f4f6"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%239ca3af" text-anchor="middle" dominant-baseline="middle"%3ELỗi%3C/text%3E%3C/svg%3E';
+                            }}
+                          />
+                          <div className="absolute top-1 right-1 bg-yellow-500 text-white text-xs px-1.5 py-0.5 rounded">
+                            Preview
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-8 px-4 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">
-                  <Icon path={mdiImageOutline} size={2} className="text-maintext/30 mb-2" />
-                  <p className="text-sm text-maintext/70 italic text-center">
-                    Chưa có hình ảnh cho sản phẩm này.
-                  </p>
-                </div>
+                  </div>
+                ) : null;
+              })() : (
+                product.images && product.images.length > 0 ? (
+                  <div className="space-y-2">
+                    <Label className="text-sm text-maintext/70">Hình ảnh hiện tại của sản phẩm:</Label>
+                    <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                      {product.images.map((image, index) => (
+                        <div
+                          key={image.id || index}
+                          className="relative group rounded-md overflow-hidden border border-gray-200"
+                          style={{ aspectRatio: '1/1' }}
+                        >
+                          <img
+                            src={image.imageUrl}
+                            alt={`Product image ${index + 1}`}
+                            className="object-cover w-full h-full"
+                          />
+                          {image.id === product.images?.[0]?.id && (
+                            <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
+                              Chính
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 px-4 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">
+                    <Icon path={mdiImageOutline} size={2} className="text-maintext/30 mb-2" />
+                    <p className="text-sm text-maintext/70 italic text-center">
+                      Chưa có hình ảnh cho sản phẩm này.
+                    </p>
+                  </div>
+                )
               )}
             </CardContent>
           </Card>
@@ -824,6 +688,27 @@ https://example.com/image3.jpg"
                 )}
               </CardContent>
             </Card>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            <Button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                handleUpdateInfo(e as any);
+              }}
+              disabled={updateProduct.isPending}
+              className="flex items-center gap-2"
+            >
+              {updateProduct.isPending ? (
+                <>
+                  <Icon path={mdiLoading} size={0.7} className="animate-spin" />
+                  Đang cập nhật...
+                </>
+              ) : (
+                'Cập nhật sản phẩm'
+              )}
+            </Button>
           </div>
         </TabsContent>
 

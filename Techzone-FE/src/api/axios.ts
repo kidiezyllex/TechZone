@@ -12,7 +12,7 @@ function getLocalAccessToken() {
 
 const instance = axios.create({
   timeout: 3 * 60 * 1000,
-  baseURL: `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/`,
+  baseURL: `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/`,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -36,14 +36,55 @@ instance.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     if (error.code === 'ECONNABORTED' || error.message === 'Network Error') {
       console.error('Request timeout or network error:', error.message);
       return Promise.reject(error);
     }
     
-    if (error.response?.status === 401) {
-      return Promise.reject(error);
+    const originalRequest = error.config as any;
+    
+    // Xử lý lỗi 401 (Unauthorized) - token hết hạn
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      const refreshTokenValue = localStorage.getItem('refreshToken');
+      
+      if (refreshTokenValue) {
+        try {
+          // Gọi API refresh token
+          const refreshResponse = await axios.post(
+            `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/auth/refresh-token`,
+            { refresh_token: refreshTokenValue }
+          );
+          
+          if (refreshResponse.data?.success && refreshResponse.data?.data?.token) {
+            const newToken = refreshResponse.data.data.token;
+            cookies.set('accessToken', newToken, { expires: 7 });
+            
+            if (refreshResponse.data.data.refreshToken) {
+              localStorage.setItem('refreshToken', refreshResponse.data.data.refreshToken);
+            }
+            
+            // Retry request với token mới
+            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+            return instance(originalRequest);
+          }
+        } catch (refreshError) {
+          // Refresh token thất bại, logout user
+          logout();
+          return Promise.reject(refreshError);
+        }
+      } else {
+        // Không có refresh token, logout user
+        logout();
+      }
+    }
+    
+    // Xử lý lỗi 403 (Forbidden)
+    if (error.response?.status === 403) {
+      console.error('403 Forbidden - Không có quyền truy cập');
+      // Có thể hiển thị thông báo hoặc redirect
     }
     
     return Promise.reject(error);

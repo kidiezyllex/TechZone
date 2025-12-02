@@ -23,7 +23,7 @@ import { sendGet, sendPost, sendPut, sendPatch, sendDelete } from "./axios";
 const mapApiProductToProduct = (p: any): IProduct => {
   const basePrice = p.base_price ? Number(p.base_price) : 0;
   const sellingPrice = p.selling_price ? Number(p.selling_price) : 0;
-  const discountPrice = p.discount_price ? Number(p.discount_price) : 0;
+  const discountPrice = p.discount_price ? Number(p.discount_price) : null;
 
   const images: IProductImage[] = Array.isArray(p.images)
     ? p.images.map((img: any) => ({
@@ -33,7 +33,7 @@ const mapApiProductToProduct = (p: any): IProduct => {
     : [];
 
   const totalStock =
-    p.total_stock != null
+    p.total_stock != null && p.total_stock !== null
       ? Number(p.total_stock)
       : Array.isArray(p.inventory)
       ? p.inventory.reduce(
@@ -58,7 +58,7 @@ const mapApiProductToProduct = (p: any): IProduct => {
     sizeId: "",
     color: { id: "", name: "", code: "" },
     size: { id: "", value: 0 },
-    price: sellingPrice || basePrice,
+    price: discountPrice || sellingPrice || basePrice,
     stock: totalStock,
     images,
   };
@@ -76,11 +76,11 @@ const mapApiProductToProduct = (p: any): IProduct => {
     status: p.is_active === 1 ? "ACTIVE" : "INACTIVE",
     createdAt: p.created_at ?? "",
     updatedAt: p.updated_at ?? "",
-    price: sellingPrice || basePrice,
+    price: discountPrice || sellingPrice || basePrice,
     specifications: p.specifications ?? "",
     basePrice,
     sellingPrice,
-    discountPrice,
+    discountPrice: discountPrice || undefined,
     totalStock,
     images,
     inventory,
@@ -109,18 +109,17 @@ export const getAllProducts = async (params: IProductFilter): Promise<IProductsR
   const formattedParams = convertParamsToQueryString(params);
   const res = await sendGet("/products", formattedParams);
 
+  // Handle new API structure: data is directly an array, pagination is at root level
   const products = Array.isArray(res.data) ? res.data.map(mapApiProductToProduct) : [];
   const pagination = res.pagination || {};
 
-  const totalItems =
-    typeof pagination.totalItems === "number"
-      ? pagination.totalItems
-      : products.length;
-
-  const totalPages =
-    typeof pagination.totalPages === "number" && pagination.totalPages !== null
-      ? pagination.totalPages
-      : 1;
+  const currentPage = pagination.page ?? params.page ?? 1;
+  const limit = pagination.limit ?? params.limit ?? 10;
+  // Handle null totalPages - if null, calculate from products length and limit
+  const totalPages = pagination.totalPages != null && pagination.totalPages !== null 
+    ? pagination.totalPages 
+    : Math.ceil(products.length / limit) || 1;
+  const totalItems = pagination.totalItems ?? products.length;
 
   return {
     success: !!res.success,
@@ -130,8 +129,8 @@ export const getAllProducts = async (params: IProductFilter): Promise<IProductsR
       pagination: {
         totalItems,
         totalPages,
-        currentPage: pagination.page ?? params.page ?? 1,
-        limit: pagination.limit ?? params.limit ?? (products.length || 10),
+        currentPage,
+        limit,
       },
     },
   };
