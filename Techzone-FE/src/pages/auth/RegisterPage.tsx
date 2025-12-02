@@ -1,26 +1,26 @@
-import { SignIn } from "@clerk/clerk-react"
+import { SignUp } from "@clerk/clerk-react"
 import { useSearchParams } from "react-router-dom"
 
-export default function LoginPage() {
+export default function RegisterPage() {
     const [searchParams] = useSearchParams()
 
-    const afterSignInUrlParam = searchParams.get('after_sign_in_url')
+    const afterSignUpUrlParam = searchParams.get('after_sign_up_url')
     const redirectUrlParam = searchParams.get('redirect_url')
 
     // Chỉ redirect nếu có query param, nếu không thì undefined để không redirect tự động
-    const afterSignInUrl = afterSignInUrlParam ? decodeURIComponent(afterSignInUrlParam) : undefined
+    const afterSignUpUrl = afterSignUpUrlParam ? decodeURIComponent(afterSignUpUrlParam) : undefined
     const redirectUrl = redirectUrlParam ? decodeURIComponent(redirectUrlParam) : undefined
 
-    // Ưu tiên afterSignInUrl, nếu không có thì dùng redirectUrl
-    const finalRedirectUrl = afterSignInUrl || redirectUrl
+    // Ưu tiên afterSignUpUrl, nếu không có thì dùng redirectUrl
+    const finalRedirectUrl = afterSignUpUrl || redirectUrl
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-muted px-4 py-8">
-            <SignIn
-                path="/auth/login"
+            <SignUp
+                path="/auth/register"
                 routing="path"
-                signUpUrl="/auth/register"
-                afterSignInUrl={finalRedirectUrl}
+                signInUrl="/auth/login"
+                afterSignUpUrl={finalRedirectUrl}
                 fallbackRedirectUrl={finalRedirectUrl || '/'}
                 redirectUrl={finalRedirectUrl}
             />
@@ -33,7 +33,7 @@ export default function LoginPage() {
               display: none !important;
             }
 
-            .cl-card.cl-signIn-start.cl-internal-d5pd3d {
+            .cl-card.cl-signUp-start.cl-internal-d5pd3d {
               padding: 16px !important;
             }
           `,

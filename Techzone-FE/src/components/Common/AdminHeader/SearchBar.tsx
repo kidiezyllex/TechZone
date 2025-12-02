@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
- 
-import { IconSearch } from '@tabler/icons-react';
+import { mdiMagnify } from '@mdi/js';
+import Icon from '@mdi/react';
 import { Input } from '@/components/ui/input';
 export default function SearchBar() {
   const [query, setQuery] = useState('');
@@ -12,12 +12,12 @@ export default function SearchBar() {
   };
 
   return (
-    <form 
+    <form
       onSubmit={handleSearch}
       className="relative w-full max-w-4xl"
     >
       <div className="relative">
-        <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-maintext" size={18} />
+        <Icon path={mdiMagnify} size={0.9} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-maintext" />
         <Input
           type="text"
           placeholder="Tìm kiếm..."

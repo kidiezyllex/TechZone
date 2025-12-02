@@ -8,8 +8,7 @@ export default function LoginPage() {
       <SignIn
         path="/auth/login"
         routing="path"
-        afterSignInUrl="/"
-        redirectUrl="/"
+        fallbackRedirectUrl="/"
       />
       <style
         dangerouslySetInnerHTML={{

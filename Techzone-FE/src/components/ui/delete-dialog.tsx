@@ -9,7 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { IconLoader2, IconTrash, IconAlertTriangle } from "@tabler/icons-react";
+import { mdiAlert, mdiDelete, mdiLoading } from "@mdi/js";
+import Icon from "@mdi/react";
 import { toast } from "react-toastify";
 
 interface DeleteDialogProps {
@@ -57,7 +58,7 @@ export const DeleteDialog = ({
         {warningMessage && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-start gap-2">
-              <IconAlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <Icon path={mdiAlert} size={1.1} className="text-red-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-red-800">
                 <p className="font-semibold mb-1">Warning:</p>
                 <p>{warningMessage}</p>
@@ -83,12 +84,12 @@ export const DeleteDialog = ({
           >
             {isDeleting ? (
               <>
-                <IconLoader2 className="h-4 w-4 animate-spin" />
+                <Icon path={mdiLoading} size={0.8} className="animate-spin" />
                 Deleting...
               </>
             ) : (
               <>
-                <IconTrash className="h-4 w-4" />
+                <Icon path={mdiDelete} size={0.8} />
                 {confirmText}
               </>
             )}

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Icon } from '@mdi/react';
 import { mdiCart } from '@mdi/js';
 import { Button } from '@/components/ui/button';
+import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import { useUser } from '@/context/useUserContext';
 import AccountDropdown from './AccountDropdown';
 import { useCartStore } from '@/stores/useCartStore';
@@ -82,7 +83,7 @@ export const NavigationBar = () => {
                     ))}
                 </div>
                 <div className="flex items-center gap-2">
-                    {!isAuthenticated ? (
+                    <SignedOut>
                         <div className="hidden md:flex items-center gap-2">
                             <Button
                                 variant="outline"
@@ -97,21 +98,38 @@ export const NavigationBar = () => {
                                 Đăng nhập với Google
                             </Button>
                         </div>
-                    ) : (
+                    </SignedOut>
+                    <SignedIn>
                         <div className="hidden md:flex items-center gap-2">
                             <span className="text-sm font-medium text-maintext">
                                 Xin chào, <span className='text-primary font-bold'>{user?.fullName || 'Khách hàng'}</span>
                             </span>
                         </div>
-                    )}
-                    <div className="flex items-center">
+                    </SignedIn>
+                    <div className="flex items-center gap-2">
                         <button onClick={() => setIsOpen(true)} className="relative p-2 text-maintext hover:text-primary transition-colors">
                             <Icon path={mdiCart} size={0.7} />
                             <span className="absolute -top-1 -right-1 bg-extra text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                                 {totalItems}
                             </span>
                         </button>
-                        {isAuthenticated && <AccountDropdown />}
+                        <SignedIn>
+                            <UserButton
+                                appearance={{
+                                    elements: {
+                                        avatarBox: "h-8 w-8",
+                                        userButtonPopoverCard: "shadow-lg",
+                                        userButtonPopoverActionButton: "hover:bg-primary/10",
+                                    }
+                                }}
+                                userProfileMode="navigation"
+                                userProfileUrl="/profile"
+                                afterSignOutUrl="/"
+                            />
+                        </SignedIn>
+                        <SignedOut>
+                            {isAuthenticated && <AccountDropdown />}
+                        </SignedOut>
                     </div>
                 </div>
             </div>

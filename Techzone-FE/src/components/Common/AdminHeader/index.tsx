@@ -1,6 +1,7 @@
 'use client';
 
-import { IconLayoutSidebarRightExpandFilled } from '@tabler/icons-react';
+import { mdiMenu } from '@mdi/js';
+import Icon from '@mdi/react';
 import { useMenuSidebar } from '@/stores/useMenuSidebar';
 import SearchBar from './SearchBar';
 import LanguageSelector from './LanguageSelector';
@@ -18,7 +19,7 @@ export default function AdminHeader() {
           onClick={toggle}
           className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 mr-4"
         >
-          <IconLayoutSidebarRightExpandFilled size={20} stroke={1.5} className='text-maintext'/>
+          <Icon path={mdiMenu} size={0.9} className='text-maintext'/>
         </button>
       </div>
       

@@ -22,6 +22,7 @@ const routeImports: Record<string, () => Promise<any>> = {
   '/checkout/shipping': () => import('@/pages/CheckoutShippingPage'),
   '/checkout/success': () => import('@/pages/CheckoutSuccessPage'),
   '/auth/login': () => import('@/pages/auth/LoginPage'),
+  '/auth/register': () => import('@/pages/auth/RegisterPage'),
   '/admin': () => import('@/pages/admin/AdminDashboardPage'),
   '/admin/products': () => import('@/pages/admin/AdminProductsPage'),
   '/admin/orders': () => import('@/pages/admin/AdminOrdersPage'),
@@ -78,7 +79,10 @@ const useIntelligentPreloading = () => {
         return ['/auth/login', '/checkout/shipping'];
       }
       if (path === '/auth/login') {
-        return ['/profile'];
+        return ['/auth/register', '/profile'];
+      }
+      if (path === '/auth/register') {
+        return ['/auth/login', '/profile'];
       }
       if (path.startsWith('/admin')) {
         return ['/admin/products', '/admin/orders', '/admin/statistics'];

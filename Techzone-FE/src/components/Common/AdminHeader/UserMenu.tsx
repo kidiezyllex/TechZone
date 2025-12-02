@@ -1,6 +1,7 @@
 'use client';
 
-import { IconLock, IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
+import { mdiAccount, mdiCog, mdiLock, mdiLogout } from '@mdi/js';
+import Icon from '@mdi/react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -18,7 +19,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useUserProfile } from '@/hooks/account';
 export default function UserMenu() {
   const { logoutUser } = useUser();
-  const {data: profileData} = useUserProfile();
+  const { data: profileData } = useUserProfile();
   const navigate = useNavigate();
   const handleLogout = () => {
     logoutUser();
@@ -47,21 +48,21 @@ export default function UserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <IconUser className="mr-2 h-4 w-4" />
+            <Icon path={mdiAccount} size={0.8} className="mr-2" />
             <span>Thông tin tài khoản</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <IconSettings className="mr-2 h-4 w-4" />
+            <Icon path={mdiCog} size={0.8} className="mr-2" />
             <span>Cài đặt</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <IconLock className="mr-2 h-4 w-4" />
+            <Icon path={mdiLock} size={0.8} className="mr-2" />
             <span>Đổi mật khẩu</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-          <IconLogout className="mr-2 h-4 w-4 text-red-600" />
+          <Icon path={mdiLogout} size={0.8} className="mr-2 text-red-600" />
           <span>Đăng xuất</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
