@@ -14,6 +14,7 @@ import { Loader2 } from "lucide-react"
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from "@/context/useUserContext"
+import { useUser as useClerkUser } from "@clerk/clerk-react"
 import { motion } from "framer-motion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Icon } from '@mdi/react'
@@ -170,14 +171,17 @@ function ProfileForm() {
 export default function ProfilePage() {
   const navigate = useNavigate()
   const { profile, isAuthenticated } = useUser()
+  const { isSignedIn: isClerkSignedIn } = useClerkUser()
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Chỉ redirect nếu cả Clerk và context tùy chỉnh đều chưa authenticated
+    if (!isAuthenticated && !isClerkSignedIn) {
       navigate("/auth/login")
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, isClerkSignedIn, navigate])
 
-  if (!isAuthenticated) {
+  // Hiển thị loading hoặc null nếu cả hai đều chưa authenticated
+  if (!isAuthenticated && !isClerkSignedIn) {
     return null
   }
 

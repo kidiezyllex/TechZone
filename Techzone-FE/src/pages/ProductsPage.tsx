@@ -6,14 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Icon } from "@mdi/react"
-import { mdiCartOutline, mdiHeartOutline, mdiEye, mdiFilterOutline, mdiClose, mdiMagnify, mdiPercent } from "@mdi/js"
 import { useProducts, useSearchProducts } from "@/hooks/product"
-import { usePromotions } from "@/hooks/promotion"
-import { applyPromotionsToProducts, calculateProductDiscount } from "@/lib/promotions"
-import { getSizeLabel } from "@/utils/sizeMapping"
 import type { IProductFilter } from "@/interface/request/product"
+import { useBrands, useCategories } from "@/hooks/attributes"
+import { ProductCard } from "@/components/HomePage/ProductCard"
+import type { Product } from "@/components/HomePage/ProductCard"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -24,12 +21,10 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { checkImageUrl } from "@/lib/utils"
 import { useCartStore } from "@/stores/useCartStore"
 import { toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { motion, AnimatePresence } from "framer-motion"
-import QrCodeScanner from "@/components/ProductPage/QrCodeScanner"
 import VoucherForm from "@/components/ProductPage/VoucherForm"
 import CartIcon from "@/components/ui/CartIcon"
 import {
@@ -41,13 +36,10 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination"
-
-interface ProductCardProps {
-  product: any
-  onAddToCart: () => void
-  onQuickView: () => void
-  onAddToWishlist: () => void
-}
+import Icon from "@mdi/react"
+import { mdiFilterOutline, mdiMagnify } from "@mdi/js"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { mdiClose } from "@mdi/js"
 
 interface ProductFiltersProps {
   filters: IProductFilter
@@ -93,8 +85,6 @@ export default function ProductsPage() {
   const productsQuery = useProducts(paginationParams)
   const searchQuery2 = useSearchProducts(isSearching ? { keyword: searchQuery, status: "ACTIVE" } : { keyword: "" })
   const { data: rawData, isLoading, isError } = isSearching ? searchQuery2 : productsQuery
-  const { data: promotionsData } = usePromotions({ status: "ACTIVE" });
-  console.log(promotionsData)
   const data = useMemo(() => {
     if (!rawData || !rawData.data) return rawData
     const productsArray = Array.isArray(rawData.data)
@@ -102,16 +92,12 @@ export default function ProductsPage() {
       : (rawData.data?.products || [])
     if (!Array.isArray(productsArray)) return rawData
     let filteredProducts = [...productsArray]
-    if (promotionsData?.data?.promotions) {
-      filteredProducts = applyPromotionsToProducts(filteredProducts, promotionsData.data.promotions)
-    }
-
 
     if (filters.brands && filters.brands.length > 0) {
       const brandsArray = Array.isArray(filters.brands) ? filters.brands : [filters.brands]
       filteredProducts = filteredProducts.filter((product) => {
         const brandId = product.brand_id || product.brand?.id
-        return brandsArray.includes(brandId)
+        return brandsArray.some(filterBrand => String(filterBrand) === String(brandId))
       })
     }
 
@@ -119,37 +105,8 @@ export default function ProductsPage() {
       const categoriesArray = Array.isArray(filters.categories) ? filters.categories : [filters.categories]
       filteredProducts = filteredProducts.filter((product) => {
         const categoryId = product.category_id || product.category?.id
-        return categoriesArray.includes(categoryId)
-      })
-    }
-
-    if (filters.color) {
-      // Note: Color filtering may not be available in new structure
-      // Keeping for backward compatibility
-      filteredProducts = filteredProducts.filter((product) => {
-        // If product has variants, check them
-        if (product.variants && Array.isArray(product.variants)) {
-          return product.variants.some((variant: any) => {
-            const colorId = variant.color?.id || variant.colorId
-            return colorId === filters.color
-          })
-        }
-        return false
-      })
-    }
-
-    if (filters.size) {
-      // Note: Size filtering may not be available in new structure
-      // Keeping for backward compatibility
-      filteredProducts = filteredProducts.filter((product) => {
-        // If product has variants, check them
-        if (product.variants && Array.isArray(product.variants)) {
-          return product.variants.some((variant: any) => {
-            const sizeId = variant.size?.id || variant.sizeId
-            return sizeId === filters.size
-          })
-        }
-        return false
+        // Convert to string for comparison to handle both number and string IDs
+        return categoriesArray.some(filterCategory => String(filterCategory) === String(categoryId))
       })
     }
 
@@ -158,21 +115,7 @@ export default function ProductsPage() {
       const maxPrice = filters.maxPrice !== undefined ? filters.maxPrice : Number.POSITIVE_INFINITY
 
       filteredProducts = filteredProducts.filter((product: any) => {
-        // Use discount_price if available, otherwise selling_price
         let price = parseFloat(product.discount_price || product.selling_price || product.base_price || 0);
-
-        if (promotionsData?.data?.promotions) {
-          const discount = calculateProductDiscount(
-            product.id,
-            price,
-            promotionsData.data.promotions
-          );
-
-          if (discount.discountPercent > 0) {
-            price = discount.discountedPrice;
-          }
-        }
-
         return price >= minPrice && price <= maxPrice
       })
     }
@@ -182,19 +125,6 @@ export default function ProductsPage() {
       filteredProducts.sort((a: any, b: any) => {
         let priceA = parseFloat(a.discount_price || a.selling_price || a.base_price || 0);
         let priceB = parseFloat(b.discount_price || b.selling_price || b.base_price || 0);
-
-        if (promotionsData?.data?.promotions) {
-          const discountA = calculateProductDiscount(a.id, priceA, promotionsData.data.promotions);
-          const discountB = calculateProductDiscount(b.id, priceB, promotionsData.data.promotions);
-
-          if (discountA.discountPercent > 0) {
-            priceA = discountA.discountedPrice;
-          }
-          if (discountB.discountPercent > 0) {
-            priceB = discountB.discountedPrice;
-          }
-        }
-
         const dateA = new Date(a.created_at || a.createdAt).getTime()
         const dateB = new Date(b.created_at || b.createdAt).getTime()
 
@@ -232,7 +162,7 @@ export default function ProductsPage() {
         },
       }
     }
-  }, [rawData, filters, sortOption, pagination, promotionsData])
+  }, [rawData, filters, sortOption, pagination])
 
   const handleFilterChange = (updatedFilters: Partial<IProductFilter>) => {
     setFilters((prev) => ({
@@ -282,24 +212,6 @@ export default function ProductsPage() {
         originalPrice = sellingPrice;
       }
     }
-
-    // Apply promotions if available
-    if (promotionsData?.data?.promotions) {
-      const discount = calculateProductDiscount(
-        product.id,
-        basePrice,
-        promotionsData.data.promotions
-      );
-
-      if (discount.discountPercent > 0) {
-        finalPrice = discount.discountedPrice;
-        originalPrice = discount.originalPrice;
-        discountPercent = discount.discountPercent;
-        hasDiscount = true;
-      }
-    }
-
-    // Get primary image
     const primaryImage = product.images?.find((img: any) => img.is_primary === 1) || product.images?.[0];
     const imageUrl = primaryImage?.image_url || primaryImage?.imageUrl || '';
 
@@ -315,13 +227,7 @@ export default function ProductsPage() {
       quantity: 1,
       slug: product.slug || product.code,
       brand: product.brand_name || (typeof product.brand === 'string' ? product.brand : product.brand?.name),
-      size: undefined, // Not available in new structure
-      colors: [], // Not available in new structure
       stock: totalStock,
-      colorId: '',
-      sizeId: '',
-      colorName: '',
-      sizeName: ''
     };
 
     addToCart(cartItem, 1);
@@ -349,7 +255,6 @@ export default function ProductsPage() {
 
   const filteredProducts = useMemo(() => {
     if (!data || !data.data) return []
-    // Handle both structures: array directly or nested in products property
     if (Array.isArray(data.data)) {
       return data.data
     }
@@ -360,7 +265,7 @@ export default function ProductsPage() {
   }, [data])
 
   return (
-    <div className="container mx-auto py-8 relative">
+    <div className="w-full mx-auto p-8 relative bg-slate-100">
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -387,7 +292,7 @@ export default function ProductsPage() {
             >
               <div className="bg-white rounded-md shadow-sm border p-4 mb-4">
                 <div className="flex justify-between items-center mb-2">
-                  <h2 className="font-medium">Bộ lọc sản phẩm</h2>
+                  <h2 className="font-semibold">Bộ lọc sản phẩm</h2>
                   <Button variant="ghost" size="sm" onClick={toggleFilter}>
                     <Icon path={mdiClose} size={0.7} />
                   </Button>
@@ -400,20 +305,8 @@ export default function ProductsPage() {
 
         <div className="hidden lg:block w-full lg:w-1/4 xl:w-1/5 ">
           <div className="bg-white rounded-md shadow-sm border p-4 sticky top-20">
-            <h2 className="font-medium mb-4">Bộ lọc sản phẩm</h2>
+            <h2 className="font-medium mb-4 text-base uppercase">Bộ lọc sản phẩm</h2>
             <ProductFilters filters={filters} onChange={handleFilterChange} />
-
-            {filteredProducts.length > 0 && (
-              <VoucherForm
-                orderValue={filteredProducts.reduce((sum, product) => {
-                  const price = parseFloat(product.discount_price || product.selling_price || product.base_price || 0)
-                  return sum + price
-                }, 0)}
-                onApplyVoucher={handleApplyVoucher}
-                onRemoveVoucher={handleRemoveVoucher}
-                appliedVoucher={appliedVoucher}
-              />
-            )}
           </div>
         </div>
 
@@ -483,16 +376,60 @@ export default function ProductsPage() {
                 <p className="text-sm text-maintext font-semibold">Tìm thấy <span className="text-primary text-lg">{filteredProducts.length}</span> sản phẩm</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    promotionsData={promotionsData}
-                    onAddToCart={() => handleAddToCart(product)}
-                    onQuickView={() => handleQuickView(product)}
-                    onAddToWishlist={() => handleAddToWishlist(product)}
-                  />
-                ))}
+                {filteredProducts.map((product, index) => {
+                  // Transform product data to match ProductCard interface
+                  const sellingPrice = parseFloat(product.selling_price || product.base_price || 0);
+                  const discountPrice = product.discount_price ? parseFloat(product.discount_price) : null;
+                  const basePrice = discountPrice || sellingPrice;
+
+                  // Calculate discount percentage
+                  let discountPercent = 0;
+                  if (discountPrice && sellingPrice > discountPrice) {
+                    discountPercent = Math.round(((sellingPrice - discountPrice) / sellingPrice) * 100);
+                  }
+
+                  let finalPrice = basePrice;
+                  let finalDiscountPercent = discountPercent;
+                  let originalPrice = sellingPrice;
+                  const primaryImage = product.images?.find((img: any) => img.is_primary === 1) || product.images?.[0];
+                  const imageUrl = primaryImage?.image_url || primaryImage?.imageUrl || '/images/white-image.png';
+
+                  // Build slug
+                  const slug = product.slug || product.name.toLowerCase().replace(/\s+/g, "-");
+                  const productSlug = slug.includes('-') && slug.split('-').pop() === String(product.id)
+                    ? slug
+                    : `${slug}-${product.id}`;
+
+                  // Get brand name
+                  const brandName = product.brand_name || (typeof product.brand === 'string' ? product.brand : product.brand?.name || '');
+
+                  // Transform to ProductCard format
+                  const productCardData: Product = {
+                    id: product.id,
+                    name: product.name,
+                    price: finalPrice,
+                    originalPrice: finalDiscountPercent > 0 ? originalPrice : undefined,
+                    discount: finalDiscountPercent,
+                    image: imageUrl,
+                    slug: productSlug,
+                    brand: brandName,
+                    isBestSeller: product.is_best_seller === 1 || product.isBestSeller === true,
+                    isFeatured: product.is_featured === 1 || product.isFeatured === true,
+                    isNew: product.is_new === 1 || product.isNew === true,
+                    stock: parseInt(product.total_stock || 0),
+                  };
+
+                  return (
+                    <ProductCard
+                      key={product.id}
+                      product={productCardData}
+                      index={index}
+                      onAddToCart={() => handleAddToCart(product)}
+                      onQuickView={() => handleQuickView(product)}
+                      onAddToWishlist={() => handleAddToWishlist(product)}
+                    />
+                  );
+                })}
               </div>
 
 
@@ -648,254 +585,13 @@ export default function ProductsPage() {
   )
 }
 
-const ProductCard = ({ product, promotionsData, onAddToCart, onQuickView, onAddToWishlist }: ProductCardProps & { promotionsData?: any }) => {
-  const [isHovered, setIsHovered] = useState(false)
-
-  // Get primary image or first image
-  const primaryImage = product.images?.find((img: any) => img.is_primary === 1) || product.images?.[0];
-  const imageUrl = primaryImage?.image_url || primaryImage?.imageUrl || "/placeholder.svg";
-
-  // Calculate price and discount
-  const sellingPrice = parseFloat(product.selling_price || product.base_price || 0);
-  const discountPrice = product.discount_price ? parseFloat(product.discount_price) : null;
-  const basePrice = discountPrice || sellingPrice;
-
-  // Calculate discount percentage
-  let discountPercent = 0;
-  if (discountPrice && sellingPrice > discountPrice) {
-    discountPercent = Math.round(((sellingPrice - discountPrice) / sellingPrice) * 100);
-  }
-
-  // Apply promotions
-  let finalPrice = basePrice;
-  let finalDiscountPercent = discountPercent;
-  if (promotionsData?.data?.promotions) {
-    const discount = calculateProductDiscount(
-      product.id,
-      basePrice,
-      promotionsData.data.promotions
-    );
-    if (discount.discountPercent > 0) {
-      finalPrice = discount.discountedPrice;
-      finalDiscountPercent = discount.discountPercent;
-    }
-  }
-
-  const totalStock = parseInt(product.total_stock || 0);
-  const slug = product.slug || product.name.toLowerCase().replace(/\s+/g, "-");
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-    >
-      <Card className="group overflow-visible border rounded-lg hover:shadow-2xl shadow-lg transition-all duration-500 h-full flex flex-col transform bg-white relative backdrop-blur-sm">
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg z-10 pointer-events-none" />
-
-        <div className="relative overflow-visible bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-t-2xl">
-          <a href={`/products/${slug}-${product.id}`} className="block">
-            <div className="aspect-square overflow-visible relative flex items-center justify-center">
-              <motion.div
-                className="w-full h-full relative z-20"
-              >
-                <img
-                  src={checkImageUrl(imageUrl)}
-                  alt={product.name}
-                  className="object-contain px-2 w-full h-full filter group-hover:brightness-110 transition-all duration-500"
-                />
-              </motion.div>
-            </div>
-          </a>
-
-          <div className="absolute top-2 left-2 flex flex-row flex-wrap gap-1 z-20 max-w-[calc(100%-4rem)]">
-            {finalDiscountPercent > 0 && (
-              <motion.div
-                initial={{ scale: 0, rotate: 180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-gradient-to-r from-green-500 via-emerald-500 to-lime-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm animate-pulse flex-shrink-0 flex items-center justify-center gap-0.5"
-              >
-                <span className="text-[10px]">💥</span>
-                <span className="text-[10px]">-{finalDiscountPercent}%</span>
-              </motion.div>
-            )}
-
-            {/* Featured badge */}
-            {product.is_featured === 1 && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-purple-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm"
-              >
-                Nổi bật
-              </motion.div>
-            )}
-
-            {/* New badge */}
-            {product.is_new === 1 && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.25 }}
-                className="bg-blue-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm"
-              >
-                Mới
-              </motion.div>
-            )}
-
-            {/* Stock status */}
-            {totalStock === 0 ? (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm"
-              >
-                Hết hàng
-              </motion.div>
-            ) : totalStock <= 5 ? (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-white/50 backdrop-blur-sm"
-              >
-                Sắp hết
-              </motion.div>
-            ) : null}
-          </div>
-
-
-          <motion.div
-            className="absolute right-2 top-2 transform -translate-y-1/2 flex flex-col gap-4 z-50"
-            initial={{ x: 60, opacity: 0 }}
-            animate={{
-              x: isHovered ? 0 : 60,
-              opacity: isHovered ? 1 : 0,
-            }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-          >
-            <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-10 w-10 bg-white/90 backdrop-blur-md hover:!bg-primary hover:text-white shadow-xl border-0 hover:shadow-2xl transition-all duration-300 group/btn"
-                onClick={(e) => {
-                  e.preventDefault()
-                  onAddToCart()
-                }}
-                aria-label="Thêm vào giỏ hàng"
-              >
-                <Icon path={mdiCartOutline} size={0.7} className="group-hover/btn:animate-bounce group-hover:text-white" />
-              </Button>
-            </motion.div>
-
-            <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-10 w-10 bg-white/90 backdrop-blur-md hover:!bg-pink-500 hover:text-white shadow-xl border-0 hover:shadow-2xl transition-all duration-300 group/btn"
-                onClick={(e) => {
-                  e.preventDefault()
-                  onAddToWishlist()
-                }}
-                aria-label="Yêu thích"
-              >
-                <Icon path={mdiHeartOutline} size={0.7} className="group-hover/btn:animate-bounce group-hover:text-white" />
-              </Button>
-            </motion.div>
-
-            <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-10 w-10 bg-white/90 backdrop-blur-md hover:!bg-blue-500 hover:text-white shadow-xl border-0 hover:shadow-2xl transition-all duration-300 group/btn"
-                onClick={(e) => {
-                  e.preventDefault()
-                  onQuickView()
-                }}
-                aria-label="Xem nhanh"
-              >
-                <Icon path={mdiEye} size={0.7} className="group-hover/btn:animate-bounce group-hover:text-white" />
-              </Button>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        <div className="p-4 flex flex-col flex-grow bg-gradient-to-b from-white via-gray-50/30 to-white border-t border-gray-100/50 rounded-b-2xl relative">
-          <div className="text-xs text-primary/80 mb-2 uppercase tracking-wider font-bold flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-pink-400 animate-pulse"></div>
-            <span className="bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
-              {product.brand_name || (typeof product.brand === "string" ? product.brand : product.brand?.name || "")}
-            </span>
-          </div>
-
-          <a
-            href={`/products/${slug}-${product.id}`}
-            className="hover:text-primary transition-colors group/link"
-          >
-            <h3 className="font-bold text-base mb-2 line-clamp-2 leading-tight group-hover:text-primary/90 transition-colors duration-300 text-maintext group-hover/link:underline decoration-primary/50 underline-offset-2">
-              {product.name}
-            </h3>
-          </a>
-
-          {/* Product info row */}
-          <div className="flex items-center justify-between mb-2">
-            {/* View count */}
-            {product.view_count > 0 && (
-              <div className="text-xs text-gray-500 flex items-center gap-1">
-                <Icon path={mdiEye} size={0.6} />
-                <span>{product.view_count}</span>
-              </div>
-            )}
-
-            {/* Sold count */}
-            {product.sold_count > 0 && (
-              <div className="text-xs text-gray-500">
-                Đã bán: {product.sold_count}
-              </div>
-            )}
-          </div>
-
-          {/* Price section */}
-          <div>
-            <div className="flex items-center justify-between">
-              <motion.div
-                className="font-extrabold text-lg text-active"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
-              >
-                {formatPrice(finalPrice)}
-              </motion.div>
-              {sellingPrice > finalPrice && (
-                <div className="text-xs text-maintext line-through font-medium bg-gray-100 px-2 py-1 rounded-sm italic">
-                  {formatPrice(sellingPrice)}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* SKU */}
-          {product.sku && (
-            <div className="text-xs text-gray-400 mt-2">
-              SKU: {product.sku}
-            </div>
-          )}
-
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-b-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        </div>
-      </Card>
-    </motion.div>
-  )
-}
 const ProductFilters = ({ filters, onChange }: ProductFiltersProps) => {
   const productsQuery = useProducts({ limit: 8, status: "ACTIVE" })
-  // Handle new API structure: data is an array directly
   const products = Array.isArray(productsQuery.data?.data) ? productsQuery.data.data : (productsQuery.data?.data?.products || [])
+
+  const brandsQuery = useBrands({ status: "ACTIVE" })
+  const categoriesQuery = useCategories({ status: "ACTIVE" })
+
   const [selectedBrand, setSelectedBrand] = useState<string | undefined>(
     filters.brands ? (Array.isArray(filters.brands) ? filters.brands[0] : filters.brands) : undefined,
   )
@@ -940,87 +636,17 @@ const ProductFilters = ({ filters, onChange }: ProductFiltersProps) => {
     }
   }
 
-  const handleColorChange = (colorId: string) => {
-    onChange({
-      color: filters.color === colorId ? undefined : colorId,
-    })
-  }
-  const handleSizeChange = (sizeId: string) => {
-    onChange({
-      size: filters.size === sizeId ? undefined : sizeId,
-    })
-  }
+  // Get brands from API
   const brands = useMemo(() => {
-    if (!products || products.length === 0) return []
+    if (!brandsQuery.data?.data || !Array.isArray(brandsQuery.data.data)) return []
+    return brandsQuery.data.data.filter(brand => brand.status === 'ACTIVE')
+  }, [brandsQuery.data])
 
-    const uniqueBrands = Array.from(
-      new Set(
-        products.map((product) => {
-          const brandId = product.brand_id || (typeof product.brand === "object" ? product.brand?.id : product.brand)
-          const brandName = product.brand_name || (typeof product.brand === "object" ? product.brand?.name : product.brand)
-          return JSON.stringify({ id: brandId, name: brandName })
-        }),
-      ),
-    ).map((brandStr) => JSON.parse(brandStr))
-
-    return uniqueBrands
-  }, [products])
-
+  // Get categories from API
   const categories = useMemo(() => {
-    if (!products || products.length === 0) return []
-
-    const uniqueCategories = Array.from(
-      new Set(
-        products.map((product) => {
-          const categoryId = product.category_id || (typeof product.category === "object" ? product.category?.id : product.category)
-          const categoryName = product.category_name || (typeof product.category === "object" ? product.category?.name : product.category)
-          return JSON.stringify({ id: categoryId, name: categoryName })
-        }),
-      ),
-    ).map((categoryStr) => JSON.parse(categoryStr))
-
-    return uniqueCategories
-  }, [products])
-
-  const colors = useMemo(() => {
-    if (!products || products.length === 0) return []
-
-    // If products have variants, extract colors from them
-    const allColors = products.flatMap((product) => {
-      if (product.variants && Array.isArray(product.variants)) {
-        return product.variants.map((variant) =>
-          variant.color || { id: variant.colorId, name: variant.colorId, code: "#000000" },
-        )
-      }
-      return []
-    })
-
-    const uniqueColors = Array.from(new Set(allColors.map((color) => JSON.stringify(color)))).map((colorStr) =>
-      JSON.parse(colorStr),
-    )
-
-    return uniqueColors
-  }, [products])
-
-  const sizes = useMemo(() => {
-    if (!products || products.length === 0) return []
-
-    // If products have variants, extract sizes from them
-    const allSizes = products.flatMap((product) => {
-      if (product.variants && Array.isArray(product.variants)) {
-        return product.variants.map((variant) =>
-          variant.size || { id: variant.sizeId, value: variant.sizeId },
-        )
-      }
-      return []
-    })
-
-    const uniqueSizes = Array.from(new Set(allSizes.map((size) => JSON.stringify(size))))
-      .map((sizeStr) => JSON.parse(sizeStr))
-      .sort((a, b) => (a.value || 0) - (b.value || 0))
-
-    return uniqueSizes
-  }, [products])
+    if (!categoriesQuery.data?.data || !Array.isArray(categoriesQuery.data.data)) return []
+    return categoriesQuery.data.data.filter(category => category.status === 'ACTIVE')
+  }, [categoriesQuery.data])
 
   const priceRange = useMemo(() => {
     if (!products || products.length === 0) {
@@ -1064,13 +690,11 @@ const ProductFilters = ({ filters, onChange }: ProductFiltersProps) => {
       categories: undefined,
       minPrice: undefined,
       maxPrice: undefined,
-      color: undefined,
-      size: undefined,
     })
     toast.info("Đã đặt lại bộ lọc")
   }
 
-  if (productsQuery.isLoading) {
+  if (productsQuery.isLoading || brandsQuery.isLoading || categoriesQuery.isLoading) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-20 w-full" />
@@ -1083,7 +707,7 @@ const ProductFilters = ({ filters, onChange }: ProductFiltersProps) => {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-sm font-medium mb-3">Giá</h3>
+        <h3 className="text-sm font-semibold mb-3">Giá</h3>
         <div className="px-2">
           <Slider
             defaultValue={[priceRange.min, priceRange.max]}
@@ -1101,67 +725,48 @@ const ProductFilters = ({ filters, onChange }: ProductFiltersProps) => {
       </div>
 
       <div>
-        <h3 className="text-sm font-medium mb-3">Thương hiệu</h3>
-        <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-          {brands.map((brand) => (
-            <div key={(brand as any)?.id} className="flex items-center gap-2">
-              <Checkbox
-                id={`brand-${(brand as any)?.id}`}
-                checked={selectedBrand === (brand as any)?.id}
-                onCheckedChange={() => handleBrandChange((brand as any)?.id)}
-              />
-              <label htmlFor={`brand-${(brand as any)?.id}`} className="text-sm">
-                {brand.name}
-              </label>
-            </div>
-          ))}
+        <h3 className="text-sm font-semibold font-medium mb-3">Thương hiệu</h3>
+        <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-2">
+          {brands.length > 0 ? (
+            brands.map((brand) => (
+              <div key={brand.id} className="flex items-center gap-2">
+                <Checkbox
+                  id={`brand-${brand.id}`}
+                  checked={selectedBrand === String(brand.id)}
+                  onCheckedChange={() => handleBrandChange(String(brand.id))}
+                  className="h-5 w-5"
+                />
+                <label htmlFor={`brand-${brand.id}`} className="text-sm cursor-pointer font-medium">
+                  {brand.name}
+                </label>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500 col-span-2">Không có thương hiệu nào</p>
+          )}
         </div>
       </div>
 
       <div>
-        <h3 className="text-sm font-medium mb-3">Danh mục</h3>
+        <h3 className="text-sm font-semibold mb-3">Danh mục</h3>
         <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-          {categories.map((category) => (
-            <div key={(category as any)?.id} className="flex items-center gap-2">
-              <Checkbox
-                id={`category-${(category as any)?.id}`}
-                checked={selectedCategory === (category as any)?.id}
-                onCheckedChange={() => handleCategoryChange((category as any)?.id)}
-              />
-              <label htmlFor={`category-${(category as any)?.id}`} className="text-sm">
-                {category.name}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium mb-3">Màu sắc</h3>
-        <div className="flex flex-wrap gap-2">
-          {colors.map((color) => (
-            <button
-              key={color.id}
-              className={`w-8 h-8 rounded-full border overflow-hidden relative transition-all duration-300 ${filters.color === color.id ? "ring-2 ring-primary ring-offset-2" : "border-gray-300"}`}
-              style={{ backgroundColor: color.code }}
-              title={color.name}
-              onClick={() => handleColorChange(color.id)}
-            />
-          ))}
-        </div>
-      </div>
-      <div>
-        <h3 className="text-sm font-medium mb-3">Kích cỡ</h3>
-        <div className="flex flex-wrap gap-2">
-          {sizes.map((size) => (
-            <button
-              key={size.id}
-              className={`px-2 py-1 border rounded text-sm transition-all duration-300 ${filters.size === size.id ? "bg-primary text-white border-primary" : "border-gray-300 hover:border-primary"}`}
-              onClick={() => handleSizeChange(size.id)}
-            >
-              {size.value ? getSizeLabel(size.value) : size.name || size.id}
-            </button>
-          ))}
+          {categories.length > 0 ? (
+            categories.map((category) => (
+              <div key={category.id} className="flex items-center gap-2">
+                <Checkbox
+                  id={`category-${category.id}`}
+                  checked={selectedCategory === String(category.id)}
+                  onCheckedChange={() => handleCategoryChange(String(category.id))}
+                  className="h-5 w-5"
+                />
+                <label htmlFor={`category-${category.id}`} className="text-sm font-medium">
+                  {category.name}
+                </label>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">Không có danh mục nào</p>
+          )}
         </div>
       </div>
       <Button variant="outline" className="w-full" onClick={handleResetFilters}>

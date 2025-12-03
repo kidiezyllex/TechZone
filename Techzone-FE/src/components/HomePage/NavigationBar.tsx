@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Icon } from '@mdi/react';
 import { mdiCart } from '@mdi/js';
 import { Button } from '@/components/ui/button';
-import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, UserButton, useUser as useClerkUser } from '@clerk/clerk-react';
 import { useUser } from '@/context/useUserContext';
 import AccountDropdown from './AccountDropdown';
 import { useCartStore } from '@/stores/useCartStore';
@@ -44,6 +44,7 @@ const Tab = ({ text, selected, setSelected }: TabProps) => {
 export const NavigationBar = () => {
     const [selected, setSelected] = useState<string>(tabs[0].text);
     const { isAuthenticated, user } = useUser();
+    const { user: clerkUser } = useClerkUser();
     const { totalItems } = useCartStore();
     const checkPath = () => {
         const currentPath = window.location.pathname;
@@ -100,19 +101,13 @@ export const NavigationBar = () => {
                         </div>
                     </SignedOut>
                     <SignedIn>
-                        <div className="hidden md:flex items-center gap-2">
-                            <span className="text-sm font-medium text-maintext">
-                                Xin chào, <span className='text-primary font-bold'>{user?.fullName || 'Khách hàng'}</span>
+                        <div className="hidden md:flex items-center gap-3">
+                            <span className="text-base font-medium text-maintext">
+                                Xin chào, <span className='text-primary font-bold'>{clerkUser?.fullName || clerkUser?.firstName || 'Khách hàng'}</span>
                             </span>
                         </div>
                     </SignedIn>
-                    <div className="flex items-center gap-2">
-                        <button onClick={() => setIsOpen(true)} className="relative p-2 text-maintext hover:text-primary transition-colors">
-                            <Icon path={mdiCart} size={0.7} />
-                            <span className="absolute -top-1 -right-1 bg-extra text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                                {totalItems}
-                            </span>
-                        </button>
+                    <div className="flex items-center gap-3">
                         <SignedIn>
                             <UserButton
                                 appearance={{
@@ -122,14 +117,18 @@ export const NavigationBar = () => {
                                         userButtonPopoverActionButton: "hover:bg-primary/10",
                                     }
                                 }}
-                                userProfileMode="navigation"
-                                userProfileUrl="/profile"
                                 afterSignOutUrl="/"
                             />
                         </SignedIn>
                         <SignedOut>
                             {isAuthenticated && <AccountDropdown />}
                         </SignedOut>
+                        <button onClick={() => setIsOpen(true)} className="bg-primary rounded-full relative p-2 text-maintext hover:text-primary transition-colors">
+                            <Icon path={mdiCart} size={0.7} className='text-white' />
+                            <span className="absolute -top-1 -right-1 bg-extra text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                {totalItems}
+                            </span>
+                        </button>
                     </div>
                 </div>
             </div>
