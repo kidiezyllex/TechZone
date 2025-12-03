@@ -26,7 +26,8 @@ import {
   mdiKeyboardReturn,
   mdiPlus,
   mdiDelete,
-  mdiMinus
+  mdiMinus,
+  mdiLogout
 } from '@mdi/js';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -35,7 +36,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { useUser } from '@/context/useUserContext';
-import { useUser as useClerkUser } from '@clerk/clerk-react';
+import { useUser as useClerkUser, useClerk } from '@clerk/clerk-react';
 import { useOrdersByUser, useOrderDetail } from '@/hooks/order';
 import { useToast } from '@/hooks/useToast';
 import { useUpdateUserProfile, useChangePassword } from '@/hooks/account';
@@ -1145,9 +1146,6 @@ const ProfileTab = () => {
                     {displayFullName?.charAt(0)?.toUpperCase() || displayEmail?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                 )}
-                <Button variant="outline" className="w-full max-w-[160px]" type="button">
-                  Thay đổi ảnh
-                </Button>
               </div>
 
               <div className="sm:w-2/3 space-y-4">
@@ -1680,6 +1678,7 @@ export default function GeneralManagementPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const { isAuthenticated, profile, isLoadingProfile } = useUser();
   const { user: clerkUser, isSignedIn: isClerkSignedIn } = useClerkUser();
+  const { signOut } = useClerk();
   const [currentPage, setCurrentPage] = useState(1);
   const userId = profile?.data?.id;
   const { data: ordersData, isLoading, isError, refetch } = useOrdersByUser(userId || '');
@@ -1718,13 +1717,6 @@ export default function GeneralManagementPage() {
     };
   }, []);
 
-  // Tạm thời tắt redirect
-  // useEffect(() => {
-  //   if (!isAuthenticated && !isLoadingProfile) {
-  //     navigate('/auth/login');
-  //   }
-  // }, [isAuthenticated, isLoadingProfile, navigate]);
-
   if (isLoadingProfile) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -1733,10 +1725,6 @@ export default function GeneralManagementPage() {
     );
   }
 
-  // Tạm thời tắt check authentication
-  // if (!isAuthenticated) {
-  //   return null;
-  // }
 
   const tabs = [
     {
@@ -1744,11 +1732,6 @@ export default function GeneralManagementPage() {
       icon: mdiAccountEdit,
       value: 'profile',
     },
-    // {
-    //   title: 'Đổi mật khẩu',
-    //   icon: mdiLock,
-    //   value: 'password',
-    // },
     {
       title: 'Đơn hàng của bạn',
       icon: mdiOrderBoolAscending,
@@ -1759,11 +1742,6 @@ export default function GeneralManagementPage() {
       icon: mdiKeyboardReturn,
       value: 'returns',
     },
-    // {
-    //   title: 'Mã giảm giá',
-    //   icon: mdiTicketPercentOutline,
-    //   value: 'vouchers',
-    // },
   ];
 
   const handleViewOrderDetails = (orderId: string) => {
@@ -1776,18 +1754,20 @@ export default function GeneralManagementPage() {
     setCreateReturnOpen(true);
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/');
+      toast.success('Đăng xuất thành công');
+    } catch (error) {
+      toast.error('Đã xảy ra lỗi khi đăng xuất');
+    }
+  };
+
   const isOrderReturnable = (order: IOrder) => {
 
     return order.orderStatus === 'HOAN_THANH' &&
       returnableOrdersData?.data?.orders?.some(ro => ro.id === order.id);
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'dd/MM/yyyy', { locale: vi });
-    } catch (error) {
-      return dateString;
-    }
   };
 
   const formatPrice = (price: number) => {
@@ -1879,6 +1859,20 @@ export default function GeneralManagementPage() {
                       </a>
                     </motion.div>
                   ))}
+                  <motion.div
+                    whileHover={{ x: 5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center justify-between px-4 py-3 hover:bg-muted w-full text-left text-red-600 hover:text-red-700"
+                    >
+                      <div className="flex items-center">
+                        <Icon path={mdiLogout} size={0.7} className="mr-3" />
+                        <span>Đăng xuất</span>
+                      </div>
+                    </button>
+                  </motion.div>
                 </nav>
               </CardContent>
             </Card>

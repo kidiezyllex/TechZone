@@ -39,6 +39,7 @@ import { checkImageUrl } from '@/lib/utils';
 import { formatPrice } from '@/utils/formatters';
 import { useCreateOrder } from '@/hooks/order';
 import { useUser } from '@/context/useUserContext';
+import { useUser as useClerkUser } from '@clerk/clerk-react';
 import { useCreateNotification } from '@/hooks/notification';
 import { useUserProfile } from '@/hooks/account';
 import VNPayModal from '@/components/VNPayPayment/VNPayModal';
@@ -80,7 +81,8 @@ interface Ward {
 
 export default function ShippingPage() {
   const navigate = useNavigate();
-  const { user } = useUser()
+  const { user } = useUser();
+  const { user: clerkUser } = useClerkUser();
   const {
     items,
     clearCart,
@@ -99,7 +101,7 @@ export default function ShippingPage() {
   const [orderResult, setOrderResult] = useState<any>(null);
   const [vnpayOrderData, setVnpayOrderData] = useState<any>(null);
 
-  
+
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
@@ -129,19 +131,19 @@ export default function ShippingPage() {
     },
   });
 
-  
+
   const subtotal = storeSubtotal;
   const tax = storeTax;
   const shipping = storeShipping;
   const total = storeTotal;
 
-  
+
   const selectedProvince = form.watch("province");
   const selectedDistrict = form.watch("district");
   const selectedPaymentMethod = form.watch("paymentMethod");
   const selectedWard = form.watch("ward");
 
-  
+
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
@@ -159,7 +161,7 @@ export default function ShippingPage() {
     fetchProvinces();
   }, []);
 
-  
+
   useEffect(() => {
     if (selectedProvince) {
       const fetchDistricts = async () => {
@@ -168,7 +170,7 @@ export default function ShippingPage() {
           const response = await fetch(`https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`);
           const data = await response.json();
           setDistricts(data.districts || []);
-          
+
           form.setValue("district", "");
           form.setValue("ward", "");
           setWards([]);
@@ -188,7 +190,7 @@ export default function ShippingPage() {
     }
   }, [selectedProvince, form]);
 
-  
+
   useEffect(() => {
     if (selectedDistrict) {
       const fetchWards = async () => {
@@ -197,7 +199,7 @@ export default function ShippingPage() {
           const response = await fetch(`https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`);
           const data = await response.json();
           setWards(data.wards || []);
-          
+
           form.setValue("ward", "");
         } catch (error) {
           toast.error('Không thể tải danh sách phường/xã');
@@ -213,7 +215,7 @@ export default function ShippingPage() {
     }
   }, [selectedDistrict, form]);
 
-  
+
   useEffect(() => {
     if (userProfile?.data) {
       const profile = userProfile.data;
@@ -262,7 +264,7 @@ export default function ShippingPage() {
     }
   }, [selectedPaymentMethod]);
 
-  
+
   useEffect(() => {
     if (selectedProvince) {
       const found = provinces.find(p => p.code.toString() === selectedProvince);
@@ -272,7 +274,7 @@ export default function ShippingPage() {
     }
   }, [selectedProvince, provinces]);
 
-  
+
   useEffect(() => {
     if (selectedDistrict) {
       const found = districts.find(d => d.code.toString() === selectedDistrict);
@@ -282,7 +284,7 @@ export default function ShippingPage() {
     }
   }, [selectedDistrict, districts]);
 
-  
+
   useEffect(() => {
     if (selectedWard) {
       const found = wards.find(w => w.code.toString() === selectedWard);
@@ -366,12 +368,12 @@ export default function ShippingPage() {
         </div>
       `;
 
-      
+
       await createNotificationMutation.mutateAsync({
         type: 'EMAIL',
         title: `Xác nhận đơn hàng ${orderData.code || orderId}`,
         content: emailContent,
-        recipients: [userEmail, 'buitranthienan1111@gmail.com'], 
+        recipients: [userEmail, 'buitranthienan1111@gmail.com'],
         relatedTo: 'ORDER',
         relatedId: orderId
       });
@@ -400,13 +402,9 @@ export default function ShippingPage() {
 
       const orderData = {
         orderId: `DH${new Date().getFullYear()}${Date.now().toString().slice(-6)}`,
-        customerId: user?.id || '000000000000000000000000',
+        customerId: clerkUser?.id || user?.id || '000000000000000000000000',
         items: items.map(item => ({
           product: item.productId + "" || item.id + "",
-          variant: {
-            colorId: item.colorId,
-            sizeId: item.sizeId
-          },
           quantity: item.quantity,
           price: item.price
         })),
@@ -456,13 +454,9 @@ export default function ShippingPage() {
 
       const orderData = {
         orderId: `DH${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`,
-        customerId: user?.id || '000000000000000000000000',
+        customerId: clerkUser?.id || user?.id || '000000000000000000000000',
         items: items.map(item => ({
-          product: item.productId || item.id, 
-          variant: {
-            colorId: item.colorId,
-            sizeId: item.sizeId
-          },
+          product: item.productId || item.id,
           quantity: item.quantity,
           price: item.price
         })),
@@ -511,7 +505,7 @@ export default function ShippingPage() {
     navigate('/products');
   };
 
-  
+
   const isFieldDisabled = (fieldName: keyof ShippingFormValues) => {
     if (!userProfile?.data) return false;
     const profile = userProfile.data;
@@ -823,7 +817,7 @@ export default function ShippingPage() {
                 <span className='text-maintext'>{formatPrice(subtotal + voucherDiscount)}</span>
               </div>
 
-              {}
+              { }
               {appliedVoucher && voucherDiscount > 0 && (
                 <div className="flex justify-between w-full text-green-600">
                   <span className="text-sm font-semibold">Giảm giá voucher ({appliedVoucher.code})</span>
@@ -848,7 +842,7 @@ export default function ShippingPage() {
         </div>
       </div>
 
-      {}
+      { }
       <VNPayModal
         isOpen={showVNPayModal}
         onClose={() => setShowVNPayModal(false)}
@@ -862,7 +856,7 @@ export default function ShippingPage() {
         onPaymentError={handleVNPayError}
       />
 
-      {}
+      { }
       {orderResult && (
         <SuccessModal
           isOpen={showSuccessModal}
