@@ -16,7 +16,7 @@ import {
 import { sendGet, sendPost, sendPut, sendPatch, sendDelete } from "./axios";
 
 export const getAllOrders = async (params: IOrderFilter): Promise<IOrdersResponse> => {
-  const res = await sendGet("/orders", params);
+  const res = await sendGet("/orders/all/list", params);
   return res as IOrdersResponse;
 };
 

@@ -23,11 +23,6 @@ import { format } from "date-fns"
 import { vi } from "date-fns/locale"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import type { DateRange } from "react-day-picker"
-import { cn } from "@/lib/utils"
-import { CalendarIcon } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -53,10 +48,9 @@ export default function OrdersPage() {
   const [filters, setFilters] = useState<IOrderFilter>({
     page: 1,
     limit: 10,
-  })
+  } as any)
   const [selectedTab, setSelectedTab] = useState<string>("all")
   const [showFilters, setShowFilters] = useState(false)
-  const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false)
@@ -116,29 +110,13 @@ export default function OrdersPage() {
       newFilters.startDate = startOfMonth.toISOString().split("T")[0]
       newFilters.endDate = endOfMonth.toISOString().split("T")[0]
     } else {
-      if (!dateRange?.from && !dateRange?.to) {
-        const { startDate, endDate, ...restExisting } = filters
-        setFilters((prev) => ({ ...restExisting, ...newFilters }))
-        return
-      }
-    }
-
-    if (selectedTab === "all" && dateRange?.from && dateRange?.to) {
-      newFilters.startDate = dateRange.from.toISOString().split("T")[0]
-      newFilters.endDate = dateRange.to.toISOString().split("T")[0]
-    } else if (
-      dateRange?.from &&
-      dateRange?.to &&
-      selectedTab !== "today" &&
-      selectedTab !== "week" &&
-      selectedTab !== "month"
-    ) {
-      newFilters.startDate = dateRange.from.toISOString().split("T")[0]
-      newFilters.endDate = dateRange.to.toISOString().split("T")[0]
+      const { startDate, endDate, ...restExisting } = filters
+      setFilters((prev) => ({ ...restExisting, ...newFilters }))
+      return
     }
 
     setFilters((prev) => ({ ...prev, ...newFilters }))
-  }, [selectedTab, dateRange])
+  }, [selectedTab])
 
   const handleFilterChange = (key: keyof IOrderFilter, value: string | undefined) => {
     if (value === "" || value === "all") {
@@ -169,6 +147,7 @@ export default function OrdersPage() {
             queryClient.invalidateQueries({ queryKey: ["orders"] })
             queryClient.invalidateQueries({ queryKey: ["order", selectedOrder] })
             setIsStatusDialogOpen(false)
+            setStatusToUpdate("")
           },
         },
       )
@@ -208,31 +187,61 @@ export default function OrdersPage() {
     return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: vi })
   }
 
+  const getOrderStatusLabel = (status: string): string => {
+    switch (status) {
+      case "pending":
+        return "Chờ xác nhận"
+      case "confirmed":
+        return "Đã xác nhận"
+      case "shipping":
+        return "Đang vận chuyển"
+      case "completed":
+        return "Hoàn thành"
+      case "cancelled":
+        return "Đã hủy"
+      default:
+        return status
+    }
+  }
+
+  const getPaymentStatusLabel = (status: string): string => {
+    switch (status) {
+      case "pending":
+        return "Chưa thanh toán"
+      case "partial_paid":
+        return "Thanh toán một phần"
+      case "paid":
+        return "Đã thanh toán"
+      default:
+        return status
+    }
+  }
+
   const handleChangePage = (newPage: number) => {
     setFilters((prev) => ({ ...prev, page: newPage }))
   }
 
   function handleExportExcel() {
-    if (!data?.data?.orders || data.data.orders.length === 0) {
+    if (!data?.data || !Array.isArray(data.data) || data.data.length === 0) {
       toast.warn("Không có dữ liệu để xuất.")
       return
     }
-    const ordersToExport = data.data.orders
+    const ordersToExport = data.data
     const dateStr = format(new Date(), "yyyyMMdd")
     let fileNamePrefix = "orders_list"
-    if (ordersToExport.length === 1 && ordersToExport[0].code) {
-      fileNamePrefix = ordersToExport[0].code
+    if (ordersToExport.length === 1 && ordersToExport[0].order_number) {
+      fileNamePrefix = ordersToExport[0].order_number
     }
     const fileName = `${fileNamePrefix}_${dateStr}.xlsx`
 
-    const formattedOrders = ordersToExport.map((order) => ({
-      "Mã đơn hàng": order.code,
-      "Khách hàng": order.customer?.fullName || order.shippingName || "N/A",
-      "Số điện thoại": order.customer?.phoneNumber || order.shippingPhoneNumber || "N/A",
-      "Ngày tạo": formatDate(order.createdAt),
-      "Tổng tiền": formatCurrency(order.total),
-      "Trạng thái đơn hàng": order.orderStatus,
-      "Trạng thái thanh toán": order.paymentStatus,
+    const formattedOrders = ordersToExport.map((order: any) => ({
+      "Mã đơn hàng": order.order_number,
+      "Khách hàng": order.customer_name || "N/A",
+      "Số điện thoại": order.delivery_phone || "N/A",
+      "Ngày tạo": formatDate(order.created_at),
+      "Tổng tiền": formatCurrency(parseFloat(order.total_amount)),
+      "Trạng thái đơn hàng": getOrderStatusLabel(order.status),
+      "Trạng thái thanh toán": getPaymentStatusLabel(order.payment_status),
     }))
 
     const worksheet = XLSX.utils.json_to_sheet(formattedOrders)
@@ -243,15 +252,15 @@ export default function OrdersPage() {
   }
 
   function handleExportPDF() {
-    if (!data?.data?.orders || data.data.orders.length === 0) {
+    if (!data?.data || !Array.isArray(data.data) || data.data.length === 0) {
       toast.warn("Không có dữ liệu để xuất.")
       return
     }
-    const ordersToExport = data.data.orders
+    const ordersToExport = data.data
     const dateStr = format(new Date(), "yyyyMMdd")
     let fileNamePrefix = "orders_list"
-    if (ordersToExport.length === 1 && ordersToExport[0].code) {
-      fileNamePrefix = ordersToExport[0].code
+    if (ordersToExport.length === 1 && ordersToExport[0].order_number) {
+      fileNamePrefix = ordersToExport[0].order_number
     }
     const fileName = `${fileNamePrefix}_${dateStr}.pdf`
 
@@ -263,51 +272,19 @@ export default function OrdersPage() {
       floatPrecision: 16,
     })
 
-    const getOrderStatusLabelLocal = (status: string): string => {
-      switch (status) {
-        case "CHO_XAC_NHAN":
-          return "Chờ xác nhận"
-        case "CHO_GIAO_HANG":
-          return "Chờ giao hàng"
-        case "DANG_VAN_CHUYEN":
-          return "Đang vận chuyển"
-        case "DA_GIAO_HANG":
-          return "Đã giao hàng"
-        case "HOAN_THANH":
-          return "Hoàn thành"
-        case "DA_HUY":
-          return "Đã hủy"
-        default:
-          return status
-      }
-    }
-
-    const getPaymentStatusLabelLocal = (status: string): string => {
-      switch (status) {
-        case "PENDING":
-          return "Chưa thanh toán"
-        case "PARTIAL_PAID":
-          return "Thanh toán một phần"
-        case "PAID":
-          return "Đã thanh toán"
-        default:
-          return status
-      }
-    }
-
     doc.setFontSize(18)
     doc.text("Danh sách Đơn hàng", 14, 22)
     doc.setFontSize(11)
     doc.setTextColor(100)
 
     const tableColumn = ["Mã đơn hàng", "Khách hàng", "Ngày tạo", "Tổng tiền", "Trạng thái ĐH", "Trạng thái TT"]
-    const tableRows = ordersToExport.map((order) => [
-      order.code || "N/A",
-      order.customer?.fullName || order.shippingName || "N/A",
-      formatDate(order.createdAt),
-      formatCurrency(order.total),
-      getOrderStatusLabelLocal(order.orderStatus),
-      getPaymentStatusLabelLocal(order.paymentStatus),
+    const tableRows = ordersToExport.map((order: any) => [
+      order.order_number || "N/A",
+      order.customer_name || "N/A",
+      formatDate(order.created_at),
+      formatCurrency(parseFloat(order.total_amount)),
+      getOrderStatusLabel(order.status),
+      getPaymentStatusLabel(order.payment_status),
     ])
 
     autoTable(doc, {
@@ -365,40 +342,24 @@ export default function OrdersPage() {
                 <TabsTrigger
                   value="all"
                   className="px-4 text-maintext/70"
-                  onClick={() => {
-                    setDateRange(undefined)
-                    setSelectedTab("all")
-                  }}
                 >
                   Tất cả
                 </TabsTrigger>
                 <TabsTrigger
                   value="today"
                   className="px-4 text-maintext/70"
-                  onClick={() => {
-                    setDateRange(undefined)
-                    setSelectedTab("today")
-                  }}
                 >
                   Hôm nay
                 </TabsTrigger>
                 <TabsTrigger
                   value="week"
                   className="px-4 text-maintext/70"
-                  onClick={() => {
-                    setDateRange(undefined)
-                    setSelectedTab("week")
-                  }}
                 >
                   Tuần này
                 </TabsTrigger>
                 <TabsTrigger
                   value="month"
                   className="px-4 text-maintext/70"
-                  onClick={() => {
-                    setDateRange(undefined)
-                    setSelectedTab("month")
-                  }}
                 >
                   Tháng này
                 </TabsTrigger>
@@ -421,40 +382,6 @@ export default function OrdersPage() {
                 />
               </div>
               <div className="flex gap-2 w-full md:w-auto">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal text-primary",
-                        !dateRange && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-                      {dateRange?.from ? (
-                        dateRange.to ? (
-                          <>
-                            {format(dateRange.from, "dd/MM/yyyy")} - {format(dateRange.to, "dd/MM/yyyy")}
-                          </>
-                        ) : (
-                          format(dateRange.from, "dd/MM/yyyy")
-                        )
-                      ) : (
-                        <span className="text-primary">Chọn khoảng thời gian</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      defaultMonth={dateRange?.from}
-                      selected={dateRange}
-                      onSelect={setDateRange}
-                      numberOfMonths={2}
-                    />
-                  </PopoverContent>
-                </Popover>
                 <Button variant="outline" className="flex items-center" onClick={() => setShowFilters(!showFilters)}>
                   <Icon path={mdiFilterOutline} size={0.7} className="mr-2" />
                   {showFilters ? "Ẩn bộ lọc" : "Hiện bộ lọc"}
@@ -498,12 +425,11 @@ export default function OrdersPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                          <SelectItem value="CHO_XAC_NHAN">Chờ xác nhận</SelectItem>
-                          <SelectItem value="CHO_GIAO_HANG">Chờ giao hàng</SelectItem>
-                          <SelectItem value="DANG_VAN_CHUYEN">Đang vận chuyển</SelectItem>
-                          <SelectItem value="DA_GIAO_HANG">Đã giao hàng</SelectItem>
-                          <SelectItem value="HOAN_THANH">Hoàn thành</SelectItem>
-                          <SelectItem value="DA_HUY">Đã hủy</SelectItem>
+                          <SelectItem value="pending">Chờ xác nhận</SelectItem>
+                          <SelectItem value="confirmed">Đã xác nhận</SelectItem>
+                          <SelectItem value="shipping">Đang vận chuyển</SelectItem>
+                          <SelectItem value="completed">Hoàn thành</SelectItem>
+                          <SelectItem value="cancelled">Đã hủy</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -518,9 +444,9 @@ export default function OrdersPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                          <SelectItem value="PENDING">Chưa thanh toán</SelectItem>
-                          <SelectItem value="PARTIAL_PAID">Thanh toán một phần</SelectItem>
-                          <SelectItem value="PAID">Đã thanh toán</SelectItem>
+                          <SelectItem value="pending">Chưa thanh toán</SelectItem>
+                          <SelectItem value="partial_paid">Thanh toán một phần</SelectItem>
+                          <SelectItem value="paid">Đã thanh toán</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -583,12 +509,11 @@ export default function OrdersPage() {
                 <SelectValue placeholder="Chọn trạng thái" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="CHO_XAC_NHAN">Chờ xác nhận</SelectItem>
-                <SelectItem value="CHO_GIAO_HANG">Chờ giao hàng</SelectItem>
-                <SelectItem value="DANG_VAN_CHUYEN">Đang vận chuyển</SelectItem>
-                <SelectItem value="DA_GIAO_HANG">Đã giao hàng</SelectItem>
-                <SelectItem value="HOAN_THANH">Hoàn thành</SelectItem>
-                <SelectItem value="DA_HUY">Đã hủy</SelectItem>
+                <SelectItem value="pending">Chờ xác nhận</SelectItem>
+                <SelectItem value="confirmed">Đã xác nhận</SelectItem>
+                <SelectItem value="shipping">Đang vận chuyển</SelectItem>
+                <SelectItem value="completed">Hoàn thành</SelectItem>
+                <SelectItem value="cancelled">Đã hủy</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -654,13 +579,16 @@ export default function OrdersPage() {
       )
     }
 
-    if (!data?.data.orders || data.data.orders.length === 0) {
+    if (!data?.data || !Array.isArray(data.data) || data.data.length === 0) {
       return (
         <div className="text-center py-10">
           <p className="text-maintext">Không tìm thấy đơn hàng nào.</p>
         </div>
       )
     }
+
+    const orders = Array.isArray(data.data) ? data.data : []
+    const pagination = (data as any).pagination || { page: 1, limit: 10, total: 0, totalPages: 0 }
 
     return (
       <>
@@ -679,37 +607,37 @@ export default function OrdersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.data.orders.map((order) => (
+              {orders.map((order: any) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.code}</TableCell>
+                  <TableCell className="font-medium">{order.order_number}</TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{order.customer?.fullName || order.shippingName}</div>
-                      <div className="text-sm text-maintext italic">{order.customer?.phoneNumber === "0000000000" ? "Chưa có SĐT" : order.customer?.phoneNumber}</div>
+                      <div className="font-medium">{order.customer_name || "N/A"}</div>
+                      <div className="text-sm text-maintext italic">{order.delivery_phone || "Chưa có SĐT"}</div>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">{formatDate(order.createdAt)}</TableCell>
+                  <TableCell className="hidden md:table-cell">{formatDate(order.created_at)}</TableCell>
                   <TableCell className="hidden lg:table-cell">
-                    <OrderTypeBadge orderCode={order.code} />
+                    <OrderTypeBadge deliveryType={order.delivery_type} />
                   </TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(order.total)}</TableCell>
+                  <TableCell className="text-right font-medium">{formatCurrency(parseFloat(order.total_amount))}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    <OrderStatusBadge status={order.orderStatus} />
+                    <OrderStatusBadge status={order.status} />
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
-                    <PaymentStatusBadge status={order.paymentStatus} />
+                    <PaymentStatusBadge status={order.payment_status} />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <Button variant="outline" size="icon" onClick={() => handleViewOrder(order.id)}>
+                      <Button variant="outline" size="icon" onClick={() => handleViewOrder(order.id.toString())}>
                         <Icon path={mdiEye} size={0.7} />
                       </Button>
                       <Button
                         variant="outline"
                         size="icon"
-                        disabled={order.orderStatus === "DA_HUY" || order.orderStatus === "HOAN_THANH"}
+                        disabled={order.status === "cancelled" || order.status === "completed"}
                         onClick={() => {
-                          setOrderToCancel(order.id)
+                          setOrderToCancel(order.id.toString())
                           setIsConfirmCancelDialogOpen(true)
                         }}
                       >
@@ -723,23 +651,23 @@ export default function OrdersPage() {
           </Table>
         </div>
 
-        {data.data.pagination.totalPages > 1 && (
+        {pagination.totalPages > 1 && (
           <div className="flex justify-center mt-6">
             <div className="flex space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleChangePage(Math.max(1, data.data.pagination.currentPage - 1))}
-                disabled={data.data.pagination.currentPage === 1}
+                onClick={() => handleChangePage(Math.max(1, pagination.page - 1))}
+                disabled={pagination.page === 1}
               >
                 Trước
               </Button>
-              {Array.from({ length: data.data.pagination.totalPages }, (_, i) => i + 1)
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
                 .filter(
                   (page) =>
                     page === 1 ||
-                    page === data.data.pagination.currentPage ||
-                    Math.abs(page - data.data.pagination.currentPage) <= 1,
+                    page === pagination.page ||
+                    Math.abs(page - pagination.page) <= 1,
                 )
                 .reduce((acc: (number | string)[], page, idx, arr) => {
                   if (idx > 0 && page - arr[idx - 1] > 1) {
@@ -756,7 +684,7 @@ export default function OrdersPage() {
                   ) : (
                     <Button
                       key={`page-${page}`}
-                      variant={data.data.pagination.currentPage === page ? "default" : "outline"}
+                      variant={pagination.page === page ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleChangePage(page as number)}
                     >
@@ -768,9 +696,9 @@ export default function OrdersPage() {
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  handleChangePage(Math.min(data.data.pagination.totalPages, data.data.pagination.currentPage + 1))
+                  handleChangePage(Math.min(pagination.totalPages, pagination.page + 1))
                 }
-                disabled={data.data.pagination.currentPage === data.data.pagination.totalPages}
+                disabled={pagination.page === pagination.totalPages}
               >
                 Sau
               </Button>
@@ -785,17 +713,15 @@ export default function OrdersPage() {
 const OrderStatusBadge = ({ status }: { status: string }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case "CHO_XAC_NHAN":
+      case "pending":
         return { label: "Chờ xác nhận", className: "!bg-amber-50 !text-amber-500 !border-amber-500" }
-      case "CHO_GIAO_HANG":
-        return { label: "Chờ giao hàng", className: "!bg-blue-50 !text-blue-500 !border-blue-500" }
-      case "DANG_VAN_CHUYEN":
+      case "confirmed":
+        return { label: "Đã xác nhận", className: "!bg-blue-50 !text-blue-500 !border-blue-500" }
+      case "shipping":
         return { label: "Đang vận chuyển", className: "!bg-orange-50 !text-orange-500 !border-orange-500" }
-      case "DA_GIAO_HANG":
-        return { label: "Đã giao hàng", className: "!bg-green-50 !text-green-500 !border-green-500" }
-      case "HOAN_THANH":
+      case "completed":
         return { label: "Hoàn thành", className: "!bg-green-50 !text-green-500 !border-green-500" }
-      case "DA_HUY":
+      case "cancelled":
         return { label: "Đã hủy", className: "!bg-red-50 !text-red-500 !border-red-500" }
       default:
         return { label: "Không xác định", className: "!bg-gray-50 !text-maintext !border-gray-500" }
@@ -810,11 +736,11 @@ const OrderStatusBadge = ({ status }: { status: string }) => {
 const PaymentStatusBadge = ({ status }: { status: string }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case "PENDING":
+      case "pending":
         return { label: "Chưa thanh toán", className: "!bg-yellow-50 !text-yellow-500 !border-yellow-500" }
-      case "PARTIAL_PAID":
+      case "partial_paid":
         return { label: "Thanh toán một phần", className: "!bg-blue-50 !text-blue-500 !border-blue-500" }
-      case "PAID":
+      case "paid":
         return { label: "Đã thanh toán", className: "!bg-green-50 !text-green-500 !border-green-500" }
       default:
         return { label: "Không xác định", className: "!bg-gray-50 !text-maintext !border-gray-500" }
@@ -826,18 +752,18 @@ const PaymentStatusBadge = ({ status }: { status: string }) => {
   return <Badge className={config.className}>{config.label}</Badge>
 }
 
-const OrderTypeBadge = ({ orderCode }: { orderCode: string }) => {
-  const getOrderType = (code: string) => {
-    if (code && code.includes("POS")) {
+const OrderTypeBadge = ({ deliveryType }: { deliveryType: string }) => {
+  const getOrderType = (type: string) => {
+    if (type === "pickup") {
       return { label: "Tại quầy", className: "!bg-purple-50 !text-purple-500 !border-purple-500" }
-    } else if (code && code.includes("DH")) {
+    } else if (type === "delivery") {
       return { label: "Online", className: "!bg-cyan-50 !text-cyan-500 !border-cyan-500" }
     } else {
       return { label: "Không xác định", className: "!bg-gray-50 !text-maintext !border-gray-500" }
     }
   }
 
-  const config = getOrderType(orderCode)
+  const config = getOrderType(deliveryType)
 
   return <Badge className={config.className}>{config.label}</Badge>
 }
@@ -867,16 +793,18 @@ const OrderDetailDialog = ({
 
   const getPaymentMethodName = (method: string) => {
     switch (method) {
-      case "CASH":
+      case "cash":
         return "Tiền mặt"
-      case "BANK_TRANSFER":
+      case "bank_transfer":
         return "Chuyển khoản ngân hàng"
-      case "COD":
+      case "cod":
         return "Thanh toán khi nhận hàng"
-      case "MIXED":
+      case "online":
+        return "Thanh toán online"
+      case "mixed":
         return "Thanh toán nhiều phương thức"
       default:
-        return "Không xác định"
+        return method || "Không xác định"
     }
   }
 
@@ -885,7 +813,7 @@ const OrderDetailDialog = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex justify-between items-center">
-            <span>Chi tiết đơn hàng: {orderDetail.orderNumber}</span>
+            <span>Chi tiết đơn hàng: {orderDetail.order_number || orderDetail.orderNumber || "N/A"}</span>
             <div className="flex space-x-2">
               <a href={`/admin/orders/edit/${orderId}`}>
                 <Button variant="outline" size="sm">
@@ -909,23 +837,23 @@ const OrderDetailDialog = ({
                 <div className="mt-2 rounded-md border p-4 space-y-4">
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Mã đơn hàng:</span>
-                    <span className="text-sm font-medium">{orderDetail.orderNumber}</span>
+                    <span className="text-sm font-medium">{orderDetail.order_number || orderDetail.orderNumber || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Ngày tạo:</span>
-                    <span className="text-sm font-medium">{formatDate(orderDetail.createdAt)}</span>
+                    <span className="text-sm font-medium">{formatDate(orderDetail.created_at || orderDetail.createdAt)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Trạng thái đơn hàng:</span>
-                    <OrderStatusBadge status={orderDetail.orderStatus} />
+                    <OrderStatusBadge status={orderDetail.status || orderDetail.orderStatus} />
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Trạng thái thanh toán:</span>
-                    <PaymentStatusBadge status={orderDetail.paymentStatus} />
+                    <PaymentStatusBadge status={orderDetail.payment_status || orderDetail.paymentStatus} />
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Phương thức thanh toán:</span>
-                    <span className="text-sm font-medium">{getPaymentMethodName(orderDetail.paymentMethod)}</span>
+                    <span className="text-sm font-medium">{getPaymentMethodName(orderDetail.payment_method || orderDetail.paymentMethod)}</span>
                   </div>
                 </div>
               </div>
@@ -935,17 +863,17 @@ const OrderDetailDialog = ({
                 <div className="mt-2 rounded-md border p-4 space-y-4">
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Tên khách hàng:</span>
-                    <span className="text-sm font-medium">{orderDetail.customer?.fullName}</span>
+                    <span className="text-sm font-medium">{orderDetail.customer_name || orderDetail.customer?.fullName || "N/A"}</span>
                   </div>
-                  {orderDetail.customer?.email && (
+                  {(orderDetail.email || orderDetail.customer?.email) && (
                     <div className="flex justify-between">
                       <span className="text-sm text-maintext">Email:</span>
-                      <span className="text-sm font-medium">{orderDetail.customer.email}</span>
+                      <span className="text-sm font-medium">{orderDetail.email || orderDetail.customer.email}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Số điện thoại:</span>
-                    <span className="text-sm font-medium">{orderDetail.customer?.phoneNumber}</span>
+                    <span className="text-sm font-medium">{orderDetail.delivery_phone || orderDetail.customer?.phoneNumber || "N/A"}</span>
                   </div>
                 </div>
               </div>
@@ -953,13 +881,15 @@ const OrderDetailDialog = ({
               <div>
                 <h3 className="text-sm font-medium text-maintext">Địa chỉ giao hàng</h3>
                 <div className="mt-2 rounded-md border p-4">
-                  {orderDetail.shippingAddress ? (
+                  {orderDetail.delivery_address || orderDetail.shippingAddress ? (
                     <div className="space-y-2">
-                      <p className="text-sm font-medium">{orderDetail.shippingAddress.name}</p>
-                      <p className="text-sm">{orderDetail.shippingAddress.phoneNumber}</p>
+                      <p className="text-sm font-medium">{orderDetail.customer_name || orderDetail.shippingAddress?.name || "N/A"}</p>
+                      <p className="text-sm">{orderDetail.delivery_phone || orderDetail.shippingAddress?.phoneNumber || "N/A"}</p>
                       <p className="text-sm">
-                        {orderDetail.shippingAddress.specificAddress}, {orderDetail.shippingAddress.wardName},{" "}
-                        {orderDetail.shippingAddress.districtName}, {orderDetail.shippingAddress.provinceName}
+                        {orderDetail.delivery_address ||
+                          (orderDetail.shippingAddress ?
+                            `${orderDetail.shippingAddress.specificAddress || ""}, ${orderDetail.shippingAddress.wardName || ""}, ${orderDetail.shippingAddress.districtName || ""}, ${orderDetail.shippingAddress.provinceName || ""}`
+                            : "N/A")}
                       </p>
                     </div>
                   ) : (
@@ -976,46 +906,50 @@ const OrderDetailDialog = ({
                 <h3 className="text-sm font-medium text-maintext">Sản phẩm đã đặt</h3>
                 <div className="mt-2 rounded-md">
                   <div className="max-h-[300px] overflow-y-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Sản phẩm</TableHead>
-                          <TableHead className="text-right">Đơn giá</TableHead>
-                          <TableHead className="text-right">SL</TableHead>
-                          <TableHead className="text-right">Tổng</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {orderDetail.items.map((item: any, index: number) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                {item.product && item.product.imageUrl && (
-                                  <div className="w-10 h-10 rounded border overflow-hidden bg-gray-100">
-                                    <img
-                                      src={item.product.imageUrl}
-                                      alt={item.product.name}
-                                      className="w-full h-full object-contain"
-                                    />
-                                  </div>
-                                )}
-                                <div>
-                                  <div className="font-medium text-sm">{item.product?.name}</div>
-                                  <div className="text-xs text-maintext">
-                                    {item.variant?.colorName &&
-                                      item.variant?.sizeName &&
-                                      `${item.variant.colorName} / ${item.variant.sizeName}`}
+                    {orderDetail.items && orderDetail.items.length > 0 ? (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Sản phẩm</TableHead>
+                            <TableHead className="text-right">Đơn giá</TableHead>
+                            <TableHead className="text-right">SL</TableHead>
+                            <TableHead className="text-right">Tổng</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {orderDetail.items.map((item: any, index: number) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  {item.product && item.product.imageUrl && (
+                                    <div className="w-10 h-10 rounded border overflow-hidden bg-gray-100">
+                                      <img
+                                        src={item.product.imageUrl}
+                                        alt={item.product.name}
+                                        className="w-full h-full object-contain"
+                                      />
+                                    </div>
+                                  )}
+                                  <div>
+                                    <div className="font-medium text-sm">{item.product?.name || "N/A"}</div>
+                                    <div className="text-xs text-maintext">
+                                      {item.variant?.colorName &&
+                                        item.variant?.sizeName &&
+                                        `${item.variant.colorName} / ${item.variant.sizeName}`}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
-                            <TableCell className="text-right">{item.quantity}</TableCell>
-                            <TableCell className="text-right">{formatCurrency(item.price * item.quantity)}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                              </TableCell>
+                              <TableCell className="text-right">{formatCurrency(item.price || 0)}</TableCell>
+                              <TableCell className="text-right">{item.quantity || 0}</TableCell>
+                              <TableCell className="text-right">{formatCurrency((item.price || 0) * (item.quantity || 0))}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ) : (
+                      <p className="text-sm text-maintext p-4">Không có sản phẩm nào</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1025,17 +959,23 @@ const OrderDetailDialog = ({
                 <div className="mt-2 rounded-md border p-4 space-y-4">
                   <div className="flex justify-between">
                     <span className="text-sm text-maintext">Tổng tiền hàng:</span>
-                    <span className="text-sm font-medium">{formatCurrency(orderDetail.subTotal)}</span>
+                    <span className="text-sm font-medium">{formatCurrency(parseFloat(orderDetail.subtotal || orderDetail.subTotal || "0"))}</span>
                   </div>
-                  {orderDetail.voucher && (
+                  {parseFloat(orderDetail.discount_amount || orderDetail.discount || "0") > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-sm text-maintext">Mã giảm giá ({orderDetail.voucher.code}):</span>
-                      <span className="text-sm font-medium text-red-500">-{formatCurrency(orderDetail.discount)}</span>
+                      <span className="text-sm text-maintext">Giảm giá:</span>
+                      <span className="text-sm font-medium text-red-500">-{formatCurrency(parseFloat(orderDetail.discount_amount || orderDetail.discount || "0"))}</span>
+                    </div>
+                  )}
+                  {parseFloat(orderDetail.shipping_fee || "0") > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-maintext">Phí vận chuyển:</span>
+                      <span className="text-sm font-medium">{formatCurrency(parseFloat(orderDetail.shipping_fee || "0"))}</span>
                     </div>
                   )}
                   <div className="flex justify-between border-t pt-2">
                     <span className="text-sm font-medium">Tổng thanh toán:</span>
-                    <span className="text-base font-bold">{formatCurrency(orderDetail.total)}</span>
+                    <span className="text-base font-bold">{formatCurrency(parseFloat(orderDetail.total_amount || orderDetail.total || "0"))}</span>
                   </div>
                 </div>
               </div>
@@ -1045,15 +985,15 @@ const OrderDetailDialog = ({
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     className="w-full"
-                    disabled={["DA_HUY", "HOAN_THANH"].includes(orderDetail.orderStatus)}
-                    onClick={() => onUpdateStatus(orderId, orderDetail.orderStatus)}
+                    disabled={["cancelled", "completed", "DA_HUY", "HOAN_THANH"].includes(orderDetail.status || orderDetail.orderStatus || "")}
+                    onClick={() => onUpdateStatus(orderId, orderDetail.status || orderDetail.orderStatus)}
                   >
                     Cập nhật trạng thái
                   </Button>
                   <Button
                     variant="outline"
                     className="w-full"
-                    disabled={["DA_HUY", "HOAN_THANH"].includes(orderDetail.orderStatus)}
+                    disabled={["cancelled", "completed", "DA_HUY", "HOAN_THANH"].includes(orderDetail.status || orderDetail.orderStatus || "")}
                     onClick={() => onCancelOrder(orderId)}
                   >
                     Hủy đơn hàng
