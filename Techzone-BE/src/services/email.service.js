@@ -3,16 +3,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Cấu hình nodemailer transporter
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Hoặc dùng SendGrid
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER || 'techzone.noreply@gmail.com',
     pass: process.env.EMAIL_PASSWORD || ''
   }
 });
 
-// Template email OTP
 const otpEmailTemplate = (name, code, type) => {
   const typeText = type === 'register' ? 'đăng ký tài khoản' : 'đặt lại mật khẩu';
   

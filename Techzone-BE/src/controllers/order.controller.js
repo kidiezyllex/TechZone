@@ -1,107 +1,254 @@
 import { query, transaction } from '../config/database.config.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
 import { ValidationError, NotFoundError } from '../utils/errors.js';
+import { hashPassword } from '../utils/bcrypt.js';
 
-// TẠO ĐƠN HÀNG (Checkout)
 export const createOrder = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { store_id, shipping_address, shipping_city, shipping_district, phone, payment_method, notes } = req.body;
+    const {
+      orderId,
+      customerId,
+      items,
+      subTotal,
+      discount,
+      total,
+      shippingAddress,
+      paymentMethod,
+      notes
+    } = req.body;
     
-    // Pre-validate before transaction
-    const [storeCheck] = await query('SELECT id, name FROM stores WHERE id = ? AND is_active = TRUE', [store_id]);
-    if (!storeCheck) {
-      return errorResponse(res, 'Chi nhánh không tồn tại hoặc không còn hoạt động', 404);
+    // Validate required fields
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return errorResponse(res, 'Danh sách sản phẩm không được để trống', 400);
     }
     
-    const [customerCheck] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
-    if (!customerCheck) {
-      return errorResponse(res, 'Không tìm thấy thông tin khách hàng', 404);
+    if (subTotal == null || total == null) {
+      return errorResponse(res, 'Tổng tiền và tổng thanh toán không được để trống', 400);
     }
     
-    const [cartCheck] = await query('SELECT id FROM carts WHERE user_id = ?', [userId]);
-    if (!cartCheck) {
-      return errorResponse(res, 'Giỏ hàng trống', 400);
+    if (!shippingAddress) {
+      return errorResponse(res, 'Địa chỉ giao hàng không được để trống', 400);
     }
     
-    const result = await transaction(async (conn) => {
-      // Lấy cart items
-      const [cartRows] = await conn.execute('SELECT id FROM carts WHERE user_id = ?', [userId]);
-      const cart = cartRows[0];
+    if (!paymentMethod) {
+      return errorResponse(res, 'Phương thức thanh toán không được để trống', 400);
+    }
+    
+    let user_id_to_use = userId;
+    let customerId_db;
+    
+    if (customerId) {
+      const firebaseEmail = `${customerId}@firebase.user`;
       
-      if (!cart) {
-        throw new ValidationError('Giỏ hàng trống');
-      }
+      let [existingUser] = await query('SELECT id FROM users WHERE email = ?', [firebaseEmail]);
       
-      const [items] = await conn.execute(
-        `SELECT ci.product_id, ci.quantity, p.name, p.price, p.discount_percentage,
-                (p.price * (100 - p.discount_percentage) / 100) as unit_price
-         FROM cart_items ci
-         JOIN products p ON ci.product_id = p.id
-         WHERE ci.cart_id = ? AND p.is_active = TRUE`,
-        [cart.id]
-      );
-      
-      if (items.length === 0) {
-        throw new ValidationError('Giỏ hàng trống');
-      }
-      
-      // Tính tổng tiền
-      let totalAmount = 0;
-      for (const item of items) {
-        totalAmount += item.unit_price * item.quantity;
+      if (!existingUser) {
+        // Create new user from customerId and name
+        const customerName = shippingAddress?.name || 'Khách hàng';
+        const customerPhone = shippingAddress?.phoneNumber || null;
         
-        // Kiểm tra và trừ tồn kho
-        const [inventoryRows] = await conn.execute(
-          'SELECT id, quantity FROM inventory WHERE product_id = ? AND store_id = ? LIMIT 1',
-          [item.product_id, store_id]
+        // Get customer role
+        const [customerRole] = await query(
+          'SELECT id FROM roles WHERE name = ?',
+          ['customer']
         );
-        const inventory = inventoryRows[0];
         
-        if (!inventory || inventory.quantity < item.quantity) {
-          throw new ValidationError(`Sản phẩm "${item.name}" không đủ hàng tại chi nhánh này`);
+        if (!customerRole) {
+          return errorResponse(res, 'Không tìm thấy role customer', 500);
         }
         
-        await conn.execute(
-          'UPDATE inventory SET quantity = quantity - ? WHERE id = ?',
-          [item.quantity, inventory.id]
-        );
-      }
-      
-      // Tạo đơn hàng
-      const [orderResult] = await conn.execute(
-        `INSERT INTO orders (user_id, store_id, total_amount, shipping_address, shipping_city, shipping_district, phone, payment_method, notes, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-        [userId, store_id, totalAmount, shipping_address, shipping_city, shipping_district, phone, payment_method, notes || null]
-      );
-      
-      const orderId = orderResult.insertId;
-      
-      // Tạo order items
-      for (const item of items) {
-        await conn.execute(
-          'INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)',
-          [orderId, item.product_id, item.quantity, item.unit_price, item.unit_price * item.quantity]
+        // Generate a random password hash (since it's Firebase auth, password is not used)
+        const randomPassword = `firebase_${customerId}_${Date.now()}`;
+        const hashedPassword = await hashPassword(randomPassword);
+        
+        // Create user
+        const userResult = await query(
+          `INSERT INTO users (email, password_hash, full_name, phone, role_id, is_verified) 
+           VALUES (?, ?, ?, ?, ?, TRUE)`,
+          [firebaseEmail, hashedPassword, customerName, customerPhone, customerRole.id]
         );
         
-        // Cập nhật sold_count
+        user_id_to_use = userResult.insertId;
+        
+        // Create customer record
+        await query(
+          'INSERT INTO customers (user_id, classification) VALUES (?, ?)',
+          [user_id_to_use, 'new']
+        );
+      } else {
+        user_id_to_use = existingUser.id;
+        
+        // Update user info if provided (name and phone from shippingAddress)
+        if (shippingAddress?.name || shippingAddress?.phoneNumber) {
+          const updateFields = [];
+          const updateValues = [];
+          
+          if (shippingAddress.name) {
+            updateFields.push('full_name = ?');
+            updateValues.push(shippingAddress.name);
+          }
+          
+          if (shippingAddress.phoneNumber) {
+            updateFields.push('phone = ?');
+            updateValues.push(shippingAddress.phoneNumber);
+          }
+          
+          if (updateFields.length > 0) {
+            updateValues.push(user_id_to_use);
+            await query(
+              `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`,
+              updateValues
+            );
+          }
+        }
+      }
+    }
+    
+    const [customerCheck] = await query('SELECT id FROM customers WHERE user_id = ?', [user_id_to_use]);
+    if (!customerCheck) {
+      await query(
+        'INSERT INTO customers (user_id, classification) VALUES (?, ?)',
+        [user_id_to_use, 'new']
+      );
+      const [newCustomer] = await query('SELECT id FROM customers WHERE user_id = ?', [user_id_to_use]);
+      customerId_db = newCustomer.id;
+    } else {
+      customerId_db = customerCheck.id;
+    }
+    
+    const orderNumber = orderId || `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    
+    const deliveryAddress = shippingAddress.specificAddress != null ? String(shippingAddress.specificAddress) : null;
+    const deliveryCity = shippingAddress.provinceId ? null : (shippingAddress.city != null ? String(shippingAddress.city) : null);
+    const deliveryPhone = shippingAddress.phoneNumber != null ? String(shippingAddress.phoneNumber) : null;
+    
+    const paymentMethodNormalized = paymentMethod.toLowerCase() === 'cod' ? 'cod' : 'online';
+    
+    const subtotalValue = parseFloat(subTotal);
+    const discountAmount = discount != null ? parseFloat(discount) : 0;
+    const totalAmount = parseFloat(total);
+    const notesValue = notes != null ? notes : null;
+    const storeIdValue = shippingAddress.storeId != null ? parseInt(shippingAddress.storeId) : null;
+    
+    const deliveryType = deliveryAddress ? 'delivery' : 'pickup';
+    
+    const result = await transaction(async (conn) => {
+      // Validate and process items
+      const orderItems = [];
+      for (const item of items) {
+        if (!item.product || !item.quantity || item.price == null) {
+          throw new ValidationError('Thông tin sản phẩm không hợp lệ');
+        }
+        
+        const productId = parseInt(item.product);
+        const quantity = parseInt(item.quantity);
+        const unitPrice = parseFloat(item.price);
+        
+        // Get product details
+        const [productRows] = await conn.execute(
+          'SELECT id, name FROM products WHERE id = ? AND is_active = TRUE',
+          [productId]
+        );
+        
+        if (productRows.length === 0) {
+          throw new ValidationError(`Sản phẩm với ID ${productId} không tồn tại hoặc không còn hoạt động`);
+        }
+        
+        const product = productRows[0];
+        
+        // Check inventory if store_id is provided
+        if (storeIdValue) {
+          const [inventoryRows] = await conn.execute(
+            'SELECT id, quantity FROM inventory WHERE product_id = ? AND store_id = ? LIMIT 1',
+            [productId, storeIdValue]
+          );
+          
+          if (inventoryRows.length > 0) {
+            const inventory = inventoryRows[0];
+            if (inventory.quantity < quantity) {
+              throw new ValidationError(`Sản phẩm "${product.name}" không đủ hàng tại chi nhánh này`);
+            }
+            
+            // Update inventory
+            await conn.execute(
+              'UPDATE inventory SET quantity = quantity - ? WHERE id = ?',
+              [quantity, inventory.id]
+            );
+          }
+        }
+        
+        orderItems.push({
+          productId,
+          productName: product.name,
+          quantity,
+          unitPrice,
+          subtotal: unitPrice * quantity
+        });
+      }
+      
+      const shippingFee = 0;
+      
+      const [orderResult] = await conn.execute(
+        `INSERT INTO orders (
+          order_number, customer_id, store_id, delivery_type, 
+          delivery_address, delivery_city, delivery_phone, 
+          payment_method, subtotal, discount_amount, shipping_fee, total_amount, 
+          status, notes
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
+        [
+          orderNumber,
+          customerId_db,
+          storeIdValue,
+          deliveryType,
+          deliveryAddress,
+          deliveryCity,
+          deliveryPhone,
+          paymentMethodNormalized,
+          subtotalValue,
+          discountAmount,
+          shippingFee,
+          totalAmount,
+          notesValue
+        ]
+      );
+      
+      const orderId_db = orderResult.insertId;
+      
+      // Create order items
+      for (const item of orderItems) {
+        await conn.execute(
+          `INSERT INTO order_items (
+            order_id, product_id, product_name, quantity, unit_price, subtotal
+          ) VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            orderId_db,
+            item.productId,
+            item.productName,
+            item.quantity,
+            item.unitPrice,
+            item.subtotal
+          ]
+        );
+        
+        // Update sold_count
         await conn.execute(
           'UPDATE products SET sold_count = sold_count + ? WHERE id = ?',
-          [item.quantity, item.product_id]
+          [item.quantity, item.productId]
         );
       }
       
-      // Xóa cart items
-      await conn.execute('DELETE FROM cart_items WHERE cart_id = ?', [cart.id]);
-      
-      // Cập nhật customer stats
+      // Update customer stats
       await conn.execute(
-        `UPDATE customers SET total_orders = total_orders + 1, total_spent = total_spent + ?, last_order_date = NOW()
-         WHERE user_id = ?`,
-        [totalAmount, userId]
+        `UPDATE customers SET 
+          total_orders = total_orders + 1, 
+          total_spent = total_spent + ?, 
+          last_order_date = NOW()
+         WHERE id = ?`,
+        [totalAmount, customerId_db]
       );
       
-      return orderId;
+      return orderId_db;
     });
     
     const [order] = await query('SELECT * FROM orders WHERE id = ?', [result]);
@@ -123,8 +270,14 @@ export const getUserOrders = async (req, res, next) => {
     const { page = 1, limit = 10, status } = req.query;
     const offset = (page - 1) * limit;
     
-    let sql = 'SELECT * FROM orders WHERE user_id = ?';
-    const params = [userId];
+    // Get customer_id from user_id
+    const [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
+    if (!customer) {
+      return errorResponse(res, 'Không tìm thấy thông tin khách hàng', 404);
+    }
+    
+    let sql = 'SELECT * FROM orders WHERE customer_id = ?';
+    const params = [customer.id];
     
     if (status) {
       sql += ' AND status = ?';
@@ -149,22 +302,54 @@ export const getUserOrders = async (req, res, next) => {
 export const getOrderById = async (req, res, next) => {
   try {
     const userId = req.user.id;
+    const userRole = req.user.role_name?.toLowerCase();
     const { id } = req.params;
     
-    const [order] = await query(
-      `SELECT o.*, s.name as store_name, s.address as store_address
-       FROM orders o
-       LEFT JOIN stores s ON o.store_id = s.id
-       WHERE o.id = ? AND o.user_id = ?`,
-      [id, userId]
-    );
+    const isAdminOrStaff = userRole === 'admin' || userRole === 'staff';
+    
+    let order;
+    let sql = `SELECT o.*, s.name as store_name, s.address as store_address
+               FROM orders o
+               LEFT JOIN stores s ON o.store_id = s.id
+               WHERE o.id = ?`;
+    let params = [id];
+    
+    if (!isAdminOrStaff) {
+      let [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
+      
+      if (!customer) {
+        try {
+          await query(
+            'INSERT INTO customers (user_id, classification) VALUES (?, ?)',
+            [userId, 'new']
+          );
+          [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
+        } catch (error) {
+          [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
+        }
+        
+        if (!customer) {
+          return errorResponse(res, 'Không tìm thấy thông tin khách hàng', 404);
+        }
+      }
+      
+      sql += ' AND o.customer_id = ?';
+      params.push(customer.id);
+    }
+    
+    const [orderResult] = await query(sql, params);
+    order = orderResult;
     
     if (!order) {
       return errorResponse(res, 'Không tìm thấy đơn hàng', 404);
     }
     
     const items = await query(
-      `SELECT oi.*, p.name as product_name, p.image_url
+      `SELECT oi.*, p.name as product_name, 
+              (SELECT image_url FROM product_images 
+               WHERE product_id = p.id 
+               ORDER BY is_primary DESC, display_order ASC 
+               LIMIT 1) as image_url
        FROM order_items oi
        JOIN products p ON oi.product_id = p.id
        WHERE oi.order_id = ?`,
@@ -179,23 +364,65 @@ export const getOrderById = async (req, res, next) => {
   }
 };
 
-// CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG (Staff/Admin only)
 export const updateOrderStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, paymentStatus } = req.body;
     
-    const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
-    if (!validStatuses.includes(status)) {
-      return errorResponse(res, 'Trạng thái không hợp lệ', 400);
+    // Validate that at least one field is provided
+    if (!status && !paymentStatus) {
+      return errorResponse(res, 'Cần cung cấp ít nhất một trường: status hoặc paymentStatus', 400);
     }
     
-    const [order] = await query('SELECT id, status FROM orders WHERE id = ?', [id]);
+    // Validate status if provided
+    if (status) {
+      const validStatuses = ['pending', 'confirmed', 'packing', 'shipping', 'completed', 'cancelled'];
+      if (!validStatuses.includes(status)) {
+        return errorResponse(res, 'Trạng thái không hợp lệ', 400);
+      }
+    }
+    
+    // Validate paymentStatus if provided
+    if (paymentStatus) {
+      const validPaymentStatuses = ['pending', 'paid', 'refunded'];
+      if (!validPaymentStatuses.includes(paymentStatus)) {
+        return errorResponse(res, 'Trạng thái thanh toán không hợp lệ', 400);
+      }
+    }
+    
+    const [order] = await query('SELECT id, status, payment_status FROM orders WHERE id = ?', [id]);
     if (!order) {
       return errorResponse(res, 'Không tìm thấy đơn hàng', 404);
     }
     
-    await query('UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?', [status, id]);
+    // Build update query dynamically
+    const updateFields = [];
+    const updateValues = [];
+    
+    if (status) {
+      updateFields.push('status = ?');
+      updateValues.push(status);
+      
+      // Update timestamps based on status
+      if (status === 'confirmed') {
+        updateFields.push('confirmed_at = NOW()');
+      } else if (status === 'completed') {
+        updateFields.push('completed_at = NOW()');
+      }
+    }
+    
+    if (paymentStatus) {
+      updateFields.push('payment_status = ?');
+      updateValues.push(paymentStatus);
+    }
+    
+    updateFields.push('updated_at = NOW()');
+    updateValues.push(id);
+    
+    await query(
+      `UPDATE orders SET ${updateFields.join(', ')} WHERE id = ?`,
+      updateValues
+    );
     
     const [updated] = await query('SELECT * FROM orders WHERE id = ?', [id]);
     
@@ -205,15 +432,20 @@ export const updateOrderStatus = async (req, res, next) => {
   }
 };
 
-// HỦY ĐƠN HÀNG (Customer)
 export const cancelOrder = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
     
+    // Get customer_id from user_id
+    const [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
+    if (!customer) {
+      return errorResponse(res, 'Không tìm thấy thông tin khách hàng', 404);
+    }
+    
     const [order] = await query(
-      'SELECT id, status FROM orders WHERE id = ? AND user_id = ?',
-      [id, userId]
+      'SELECT id, status FROM orders WHERE id = ? AND customer_id = ?',
+      [id, customer.id]
     );
     
     if (!order) {
@@ -232,7 +464,6 @@ export const cancelOrder = async (req, res, next) => {
   }
 };
 
-// LẤY TẤT CẢ ĐƠN HÀNG (Admin/Staff)
 export const getAllOrders = async (req, res, next) => {
   try {
     const { page = 1, limit = 20, status, store_id, search } = req.query;
@@ -241,7 +472,8 @@ export const getAllOrders = async (req, res, next) => {
     let sql = `
       SELECT o.*, u.email, u.full_name as customer_name, s.name as store_name
       FROM orders o
-      JOIN users u ON o.user_id = u.id
+      JOIN customers c ON o.customer_id = c.id
+      JOIN users u ON c.user_id = u.id
       LEFT JOIN stores s ON o.store_id = s.id
       WHERE 1=1
     `;

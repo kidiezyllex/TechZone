@@ -166,5 +166,6 @@ router.get('/all/list', authenticate, authorize(['Admin', 'Staff']), getAllOrder
  *         description: Trạng thái đơn hàng được cập nhật
  */
 router.put('/:id/status', authenticate, authorize(['Admin', 'Staff']), updateOrderStatus);
+router.patch('/:id/status', authenticate, authorize(['Admin', 'Staff']), updateOrderStatus);
 
 export default router;
