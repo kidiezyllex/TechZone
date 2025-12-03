@@ -5,7 +5,7 @@ import { hashPassword } from '../utils/bcrypt.js';
 
 export const createOrder = async (req, res, next) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id; // Optional: user might not be authenticated
     const {
       orderId,
       customerId,
@@ -33,6 +33,11 @@ export const createOrder = async (req, res, next) => {
     
     if (!paymentMethod) {
       return errorResponse(res, 'Phương thức thanh toán không được để trống', 400);
+    }
+    
+    // customerId is required if user is not authenticated
+    if (!userId && !customerId) {
+      return errorResponse(res, 'customerId là bắt buộc khi không có xác thực', 400);
     }
     
     let user_id_to_use = userId;

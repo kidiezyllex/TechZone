@@ -138,4 +138,109 @@ router.get('/orders/by-status', authenticate, authorize(['Admin', 'Manager', 'St
  */
 router.get('/export', authenticate, authorize(['Admin', 'Manager', 'Staff']), statsController.exportReport);
 
+/**
+ * @swagger
+ * /api/stats/cost:
+ *   get:
+ *     summary: Báo cáo chi phí nhập hàng
+ *     tags: [8. Statistics - Thống Kê & Báo Cáo]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: store_id
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: from_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: to_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: period
+ *         schema:
+ *           type: string
+ *           enum: [day, month, year]
+ *           default: day
+ *     responses:
+ *       200:
+ *         description: Báo cáo chi phí nhập hàng
+ */
+router.get('/cost', authenticate, authorize(['Admin', 'Manager', 'Staff']), statsController.getCostReport);
+
+/**
+ * @swagger
+ * /api/stats/profit:
+ *   get:
+ *     summary: Báo cáo lợi nhuận (Revenue - Cost)
+ *     tags: [8. Statistics - Thống Kê & Báo Cáo]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: store_id
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: from_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: to_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: period
+ *         schema:
+ *           type: string
+ *           enum: [day, month, year]
+ *           default: day
+ *     responses:
+ *       200:
+ *         description: Báo cáo lợi nhuận
+ */
+router.get('/profit', authenticate, authorize(['Admin', 'Manager', 'Staff']), statsController.getProfitReport);
+
+/**
+ * @swagger
+ * /api/stats/reviews:
+ *   get:
+ *     summary: Thống kê đánh giá sản phẩm
+ *     tags: [8. Statistics - Thống Kê & Báo Cáo]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: product_id
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: from_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: to_date
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: min_rating
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 5
+ *     responses:
+ *       200:
+ *         description: Thống kê đánh giá sản phẩm
+ */
+router.get('/reviews', authenticate, authorize(['Admin', 'Manager', 'Staff']), statsController.getReviewStats);
+
 export default router;

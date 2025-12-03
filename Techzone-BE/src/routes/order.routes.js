@@ -17,8 +17,6 @@ const router = express.Router();
  *   post:
  *     summary: Tạo đơn hàng mới (Checkout)
  *     tags: [3. Cart & Orders - Quản lý Đơn Hàng]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -43,7 +41,7 @@ const router = express.Router();
  *       201:
  *         description: Đơn hàng được tạo thành công
  */
-router.post('/', authenticate, createOrder);
+router.post('/', createOrder);
 
 /**
  * @swagger

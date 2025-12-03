@@ -13,8 +13,18 @@ export const getInventoryByStore = async (req, res, next) => {
 
     const offset = (page - 1) * limit;
     let sql = `
-      SELECT i.id, i.product_id, i.store_id, i.quantity, i.reorder_level, i.last_restocked,
-             p.name, p.sku, p.price, c.name as category_name, s.name as store_name
+      SELECT 
+        i.id,
+        i.product_id,
+        i.store_id,
+        i.quantity,
+        i.reserved_quantity,
+        i.updated_at AS last_restocked,
+        p.name,
+        p.sku,
+        p.selling_price AS price,
+        c.name AS category_name,
+        s.name AS store_name
       FROM inventory i
       JOIN products p ON i.product_id = p.id
       JOIN categories c ON p.category_id = c.id
@@ -74,21 +84,15 @@ export const importInventory = async (req, res, next) => {
 
       if (inventory) {
         await conn.execute(
-          'UPDATE inventory SET quantity = quantity + ?, last_restocked = NOW() WHERE id = ?',
+          'UPDATE inventory SET quantity = quantity + ?, updated_at = NOW() WHERE id = ?',
           [quantity, inventory.id]
         );
       } else {
         await conn.execute(
-          'INSERT INTO inventory (product_id, store_id, quantity, reorder_level, last_restocked) VALUES (?, ?, ?, ?, NOW())',
-          [product_id, store_id, quantity, 10]
+          'INSERT INTO inventory (product_id, store_id, quantity, reserved_quantity, updated_at) VALUES (?, ?, ?, ?, NOW())',
+          [product_id, store_id, quantity, 0]
         );
       }
-
-      // Log nhập kho
-      await conn.execute(
-        'INSERT INTO inventory_logs (product_id, store_id, type, quantity, supplier_id, notes) VALUES (?, ?, ?, ?, ?, ?)',
-        [product_id, store_id, 'import', quantity, supplier_id || null, notes || null]
-      );
 
       return { success: true, product_id, store_id, quantity };
     });
@@ -124,14 +128,8 @@ export const exportInventory = async (req, res, next) => {
 
       // Cập nhật inventory
       await conn.execute(
-        'UPDATE inventory SET quantity = quantity - ? WHERE id = ?',
+        'UPDATE inventory SET quantity = quantity - ?, updated_at = NOW() WHERE id = ?',
         [quantity, inventory.id]
-      );
-
-      // Log xuất kho
-      await conn.execute(
-        'INSERT INTO inventory_logs (product_id, store_id, type, quantity, notes) VALUES (?, ?, ?, ?, ?)',
-        [product_id, store_id, reason, quantity, notes || null]
       );
 
       return { success: true, product_id, store_id, quantity };
@@ -153,20 +151,20 @@ export const getInventoryLogs = async (req, res, next) => {
     const offset = (page - 1) * limit;
 
     let sql = `
-      SELECT il.*, p.name as product_name, s.name as store_name
-      FROM inventory_logs il
-      JOIN products p ON il.product_id = p.id
-      JOIN stores s ON il.store_id = s.id
+      SELECT sm.*, p.name as product_name, s.name as store_name
+      FROM stock_movements sm
+      JOIN products p ON sm.product_id = p.id
+      JOIN stores s ON sm.store_id = s.id
       WHERE 1=1
     `;
     const params = [];
 
     if (store_id) {
-      sql += ' AND il.store_id = ?';
+      sql += ' AND sm.store_id = ?';
       params.push(store_id);
     }
     if (product_id) {
-      sql += ' AND il.product_id = ?';
+      sql += ' AND sm.product_id = ?';
       params.push(product_id);
     }
 
@@ -174,7 +172,7 @@ export const getInventoryLogs = async (req, res, next) => {
     const [countResult] = await query(countSql, params);
     const total = countResult.total;
 
-    sql += ' ORDER BY il.created_at DESC LIMIT ? OFFSET ?';
+    sql += ' ORDER BY sm.created_at DESC LIMIT ? OFFSET ?';
     params.push(limit, offset);
 
     const [data] = await query(sql, params);
@@ -195,16 +193,22 @@ export const getLowStockProducts = async (req, res, next) => {
     }
 
     const sql = `
-      SELECT i.id, i.product_id, i.quantity, i.reorder_level,
-             p.name, p.sku, p.price, c.name as category_name
+      SELECT 
+        i.id,
+        i.product_id,
+        i.quantity,
+        p.name,
+        p.sku,
+        p.selling_price AS price,
+        c.name AS category_name
       FROM inventory i
       JOIN products p ON i.product_id = p.id
       JOIN categories c ON p.category_id = c.id
-      WHERE i.store_id = ? AND i.quantity < i.reorder_level AND p.is_active = TRUE
+      WHERE i.store_id = ? AND i.quantity < 5 AND p.is_active = TRUE
       ORDER BY i.quantity ASC
     `;
 
-    const [data] = await query(sql, [store_id]);
+    const data = await query(sql, [store_id]);
 
     return successResponse(res, data, 'Danh sách sản phẩm cần nhập kho');
   } catch (error) {
