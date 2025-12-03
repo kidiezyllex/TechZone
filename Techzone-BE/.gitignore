@@ -32,3 +32,6 @@ vite.config.ts.*
 
 package-lock.json
 pnpm-lock.yaml
+.md
+md/
+md
