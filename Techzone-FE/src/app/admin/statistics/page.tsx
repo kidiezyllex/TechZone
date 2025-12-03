@@ -1,29 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@mdi/react';
 import {
-  mdiCashMultiple, mdiPackageVariantClosed, mdiAccountGroup, mdiTrendingUp,
-  mdiCalendarRange, mdiChartBar, mdiSync, mdiFilterOutline, mdiLoading, mdiEye
+  mdiCashMultiple,
+  mdiPackageVariantClosed,
+  mdiAccountGroup,
+  mdiTrendingUp,
+  mdiStore,
+  mdiChartDonut,
+  mdiClipboardTextClock,
 } from '@mdi/js';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useStatistics, useRevenueReport, useTopProducts, useGenerateDailyStatistics, useStatisticsDetail } from '@/hooks/statistics';
-import { useAccounts } from '@/hooks/account';
-import { IStatisticsFilter, IRevenueReportFilter, ITopProductsFilter } from '@/interface/request/statistics';
-import { useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   BarChart,
   Bar,
@@ -37,187 +36,196 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
+import {
+  useRevenueByStore,
+  useRevenueByCategory,
+  useRevenueOverTime,
+  useDashboard,
+  useCostReport,
+  useExportReport,
+  useInventoryByStore,
+  useLowStock,
+  useInventoryLogs,
+  useCustomers,
+  useCustomerDetail,
+  useOrdersByStatus,
+  useReviewsStats,
+  useProfitReport,
+} from '@/hooks/statistics';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
-export default function StatisticsPage() {
-  const [statisticsFilters, setStatisticsFilters] = useState<IStatisticsFilter>({
-    type: 'MONTHLY',
-    page: 1,
-    limit: 10
-  });
-  const [revenueFilters, setRevenueFilters] = useState<IRevenueReportFilter>({
-    type: 'MONTHLY',
-    startDate: new Date(new Date().getFullYear(), new Date().getMonth() - 5, 1).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0]
-  });
-  const [topProductsFilters, setTopProductsFilters] = useState<ITopProductsFilter>({
-    startDate: new Date(new Date().getFullYear(), new Date().getMonth() - 2, 1).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
-    limit: 10
-  });
-  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
-  const [generateDate, setGenerateDate] = useState(new Date().toISOString().split('T')[0]);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [selectedStatisticsId, setSelectedStatisticsId] = useState<string | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
-  const queryClient = useQueryClient();
-
-
-  const overviewFilters: IStatisticsFilter = {
-    type: 'MONTHLY',
-    startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
-    limit: 1
-  };
-
-
-  const { data: statisticsData, isLoading: statisticsLoading, isError: statisticsError } = useStatistics(statisticsFilters);
-  const { data: overviewStatistics, isLoading: overviewLoading, isError: overviewError } = useStatistics(overviewFilters);
-  const { data: revenueData, isLoading: revenueLoading, isError: revenueError } = useRevenueReport(revenueFilters);
-  const { data: topProductsData, isLoading: topProductsLoading, isError: topProductsError } = useTopProducts(topProductsFilters);
-  const generateDailyStatistics = useGenerateDailyStatistics();
-  const { data: accountsData } = useAccounts({ role: 'CUSTOMER' });
-  const { data: statisticsDetailData, isLoading: isDetailLoading } = useStatisticsDetail(selectedStatisticsId || '');
-
-  const handleRevenueFilterChange = (key: keyof IRevenueReportFilter, value: any) => {
-    setRevenueFilters({ ...revenueFilters, [key]: value });
-  };
-
-  const handleTopProductsFilterChange = (key: keyof ITopProductsFilter, value: any) => {
-    setTopProductsFilters({ ...topProductsFilters, [key]: value });
-  };
-
-  const handleChangePage = (newPage: number) => {
-    setStatisticsFilters({ ...statisticsFilters, page: newPage });
-  };
-
-  const handleViewDetail = (statisticsId: string) => {
-    setSelectedStatisticsId(statisticsId);
-    setIsDetailModalOpen(true);
-  };
-
-  const handleGenerateStatistics = async () => {
-    try {
-      await generateDailyStatistics.mutateAsync({ date: generateDate }, {
-        onSuccess: () => {
-          toast.success('Đã tạo thống kê thành công');
-          queryClient.invalidateQueries({ queryKey: ['statistics'] });
-          queryClient.invalidateQueries({ queryKey: ['revenueReport'] });
-          queryClient.invalidateQueries({ queryKey: ['topProducts'] });
-          setIsGenerateDialogOpen(false);
-        },
-      });
-    } catch (error) {
-      toast.error('Tạo thống kê thất bại');
-    }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(new Date(dateString));
-  };
-
-  const formatPercentChange = (value: number) => {
-    return value > 0
-      ? <span className="text-primary">+{value.toFixed(2)}%</span>
-      : <span className="text-red-600">{value.toFixed(2)}%</span>;
-  };
-
-  interface StatCardProps {
-    title: string;
-    value: string | number;
-    icon: string;
-    iconColor: string;
-    bgColor: string;
-    change: number;
+const normalizeToArray = <T,>(data: T | T[] | null | undefined): T[] => {
+  if (Array.isArray(data)) {
+    return data;
   }
 
+  if (data && typeof data === 'object') {
+    return [data as T];
+  }
 
-  const StatCard = ({ title, value, icon, iconColor, bgColor, change }: StatCardProps) => {
-    return (
-      <Card className="h-full">
-        <CardContent className="p-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-base text-maintext">{title}</p>
-              <h3 className="text-2xl font-bold mt-2 text-maintext">{value}</h3>
-              <div className="flex items-center mt-2">
-                <Icon
-                  path={change >= 0 ? mdiTrendingUp : mdiTrendingUp}
-                  size={0.7}
-                  className={change >= 0 ? 'text-primary' : 'text-red-600'}
-                />
-                <span className={`text-sm ml-1 ${change >= 0 ? 'text-primary' : 'text-red-600'}`}>
-                  {Math.abs(change).toFixed(1)}% {change >= 0 ? 'tăng' : 'giảm'}
-                </span>
-              </div>
-            </div>
-            <div
-              className={`${bgColor} w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0`}
-            >
-              <Icon path={icon} size={1} className={iconColor} />
+  return [];
+};
+
+const toNumberValue = (value: number | string | null | undefined): number => {
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = parseFloat(value);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+
+  return 0;
+};
+
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: string;
+  iconColor: string;
+  bgColor: string;
+  change: number;
+}
+
+const StatCard = ({ title, value, icon, iconColor, bgColor, change }: StatCardProps) => {
+  return (
+    <Card className="h-full">
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-base text-maintext">{title}</p>
+            <h3 className="text-2xl font-bold mt-2 text-maintext">{value}</h3>
+            <div className="flex items-center mt-2">
+              <Icon
+                path={mdiTrendingUp}
+                size={0.7}
+                className={change >= 0 ? 'text-primary' : 'text-red-600'}
+              />
+              <span className={`text-sm ml-1 ${change >= 0 ? 'text-primary' : 'text-red-600'}`}>
+                {Math.abs(change).toFixed(1)}% {change >= 0 ? 'tăng' : 'giảm'}
+              </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    );
-  };
+          <div
+            className={`${bgColor} w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0`}
+          >
+            <Icon path={icon} size={1} className={iconColor} />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(amount);
 
-  const currentMonthData = statisticsData?.data?.statistics?.[0] || { totalOrders: 0, totalRevenue: 0, totalProfit: 0 };
+const formatDate = (dateString: string) =>
+  new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(new Date(dateString));
 
+export default function StatisticsPage() {
+  const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'products' | 'statistics'>(
+    'overview',
+  );
+  const [selectedStoreId] = useState<number | undefined>(1);
 
-  const totalRevenue = revenueData?.data?.reduce((sum: number, item: any) => sum + item.totalRevenue, 0) || currentMonthData.totalRevenue || 0;
+  const {
+    data: dashboardData,
+    isLoading: dashboardLoading,
+    isError: dashboardError,
+  } = useDashboard({});
+  const {
+    data: profitReportData,
+    isLoading: profitLoading,
+    isError: profitError,
+  } = useProfitReport({ store_id: selectedStoreId, period: 'month' });
 
+  const {
+    data: revenueOverTimeData,
+    isLoading: revenueOverTimeLoading,
+    isError: revenueOverTimeError,
+  } = useRevenueOverTime({ period: 'day', store_id: selectedStoreId });
 
-  const newCustomersCount = accountsData?.data?.accounts?.filter(account => {
-    const accountDate = new Date(account.createdAt);
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-    return accountDate.getMonth() === currentMonth && accountDate.getFullYear() === currentYear;
-  }).length || 0;
+  const { data: revenueByStoreData } = useRevenueByStore({});
+  const { data: revenueByCategoryData } = useRevenueByCategory({});
+  const { data: costReportData, isLoading: costLoading } = useCostReport({
+    store_id: selectedStoreId,
+    period: 'month',
+  });
+  const { data: exportSalesData } = useExportReport({
+    report_type: 'sales',
+    store_id: selectedStoreId,
+  });
+  const { data: exportInventoryData } = useExportReport({
+    report_type: 'inventory',
+    store_id: selectedStoreId,
+  });
 
+  const {
+    data: inventoryByStoreData,
+    isLoading: inventoryLoading,
+  } = useInventoryByStore({ store_id: selectedStoreId!, page: 1, limit: 5 });
+  const { data: lowStockData } = useLowStock({ store_id: selectedStoreId! });
+  const { data: inventoryLogsData } = useInventoryLogs({ store_id: selectedStoreId, limit: 5 });
 
-  const mockRevenueData = revenueData?.data?.length ? revenueData.data : [
-    { date: '2025-01', totalRevenue: currentMonthData.totalRevenue, totalOrders: currentMonthData.totalOrders },
-    { date: '2025-02', totalRevenue: 0, totalOrders: 0 },
-    { date: '2025-03', totalRevenue: 0, totalOrders: 0 },
-  ];
+  const { data: customersData } = useCustomers({ page: 1, limit: 5 });
+  const customersList = normalizeToArray(customersData?.data);
+  const firstCustomerId = customersList[0]?.id;
+  const { data: customerDetailData } = useCustomerDetail(firstCustomerId || '');
 
+  const { data: ordersByStatusData } = useOrdersByStatus({ store_id: selectedStoreId });
+  const { data: reviewsStatsData } = useReviewsStats({});
 
-  const mockTopProductsData = topProductsData?.data?.length ? topProductsData.data : [
-    {
-      product: { id: '1', name: 'Sản phẩm mẫu 1', brand: { id: '1', name: 'Uniqlo' } },
-      totalQuantity: 10,
-      totalRevenue: 1000000
-    },
-    {
-      product: { id: '2', name: 'Sản phẩm mẫu 2', brand: { id: '2', name: 'Prada' } },
-      totalQuantity: 8,
-      totalRevenue: 800000
-    },
-    {
-      product: { id: '3', name: 'Sản phẩm mẫu 3', brand: { id: '3', name: 'Balenciaga' } },
-      totalQuantity: 5,
-      totalRevenue: 500000
-    }
-  ];
+  const totalRevenue = toNumberValue(dashboardData?.data?.total_revenue);
+  const totalOrders = toNumberValue(dashboardData?.data?.total_orders);
+  const newCustomersCount = toNumberValue(dashboardData?.data?.new_customers);
+
+  const profitTotals = profitReportData?.data.totals;
+  const currentMonthProfit = toNumberValue(profitTotals?.total_profit);
+
+  const revenueOverTimeRaw =
+    (Array.isArray(revenueOverTimeData?.data)
+      ? revenueOverTimeData?.data
+      : Array.isArray((revenueOverTimeData as any)?.data?.data)
+        ? (revenueOverTimeData as any).data.data
+        : []) || [];
+
+  const revenueSeries =
+    revenueOverTimeRaw.map((item: any) => ({
+      period: item.period,
+      revenue: toNumberValue(item.revenue),
+      orders: toNumberValue(item.orders),
+    })) || [];
+
+  const topProductsRaw = dashboardData?.data?.top_products;
+  const topProductsFromDashboard = normalizeToArray(topProductsRaw).map((item: any) => ({
+    ...item,
+    total_sold: toNumberValue(item.total_sold),
+    revenue: toNumberValue(item.revenue),
+  }));
+
+  const revenueByStoreList = normalizeToArray(revenueByStoreData?.data);
+  const revenueByCategoryList = normalizeToArray(revenueByCategoryData?.data);
+  const costSummaryList = normalizeToArray(costReportData?.data?.summary);
+  const inventoryByStoreList = normalizeToArray(inventoryByStoreData?.data);
+  const lowStockList = normalizeToArray(lowStockData?.data);
+  const inventoryLogsList = normalizeToArray(inventoryLogsData?.data);
+  const ordersByStatusList = normalizeToArray(ordersByStatusData?.data);
+
+  const totalRevenueFromSeries = revenueSeries.reduce((sum, item) => sum + toNumberValue(item.revenue), 0);
+  const totalOrdersFromSeries = revenueSeries.reduce((sum, item) => sum + toNumberValue(item.orders), 0);
 
   return (
     <div className="space-y-4">
@@ -233,66 +241,18 @@ export default function StatisticsPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-
-        <Dialog open={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline">
-              <Icon path={mdiSync} size={0.7} className="mr-2" />
-              Tạo thống kê
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Tạo thống kê thủ công</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="generateDate">Chọn ngày cần tạo thống kê</Label>
-                <Input
-                  id="generateDate"
-                  type="date"
-                  value={generateDate}
-                  onChange={(e) => setGenerateDate(e.target.value)}
-                />
-              </div>
-              <p className="text-sm text-maintext">
-                Lưu ý: Chức năng này thường được hệ thống tự động thực hiện. Chỉ sử dụng khi cần thiết.
-              </p>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsGenerateDialogOpen(false)}
-              >
-                Hủy
-              </Button>
-              <Button
-                onClick={handleGenerateStatistics}
-                disabled={generateDailyStatistics.isPending}
-              >
-                {generateDailyStatistics.isPending ? (
-                  <>
-                    <Icon path={mdiLoading} size={0.7} className="mr-2 animate-spin" />
-                    Đang xử lý...
-                  </>
-                ) : (
-                  'Tạo thống kê'
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
 
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs defaultValue="overview" value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="space-y-4">
         <TabsList className="grid grid-cols-4 w-full max-w-6xl">
           <TabsTrigger value="overview">Tổng quan</TabsTrigger>
           <TabsTrigger value="revenue">Doanh thu</TabsTrigger>
           <TabsTrigger value="products">Sản phẩm</TabsTrigger>
-          <TabsTrigger value="statistics">Lịch sử</TabsTrigger>
+          <TabsTrigger value="statistics">Thống kê chi tiết</TabsTrigger>
         </TabsList>
+
         <TabsContent value="overview" className="space-y-4">
-          {statisticsLoading || revenueLoading || overviewLoading ? (
+          {dashboardLoading || profitLoading || revenueOverTimeLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               {[...Array(4)].map((_, index) => (
                 <Card key={index} className="h-full">
@@ -304,7 +264,7 @@ export default function StatisticsPage() {
                 </Card>
               ))}
             </div>
-          ) : statisticsError || revenueError || overviewError ? (
+          ) : dashboardError || revenueOverTimeError || profitError ? (
             <Card className="p-4">
               <p className="text-red-600">Lỗi khi tải dữ liệu thống kê</p>
             </Card>
@@ -320,7 +280,7 @@ export default function StatisticsPage() {
               />
               <StatCard
                 title="Số đơn hàng"
-                value={currentMonthData?.totalOrders?.toString() || "0"}
+                value={totalOrders.toString()}
                 icon={mdiPackageVariantClosed}
                 iconColor="text-blue-600"
                 bgColor="bg-blue-100"
@@ -328,7 +288,7 @@ export default function StatisticsPage() {
               />
               <StatCard
                 title="Lợi nhuận"
-                value={formatCurrency(currentMonthData?.totalProfit || 0)}
+                value={formatCurrency(currentMonthProfit)}
                 icon={mdiTrendingUp}
                 iconColor="text-purple-600"
                 bgColor="bg-purple-100"
@@ -353,15 +313,9 @@ export default function StatisticsPage() {
               <CardContent className="p-4">
                 <div className="w-full h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={mockRevenueData.map((item) => ({
-                        date: item.date,
-                        revenue: item.totalRevenue
-                      }))}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
+                    <LineChart data={revenueSeries} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
+                      <XAxis dataKey="period" />
                       <YAxis />
                       <Tooltip formatter={(value: number) => formatCurrency(value)} />
                       <Legend />
@@ -381,15 +335,12 @@ export default function StatisticsPage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={mockTopProductsData.slice(0, 5).map((item, index) => ({
-                          name: item.product?.name
-                            ? (item.product.name.length > 20
-                              ? `${item.product.name.substring(0, 20)}...`
-                              : item.product.name)
-                            : `Sản phẩm ${index + 1}`,
-                          fullName: item.product?.name || `Sản phẩm ${index + 1}`,
-                          quantity: item.totalQuantity,
-                          revenue: item.totalRevenue
+                        data={topProductsFromDashboard.slice(0, 5).map((item) => ({
+                          name:
+                            item.name.length > 20 ? `${item.name.substring(0, 20)}...` : item.name,
+                          fullName: item.name,
+                          quantity: item.total_sold,
+                          revenue: item.revenue,
                         }))}
                         cx="50%"
                         cy="50%"
@@ -401,14 +352,14 @@ export default function StatisticsPage() {
                         }
                         labelLine={false}
                       >
-                        {mockTopProductsData.slice(0, 5).map((entry, index) => (
+                        {topProductsFromDashboard.slice(0, 5).map((_, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
                       <Tooltip
                         formatter={(value: number, name: string, props: any) => [
                           `${value} sản phẩm`,
-                          props.payload.fullName || name
+                          props.payload.fullName || name,
                         ]}
                         labelFormatter={() => 'Sản phẩm bán chạy'}
                       />
@@ -428,62 +379,25 @@ export default function StatisticsPage() {
             </Card>
           </div>
         </TabsContent>
+
         <TabsContent value="revenue" className="space-y-4">
           <Card className="mb-4">
             <CardHeader>
               <CardTitle>Báo cáo doanh thu</CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <Label htmlFor="revType">Loại thống kê</Label>
-                  <Select
-                    value={revenueFilters.type || 'MONTHLY'}
-                    onValueChange={(value) => handleRevenueFilterChange('type', value)}
-                  >
-                    <SelectTrigger id="revType">
-                      <SelectValue placeholder="Chọn loại thống kê" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="DAILY">Theo ngày</SelectItem>
-                      <SelectItem value="WEEKLY">Theo tuần</SelectItem>
-                      <SelectItem value="MONTHLY">Theo tháng</SelectItem>
-                      <SelectItem value="YEARLY">Theo năm</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="startDate">Từ ngày</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={revenueFilters.startDate}
-                    onChange={(e) => handleRevenueFilterChange('startDate', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="endDate">Đến ngày</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={revenueFilters.endDate}
-                    onChange={(e) => handleRevenueFilterChange('endDate', e.target.value)}
-                  />
-                </div>
-              </div>
-
               <div className="p-4 bg-slate-50 rounded-md mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="text-center">
-                    <h3 className="text-lg font-semibold text-maintext">Tổng doanh thu</h3>
+                    <h3 className="text-lg font-semibold text-maintext">Tổng doanh thu (series)</h3>
                     <p className="text-2xl font-bold text-green-500 mt-2">
-                      {formatCurrency(totalRevenue)}
+                      {formatCurrency(totalRevenueFromSeries)}
                     </p>
                   </div>
                   <div className="text-center">
-                    <h3 className="text-lg font-semibold text-maintext">Số đơn hàng</h3>
+                    <h3 className="text-lg font-semibold text-maintext">Số đơn hàng (series)</h3>
                     <p className="text-2xl font-bold mt-2 text-blue-500">
-                      {mockRevenueData.reduce((sum: number, item) => sum + (item.totalOrders || 0), 0)}
+                      {totalOrdersFromSeries}
                     </p>
                   </div>
                 </div>
@@ -491,15 +405,9 @@ export default function StatisticsPage() {
 
               <div className="w-full h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={mockRevenueData.map((item) => ({
-                      date: item.date,
-                      revenue: item.totalRevenue
-                    }))}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                  >
+                  <BarChart data={revenueSeries} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
+                    <XAxis dataKey="period" />
                     <YAxis />
                     <Tooltip formatter={(value: number) => formatCurrency(value)} />
                     <Legend />
@@ -508,21 +416,45 @@ export default function StatisticsPage() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-4">Chi tiết doanh thu</h3>
-                <div className="overflow-x-auto">
+              <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Doanh thu theo chi nhánh</h3>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Thời gian</TableHead>
+                        <TableHead>Chi nhánh</TableHead>
                         <TableHead className="text-right">Doanh thu</TableHead>
+                        <TableHead className="text-right">Số đơn</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {mockRevenueData.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{item.date}</TableCell>
-                          <TableCell className="text-right">{formatCurrency(item.totalRevenue)}</TableCell>
+                      {revenueByStoreList.map((s) => (
+                        <TableRow key={s.id}>
+                          <TableCell>{s.name}</TableCell>
+                          <TableCell className="text-right">{formatCurrency(toNumberValue(s.revenue))}</TableCell>
+                          <TableCell className="text-right">{s.order_count}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Doanh thu theo danh mục</h3>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Danh mục</TableHead>
+                        <TableHead className="text-right">Doanh thu</TableHead>
+                        <TableHead className="text-right">SL bán</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {revenueByCategoryList.map((c) => (
+                        <TableRow key={c.id}>
+                          <TableCell>{c.name}</TableCell>
+                          <TableCell className="text-right">{formatCurrency(toNumberValue(c.revenue))}</TableCell>
+                          <TableCell className="text-right">{c.quantity_sold}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -531,64 +463,87 @@ export default function StatisticsPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Chi phí & xuất báo cáo</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-maintext mb-2">Chi phí nhập hàng (tóm tắt)</h3>
+                {costLoading ? (
+                  <Skeleton className="h-20 w-full" />
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Giai đoạn</TableHead>
+                        <TableHead className="text-right">Chi phí</TableHead>
+                        <TableHead className="text-right">SL phiếu nhập</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {costSummaryList.slice(0, 5).map((item) => (
+                        <TableRow key={item.period + item.store_id}>
+                          <TableCell>{item.period}</TableCell>
+                          <TableCell className="text-right">
+                            {formatCurrency(toNumberValue(item.total_cost))}
+                          </TableCell>
+                          <TableCell className="text-right">{item.purchase_count}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-maintext mb-2">Một vài đơn từ báo cáo xuất</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Mã đơn</TableHead>
+                      <TableHead className="text-right">Tổng tiền</TableHead>
+                      <TableHead>Trạng thái</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {exportSalesData &&
+                      'orders' in exportSalesData.data &&
+                      exportSalesData.data.orders.slice(0, 5).map((o) => (
+                        <TableRow key={o.id}>
+                          <TableCell>{o.id}</TableCell>
+                          <TableCell className="text-right">
+                            {formatCurrency(toNumberValue(o.total_amount))}
+                          </TableCell>
+                          <TableCell>{o.status}</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
+
         <TabsContent value="products" className="space-y-4 text-maintext">
           <Card className="mb-4">
             <CardHeader>
               <CardTitle>Sản phẩm bán chạy</CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <Label htmlFor="prodStartDate">Từ ngày</Label>
-                  <Input
-                    id="prodStartDate"
-                    type="date"
-                    value={topProductsFilters.startDate}
-                    onChange={(e) => handleTopProductsFilterChange('startDate', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="prodEndDate">Đến ngày</Label>
-                  <Input
-                    id="prodEndDate"
-                    type="date"
-                    value={topProductsFilters.endDate}
-                    onChange={(e) => handleTopProductsFilterChange('endDate', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="prodLimit">Số lượng hiển thị</Label>
-                  <Select
-                    value={topProductsFilters.limit?.toString() || '10'}
-                    onValueChange={(value) => handleTopProductsFilterChange('limit', parseInt(value))}
-                  >
-                    <SelectTrigger id="prodLimit">
-                      <SelectValue placeholder="Số lượng hiển thị" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="5">5 sản phẩm</SelectItem>
-                      <SelectItem value="10">10 sản phẩm</SelectItem>
-                      <SelectItem value="20">20 sản phẩm</SelectItem>
-                      <SelectItem value="50">50 sản phẩm</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
               <div className="w-full h-80 mb-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={mockTopProductsData.slice(0, topProductsFilters.limit || 10).map((item, index) => ({
-                        name: item.product?.name
-                          ? (item.product.name.length > 20
-                            ? `${item.product.name.substring(0, 20)}...`
-                            : item.product.name)
-                          : `Sản phẩm ${index + 1}`,
-                        fullName: item.product?.name || `Sản phẩm ${index + 1}`,
-                        quantity: item.totalQuantity,
-                        revenue: item.totalRevenue
+                      data={topProductsFromDashboard.slice(0, 10).map((item) => ({
+                        name:
+                          item.name.length > 20
+                            ? `${item.name.substring(0, 20)}...`
+                            : item.name,
+                        fullName: item.name,
+                        quantity: item.total_sold,
+                        revenue: item.revenue,
                       }))}
                       cx="50%"
                       cy="50%"
@@ -600,14 +555,14 @@ export default function StatisticsPage() {
                       }
                       labelLine={false}
                     >
-                      {mockTopProductsData.slice(0, topProductsFilters.limit || 10).map((entry, index) => (
+                      {topProductsFromDashboard.slice(0, 10).map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip
                       formatter={(value: number, name: string, props: any) => [
                         `${value} sản phẩm`,
-                        props.payload.fullName || name
+                        props.payload.fullName || name,
                       ]}
                       labelFormatter={() => 'Sản phẩm bán chạy'}
                     />
@@ -628,13 +583,13 @@ export default function StatisticsPage() {
                 <div className="p-4 bg-blue-50 rounded-lg">
                   <h4 className="text-lg font-semibold text-blue-700 mb-2">Tổng số lượng bán</h4>
                   <p className="text-2xl font-bold text-blue-600">
-                    {mockTopProductsData.reduce((sum: number, item: any) => sum + item.totalQuantity, 0)} sản phẩm
+                    {topProductsFromDashboard.reduce((sum, item) => sum + item.total_sold, 0)} sản phẩm
                   </p>
                 </div>
                 <div className="p-4 bg-green-50 rounded-lg">
                   <h4 className="text-lg font-semibold text-green-700 mb-2">Tổng doanh thu</h4>
                   <p className="text-2xl font-bold text-green-600">
-                    {formatCurrency(mockTopProductsData.reduce((sum: number, item) => sum + item.totalRevenue, 0))}
+                    {formatCurrency(topProductsFromDashboard.reduce((sum, item) => sum + toNumberValue(item.revenue), 0))}
                   </p>
                 </div>
               </div>
@@ -644,18 +599,18 @@ export default function StatisticsPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Tên sản phẩm</TableHead>
-                      <TableHead>Thương hiệu</TableHead>
                       <TableHead className="text-right">Số lượng bán</TableHead>
                       <TableHead className="text-right">Doanh thu</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockTopProductsData.map((item, index) => (
+                    {topProductsFromDashboard.map((item, index) => (
                       <TableRow key={index}>
-                        <TableCell className="font-medium text-maintext">{item.product?.name || `Sản phẩm ${index + 1}`}</TableCell>
-                        <TableCell className="text-maintext">{item.product?.brand?.name || 'Uniqlo'}</TableCell>
-                        <TableCell className="text-right text-maintext">{item.totalQuantity}</TableCell>
-                        <TableCell className="text-right text-maintext">{formatCurrency(item.totalRevenue)}</TableCell>
+                        <TableCell className="font-medium text-maintext">{item.name}</TableCell>
+                        <TableCell className="text-right text-maintext">{item.total_sold}</TableCell>
+                        <TableCell className="text-right text-maintext">
+                          {formatCurrency(toNumberValue(item.revenue))}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -663,229 +618,280 @@ export default function StatisticsPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="statistics" className="space-y-4 text-maintext">
-          <Card className="mb-4">
+
+          <Card>
             <CardHeader>
-              <CardTitle>Lịch sử thống kê</CardTitle>
+              <CardTitle>Khách hàng & đánh giá sản phẩm</CardTitle>
             </CardHeader>
-            <CardContent className="p-4">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                <div>
-                  <Label htmlFor="statsType">Loại thống kê</Label>
-                  <Select
-                    value={statisticsFilters.type || ''}
-                    onValueChange={(value) => setStatisticsFilters({ ...statisticsFilters, type: value as any })}
-                  >
-                    <SelectTrigger id="statsType">
-                      <SelectValue placeholder="Chọn loại thống kê" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Tất cả</SelectItem>
-                      <SelectItem value="DAILY">Theo ngày</SelectItem>
-                      <SelectItem value="WEEKLY">Theo tuần</SelectItem>
-                      <SelectItem value="MONTHLY">Theo tháng</SelectItem>
-                      <SelectItem value="YEARLY">Theo năm</SelectItem>
-                    </SelectContent>
-                  </Select>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2">
+                  <h3 className="font-semibold text-maintext mb-2">Khách hàng gần đây</h3>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tên</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead className="text-right">Tổng chi tiêu</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {customersList.map((c) => (
+                        <TableRow key={c.id}>
+                          <TableCell className="text-maintext">{c.full_name}</TableCell>
+                          <TableCell className="text-maintext">{c.email}</TableCell>
+                          <TableCell className="text-right text-maintext">
+                            {formatCurrency(toNumberValue(c.total_spent))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-                <div>
-                  <Label htmlFor="statsStartDate">Từ ngày</Label>
-                  <Input
-                    id="statsStartDate"
-                    type="date"
-                    value={statisticsFilters.startDate || ''}
-                    onChange={(e) => setStatisticsFilters({ ...statisticsFilters, startDate: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="statsEndDate">Đến ngày</Label>
-                  <Input
-                    id="statsEndDate"
-                    type="date"
-                    value={statisticsFilters.endDate || ''}
-                    onChange={(e) => setStatisticsFilters({ ...statisticsFilters, endDate: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="statsLimit">Số lượng mỗi trang</Label>
-                  <Select
-                    value={statisticsFilters.limit?.toString() || '10'}
-                    onValueChange={(value) => setStatisticsFilters({ ...statisticsFilters, limit: parseInt(value), page: 1 })}
-                  >
-                    <SelectTrigger id="statsLimit">
-                      <SelectValue placeholder="Số lượng mỗi trang" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="10">10 mục</SelectItem>
-                      <SelectItem value="20">20 mục</SelectItem>
-                      <SelectItem value="50">50 mục</SelectItem>
-                      <SelectItem value="100">100 mục</SelectItem>
-                    </SelectContent>
-                  </Select>
+
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-maintext mb-2">Thống kê đánh giá</h3>
+                    <p className="text-sm">
+                      Tổng đánh giá:{' '}
+                      <span className="font-semibold">
+                        {reviewsStatsData?.data.summary.total_reviews || 0}
+                      </span>
+                    </p>
+                    <p className="text-sm">
+                      Điểm trung bình:{' '}
+                      <span className="font-semibold">
+                        {reviewsStatsData?.data.summary.avg_rating || '0.00'}
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {statisticsLoading ? (
-                <Skeleton className="h-80 w-full" />
-              ) : statisticsError ? (
-                <p className="text-red-600">Lỗi khi tải dữ liệu thống kê</p>
-              ) : !statisticsData?.data?.statistics?.length ? (
-                <div className="flex items-center justify-center h-80 text-maintext">
-                  <p>Không có dữ liệu thống kê</p>
+              {customerDetailData && (
+                <div className="mt-4 p-4 bg-slate-50 rounded-md text-sm">
+                  <h3 className="font-semibold text-maintext mb-2">Chi tiết khách hàng nổi bật</h3>
+                  <p>
+                    {customerDetailData.data.full_name} -{' '}
+                    <span className="text-maintext">{customerDetailData.data.email}</span>
+                  </p>
+                  <p>
+                    Tổng chi tiêu:{' '}
+                    <span className="font-semibold">
+                      {formatCurrency(toNumberValue(customerDetailData.data.total_spent))}
+                    </span>
+                  </p>
                 </div>
-              ) : (
-                <>
-                  <div className="overflow-x-auto">
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="statistics" className="space-y-4 text-maintext">
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle>Đơn hàng theo trạng thái & lợi nhuận</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Icon path={mdiClipboardTextClock} size={0.8} />
+                      Đơn hàng theo trạng thái
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Ngày thống kê</TableHead>
-                          <TableHead>Loại</TableHead>
-                          <TableHead className="text-right">Số đơn hàng</TableHead>
+                          <TableHead>Trạng thái</TableHead>
+                          <TableHead className="text-right">Số đơn</TableHead>
                           <TableHead className="text-right">Doanh thu</TableHead>
-                          <TableHead className="text-right">Lợi nhuận</TableHead>
-                          <TableHead className="text-center">Hành động</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {statisticsData?.data?.statistics?.map((item) => (
-                          <TableRow key={item.id || item.date}>
-                            <TableCell className="font-medium text-maintext">{formatDate(item.date)}</TableCell>
-                            <TableCell className="text-maintext">
-                              <Badge variant="outline">
-                                {item.type === 'DAILY' ? 'Ngày' :
-                                  item.type === 'WEEKLY' ? 'Tuần' :
-                                    item.type === 'MONTHLY' ? 'Tháng' : 'Năm'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-right text-maintext">{item.totalOrders}</TableCell>
-                            <TableCell className="text-right text-maintext">{formatCurrency(item.totalRevenue)}</TableCell>
-                            <TableCell className="text-right text-maintext">{formatCurrency(item.totalProfit)}</TableCell>
-                            <TableCell className="text-center">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleViewDetail(item.id || item.date)}
-                              >
-                                <Icon path={mdiEye} size={0.6} className="mr-1" />
-                                Chi tiết
-                              </Button>
+                        {ordersByStatusList.map((item) => (
+                          <TableRow key={item.status}>
+                            <TableCell className="uppercase">{item.status}</TableCell>
+                            <TableCell className="text-right">{item.count}</TableCell>
+                            <TableCell className="text-right">
+                              {formatCurrency(toNumberValue(item.revenue))}
                             </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Icon path={mdiChartDonut} size={0.8} />
+                      Tổng quan lợi nhuận
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {profitLoading && <Skeleton className="h-24 w-full" />}
+                    {profitError && (
+                      <p className="text-red-600 text-sm">Không thể tải dữ liệu lợi nhuận</p>
+                    )}
+                    {profitTotals && (
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-maintext">Tổng doanh thu</p>
+                          <p className="font-semibold">
+                            {formatCurrency(toNumberValue(profitTotals.total_revenue))}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-maintext">Tổng chi phí</p>
+                          <p className="font-semibold">
+                            {formatCurrency(toNumberValue(profitTotals.total_cost))}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-maintext">Tổng lợi nhuận</p>
+                          <p className="font-semibold text-green-600">
+                            {formatCurrency(toNumberValue(profitTotals.total_profit))}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-maintext">Biên lợi nhuận</p>
+                          <p className="font-semibold">{profitTotals.total_profit_margin}%</p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle>Kho hàng & sản phẩm cần nhập</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-maintext flex items-center gap-2">
+                      <Icon path={mdiStore} size={0.8} />
+                      Tồn kho theo chi nhánh
+                    </h3>
                   </div>
-                  {statisticsData && statisticsData.data.pagination.totalPages > 1 && (
-                    <div className="flex justify-center items-center gap-2 mt-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleChangePage(statisticsData.data.pagination.currentPage - 1)}
-                        disabled={statisticsData.data.pagination.currentPage <= 1}
-                      >
-                        Trước
-                      </Button>
-                      <span className="text-sm text-maintext">
-                        Trang {statisticsData.data.pagination.currentPage} / {statisticsData.data.pagination.totalPages}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleChangePage(statisticsData.data.pagination.currentPage + 1)}
-                        disabled={statisticsData.data.pagination.currentPage >= statisticsData.data.pagination.totalPages}
-                      >
-                        Sau
-                      </Button>
-                    </div>
+                  {inventoryLoading ? (
+                    <Skeleton className="h-40 w-full" />
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Sản phẩm</TableHead>
+                          <TableHead className="text-right">SL</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {inventoryByStoreList.slice(0, 5).map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell className="text-maintext">{item.name}</TableCell>
+                            <TableCell className="text-right text-maintext">
+                              {item.quantity}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   )}
-                </>
-              )}
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-maintext mb-2">Sản phẩm cần nhập kho</h3>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Sản phẩm</TableHead>
+                        <TableHead className="text-right">Tồn kho</TableHead>
+                        <TableHead className="text-right">Ngưỡng</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {lowStockList.slice(0, 5).map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="text-maintext">{item.name}</TableCell>
+                          <TableCell className="text-right text-maintext">
+                            {item.quantity}
+                          </TableCell>
+                          <TableCell className="text-right text-maintext">
+                            {item.reorder_level}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-maintext mb-2">Nhật ký nhập/xuất gần đây</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Thời gian</TableHead>
+                      <TableHead>Sản phẩm</TableHead>
+                      <TableHead>Loại</TableHead>
+                      <TableHead className="text-right">Số lượng</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {inventoryLogsList.slice(0, 5).map((log) => (
+                      <TableRow key={log.id}>
+                        <TableCell>{formatDate(log.created_at)}</TableCell>
+                        <TableCell>{log.product_name}</TableCell>
+                        <TableCell className="uppercase">{log.type}</TableCell>
+                        <TableCell className="text-right">{log.quantity}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-maintext mb-2">Một vài dòng từ báo cáo tồn kho</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Sản phẩm</TableHead>
+                      <TableHead>Chi nhánh</TableHead>
+                      <TableHead className="text-right">Tồn kho</TableHead>
+                      <TableHead className="text-right">Ngưỡng</TableHead>
+                      <TableHead className="text-right">Giá trị tồn</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {exportInventoryData &&
+                      'inventory' in exportInventoryData.data &&
+                      exportInventoryData.data.inventory.slice(0, 5).map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="text-maintext">{item.name}</TableCell>
+                          <TableCell className="text-maintext">{item.store_name}</TableCell>
+                          <TableCell className="text-right text-maintext">{item.quantity}</TableCell>
+                          <TableCell className="text-right text-maintext">
+                            {item.reorder_level}
+                          </TableCell>
+                          <TableCell className="text-right text-maintext">
+                            {formatCurrency(toNumberValue(item.inventory_value))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
-      <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Chi tiết thống kê</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            {isDetailLoading ? (
-              <div className="space-y-4">
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-              </div>
-            ) : statisticsDetailData?.data ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <h4 className="text-sm font-medium text-blue-700">Tổng đơn hàng</h4>
-                    <p className="text-xl font-bold text-blue-600">{statisticsDetailData.data.totalOrders}</p>
-                  </div>
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <h4 className="text-sm font-medium text-green-700">Doanh thu</h4>
-                    <p className="text-xl font-bold text-green-600">{formatCurrency(statisticsDetailData.data.totalRevenue)}</p>
-                  </div>
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <h4 className="text-sm font-medium text-purple-700">Lợi nhuận</h4>
-                    <p className="text-xl font-bold text-purple-600">{formatCurrency(statisticsDetailData.data.totalProfit)}</p>
-                  </div>
-                  <div className="p-4 bg-yellow-50 rounded-lg">
-                    <h4 className="text-sm font-medium text-yellow-700">Khách hàng mới</h4>
-                    <p className="text-xl font-bold text-yellow-600">{statisticsDetailData.data.customerCount?.new || 0}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="text-lg font-semibold mb-2">Thông tin thống kê</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Loại:</span>
-                        <Badge variant="outline">
-                          {statisticsDetailData.data.type === 'DAILY' ? 'Ngày' :
-                            statisticsDetailData.data.type === 'WEEKLY' ? 'Tuần' :
-                              statisticsDetailData.data.type === 'MONTHLY' ? 'Tháng' : 'Năm'}
-                        </Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Ngày thống kê:</span>
-                        <span>{formatDate(statisticsDetailData.data.date)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Tổng khách hàng:</span>
-                        <span>{statisticsDetailData.data.customerCount?.total || 0}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="text-lg font-semibold mb-2">Thông tin bổ sung</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Được tạo:</span>
-                        <span>{formatDate(statisticsDetailData.data.createdAt)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Cập nhật cuối:</span>
-                        <span>{formatDate(statisticsDetailData.data.updatedAt)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-maintext">
-                <p>Không thể tải chi tiết thống kê</p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
-
