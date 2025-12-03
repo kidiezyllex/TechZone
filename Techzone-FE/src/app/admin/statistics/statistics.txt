@@ -1,0 +1,833 @@
+1. http://localhost:8000/api/stats/reviews
+{
+    "success": true,
+    "message": "Lấy thống kê đánh giá thành công",
+    "data": {
+        "summary": {
+            "total_reviews": 30,
+            "avg_rating": "4.53",
+            "rating_5": 18,
+            "rating_4": 10,
+            "rating_3": 2,
+            "rating_2": 0,
+            "rating_1": 0,
+            "verified_reviews": 28
+        },
+        "top_products": [
+            {
+                "id": 22,
+                "name": "Asus TUF Gaming VG27AQ 27 inch",
+                "sku": "ASUS-VG27AQ-27",
+                "review_count": 3,
+                "avg_rating": "5.00",
+                "five_star_count": 3,
+                "verified_count": 3
+            },
+            {
+                "id": 7,
+                "name": "Asus ROG Strix G15",
+                "sku": "ASUS-ROG-STRIX",
+                "review_count": 2,
+                "avg_rating": "5.00",
+                "five_star_count": 2,
+                "verified_count": 2
+            },
+            {
+                "id": 5,
+                "name": "Acer Aspire 7 A715",
+                "sku": "ACER-ASPIRE-7",
+                "review_count": 2,
+                "avg_rating": "5.00",
+                "five_star_count": 2,
+                "verified_count": 1
+            },
+            {
+                "id": 3,
+                "name": "Lenovo ThinkPad X1 Carbon Gen 9",
+                "sku": "LENOVO-THINKPAD-X1",
+                "review_count": 1,
+                "avg_rating": "5.00",
+                "five_star_count": 1,
+                "verified_count": 1
+            },
+            {
+                "id": 18,
+                "name": "Asus Dual GeForce RTX 3060 12GB",
+                "sku": "ASUS-RTX3060-12GB",
+                "review_count": 1,
+                "avg_rating": "5.00",
+                "five_star_count": 1,
+                "verified_count": 1
+            },
+            {
+                "id": 15,
+                "name": "Samsung 970 EVO Plus 500GB",
+                "sku": "SAMSUNG-970-EVO-500GB",
+                "review_count": 1,
+                "avg_rating": "5.00",
+                "five_star_count": 1,
+                "verified_count": 1
+            },
+            {
+                "id": 28,
+                "name": "Corsair K70 RGB MK.2",
+                "sku": "CORSAIR-K70-RGB",
+                "review_count": 1,
+                "avg_rating": "5.00",
+                "five_star_count": 1,
+                "verified_count": 1
+            },
+            {
+                "id": 10,
+                "name": "Intel Core i7-12700K",
+                "sku": "INTEL-I7-12700K",
+                "review_count": 1,
+                "avg_rating": "5.00",
+                "five_star_count": 1,
+                "verified_count": 1
+            },
+            {
+                "id": 2,
+                "name": "HP EliteBook 840 G8",
+                "sku": "HP-ELITEBOOK-840",
+                "review_count": 1,
+                "avg_rating": "5.00",
+                "five_star_count": 1,
+                "verified_count": 1
+            },
+            {
+                "id": 9,
+                "name": "Intel Core i5-12400F",
+                "sku": "INTEL-I5-12400F",
+                "review_count": 1,
+                "avg_rating": "5.00",
+                "five_star_count": 1,
+                "verified_count": 1
+            },
+            {
+                "id": 23,
+                "name": "Logitech G102 Lightsync",
+                "sku": "LOGITECH-G102",
+                "review_count": 1,
+                "avg_rating": "5.00",
+                "five_star_count": 1,
+                "verified_count": 1
+            },
+            {
+                "id": 14,
+                "name": "G.Skill Trident Z RGB 32GB DDR4",
+                "sku": "GSKILL-TRIDENT-32GB",
+                "review_count": 2,
+                "avg_rating": "4.50",
+                "five_star_count": 1,
+                "verified_count": 2
+            },
+            {
+                "id": 17,
+                "name": "WD Blue SN570 1TB",
+                "sku": "WD-BLUE-SN570-1TB",
+                "review_count": 2,
+                "avg_rating": "4.50",
+                "five_star_count": 1,
+                "verified_count": 2
+            },
+            {
+                "id": 26,
+                "name": "Logitech G913 TKL",
+                "sku": "LOGITECH-G913-TKL",
+                "review_count": 2,
+                "avg_rating": "4.50",
+                "five_star_count": 1,
+                "verified_count": 2
+            },
+            {
+                "id": 1,
+                "name": "Dell Latitude 5420",
+                "sku": "DELL-LAT-5420",
+                "review_count": 2,
+                "avg_rating": "4.00",
+                "five_star_count": 0,
+                "verified_count": 1
+            },
+            {
+                "id": 13,
+                "name": "Corsair Vengeance LPX 16GB DDR4",
+                "sku": "CORSAIR-VENGEANCE-16GB",
+                "review_count": 1,
+                "avg_rating": "4.00",
+                "five_star_count": 0,
+                "verified_count": 1
+            },
+            {
+                "id": 11,
+                "name": "AMD Ryzen 5 5600X",
+                "sku": "AMD-RYZEN5-5600X",
+                "review_count": 1,
+                "avg_rating": "4.00",
+                "five_star_count": 0,
+                "verified_count": 1
+            },
+            {
+                "id": 25,
+                "name": "Akko 3084B Plus",
+                "sku": "AKKO-3084B-PLUS",
+                "review_count": 1,
+                "avg_rating": "4.00",
+                "five_star_count": 0,
+                "verified_count": 1
+            },
+            {
+                "id": 24,
+                "name": "Razer Viper Mini",
+                "sku": "RAZER-VIPER-MINI",
+                "review_count": 1,
+                "avg_rating": "4.00",
+                "five_star_count": 0,
+                "verified_count": 1
+            },
+            {
+                "id": 16,
+                "name": "Samsung 980 PRO 1TB",
+                "sku": "SAMSUNG-980-PRO-1TB",
+                "review_count": 1,
+                "avg_rating": "4.00",
+                "five_star_count": 0,
+                "verified_count": 1
+            }
+        ],
+        "time_series": [
+            {
+                "date": "2025-11-28",
+                "review_count": 7,
+                "avg_rating": "4.43"
+            },
+            {
+                "date": "2024-12-04",
+                "review_count": 1,
+                "avg_rating": "5.00"
+            },
+            {
+                "date": "2024-12-03",
+                "review_count": 1,
+                "avg_rating": "5.00"
+            },
+            {
+                "date": "2024-12-02",
+                "review_count": 1,
+                "avg_rating": "4.00"
+            },
+            {
+                "date": "2024-12-01",
+                "review_count": 1,
+                "avg_rating": "5.00"
+            },
+            {
+                "date": "2024-11-30",
+                "review_count": 1,
+                "avg_rating": "5.00"
+            },
+            {
+                "date": "2024-11-29",
+                "review_count": 1,
+                "avg_rating": "4.00"
+            },
+            {
+                "date": "2024-11-28",
+                "review_count": 2,
+                "avg_rating": "5.00"
+            },
+            {
+                "date": "2024-11-27",
+                "review_count": 2,
+                "avg_rating": "4.50"
+            },
+            {
+                "date": "2024-11-26",
+                "review_count": 2,
+                "avg_rating": "4.00"
+            },
+            {
+                "date": "2024-11-25",
+                "review_count": 2,
+                "avg_rating": "5.00"
+            },
+            {
+                "date": "2024-11-24",
+                "review_count": 1,
+                "avg_rating": "5.00"
+            },
+            {
+                "date": "2024-11-23",
+                "review_count": 1,
+                "avg_rating": "4.00"
+            },
+            {
+                "date": "2024-11-22",
+                "review_count": 2,
+                "avg_rating": "5.00"
+            },
+            {
+                "date": "2024-11-21",
+                "review_count": 1,
+                "avg_rating": "4.00"
+            },
+            {
+                "date": "2024-11-08",
+                "review_count": 1,
+                "avg_rating": "3.00"
+            },
+            {
+                "date": "2024-11-05",
+                "review_count": 2,
+                "avg_rating": "4.50"
+            },
+            {
+                "date": "2024-11-02",
+                "review_count": 1,
+                "avg_rating": "5.00"
+            }
+        ],
+        "recent_reviews": [
+            {
+                "id": 1,
+                "product_id": 2,
+                "user_id": 6,
+                "rating": 5,
+                "comment": "Laptop rất tốt, chạy mượt, thiết kế đẹp!",
+                "is_verified": 1,
+                "created_at": "2025-11-28T09:52:31.000Z",
+                "product_name": "HP EliteBook 840 G8",
+                "user_name": "Nguyễn Thị Hương"
+            },
+            {
+                "id": 2,
+                "product_id": 11,
+                "user_id": 7,
+                "rating": 4,
+                "comment": "CPU chạy ổn, giá hợp lý",
+                "is_verified": 1,
+                "created_at": "2025-11-28T09:52:31.000Z",
+                "product_name": "AMD Ryzen 5 5600X",
+                "user_name": "Trần Văn Đức"
+            },
+            {
+                "id": 3,
+                "product_id": 7,
+                "user_id": 8,
+                "rating": 5,
+                "comment": "Máy gaming cực mạnh, chơi game siêu mượt!",
+                "is_verified": 1,
+                "created_at": "2025-11-28T09:52:31.000Z",
+                "product_name": "Asus ROG Strix G15",
+                "user_name": "Lê Thị Mai"
+            },
+            {
+                "id": 4,
+                "product_id": 4,
+                "user_id": 9,
+                "rating": 3,
+                "comment": "Máy tạm được, hơi chậm khi mở nhiều tab",
+                "is_verified": 1,
+                "created_at": "2025-11-28T09:52:31.000Z",
+                "product_name": "Asus VivoBook 15 X515",
+                "user_name": "Phạm Văn Tùng"
+            },
+            {
+                "id": 5,
+                "product_id": 22,
+                "user_id": 10,
+                "rating": 5,
+                "comment": "Màn hình đẹp, màu sắc chuẩn, 165Hz mượt lắm",
+                "is_verified": 1,
+                "created_at": "2025-11-28T09:52:31.000Z",
+                "product_name": "Asus TUF Gaming VG27AQ 27 inch",
+                "user_name": "Vũ Thị Ngọc"
+            },
+            {
+                "id": 6,
+                "product_id": 1,
+                "user_id": 11,
+                "rating": 4,
+                "comment": "Sản phẩm ổn, giao hàng nhanh",
+                "is_verified": 0,
+                "created_at": "2025-11-28T09:52:31.000Z",
+                "product_name": "Dell Latitude 5420",
+                "user_name": "Đặng Văn Hải"
+            },
+            {
+                "id": 7,
+                "product_id": 5,
+                "user_id": 12,
+                "rating": 5,
+                "comment": "Laptop gaming giá rẻ chất lượng tốt",
+                "is_verified": 0,
+                "created_at": "2025-11-28T09:52:31.000Z",
+                "product_name": "Acer Aspire 7 A715",
+                "user_name": "Bùi Thị Thảo"
+            },
+            {
+                "id": 22,
+                "product_id": 22,
+                "user_id": 10,
+                "rating": 5,
+                "comment": "Màn hình gaming tuyệt vời lần 2! Đã mua thêm 1 cái nữa.",
+                "is_verified": 1,
+                "created_at": "2024-12-04T04:00:00.000Z",
+                "product_name": "Asus TUF Gaming VG27AQ 27 inch",
+                "user_name": "Vũ Thị Ngọc"
+            },
+            {
+                "id": 21,
+                "product_id": 14,
+                "user_id": 9,
+                "rating": 5,
+                "comment": "RAM RGB đẹp, hiệu năng tốt. Rất hài lòng!",
+                "is_verified": 1,
+                "created_at": "2024-12-03T09:00:00.000Z",
+                "product_name": "G.Skill Trident Z RGB 32GB DDR4",
+                "user_name": "Phạm Văn Tùng"
+            },
+            {
+                "id": 20,
+                "product_id": 17,
+                "user_id": 8,
+                "rating": 4,
+                "comment": "SSD tốt, nhưng không nhanh bằng Samsung 980 PRO.",
+                "is_verified": 1,
+                "created_at": "2024-12-02T05:00:00.000Z",
+                "product_name": "WD Blue SN570 1TB",
+                "user_name": "Lê Thị Mai"
+            }
+        ]
+    }
+}
+2. http://localhost:8000/api/stats/orders/by-status?store_id=1
+{
+    "success": true,
+    "message": "Lấy thống kê đơn hàng theo trạng thái thành công",
+    "data": {
+        "status": "packing",
+        "count": 1,
+        "revenue": "2240000.00"
+    }
+}
+
+3. http://localhost:8000/api/customers?page=1&limit=5
+{
+    "success": true,
+    "message": "Lấy danh sách khách hàng thành công",
+    "data": {
+        "id": 17,
+        "user_id": 22,
+        "classification": "vip",
+        "total_orders": 28,
+        "total_spent": "138000000.00",
+        "last_order_date": "2024-11-18T17:00:00.000Z",
+        "notes": null,
+        "created_at": "2025-11-28T09:52:31.000Z",
+        "updated_at": "2025-11-28T09:52:31.000Z",
+        "email": "customer17@gmail.com",
+        "full_name": "Chu Thị Nhung",
+        "phone": "0922345678"
+    },
+    "pagination": {
+        "page": 1,
+        "limit": 5,
+        "total": 0,
+        "totalPages": 0
+    }
+}
+
+4. http://localhost:8000/api/inventory/logs?store_id=1&limit=5
+{
+    "success": true,
+    "message": "Lấy danh sách nhật ký kho thành công",
+    "data": {
+        "id": 21,
+        "product_id": 22,
+        "store_id": 1,
+        "type": "out",
+        "quantity": 1,
+        "reference_type": "order",
+        "reference_id": 20,
+        "notes": "Xuất kho cho đơn hàng ORD-20241204-020",
+        "created_by": 1,
+        "created_at": "2024-12-04T03:30:00.000Z",
+        "product_name": "Asus TUF Gaming VG27AQ 27 inch",
+        "store_name": "Techzone Quận 1"
+    },
+    "pagination": {
+        "page": 1,
+        "limit": 5,
+        "total": 0,
+        "totalPages": 0
+    }
+}
+5. http://localhost:8000/api/inventory/low-stock?store_id=1
+{"success":true,"message":"Danh sách sản phẩm cần nhập kho","data":[]}
+
+
+6. http://localhost:8000/api/inventory/by-store?store_id=1&page=1&limit=5
+{
+    "success": true,
+    "message": "Lấy danh sách kho thành công",
+    "data": {
+        "id": 5,
+        "product_id": 5,
+        "store_id": 1,
+        "quantity": 12,
+        "reserved_quantity": 1,
+        "last_restocked": "2025-11-28T09:52:31.000Z",
+        "name": "Acer Aspire 7 A715",
+        "sku": "ACER-ASPIRE-7",
+        "price": "19990000.00",
+        "category_name": "Laptop Gaming",
+        "store_name": "Techzone Quận 1"
+    },
+    "pagination": {
+        "page": 1,
+        "limit": 5,
+        "total": 0,
+        "totalPages": 0
+    }
+}
+7. http://localhost:8000/api/stats/export?report_type=inventory&store_id=1
+{
+    "success": true,
+    "message": "Xuất báo cáo thành công",
+    "data": {
+        "inventory": [
+            {
+                "id": 5,
+                "name": "Acer Aspire 7 A715",
+                "sku": "ACER-ASPIRE-7",
+                "quantity": 12,
+                "reserved_quantity": 1,
+                "store_name": "Techzone Quận 1",
+                "price": "19990000.00",
+                "inventory_value": "239880000.00"
+            },
+            {
+                "id": 12,
+                "name": "Akko 3084B Plus",
+                "sku": "AKKO-3084B-PLUS",
+                "quantity": 22,
+                "reserved_quantity": 3,
+                "store_name": "Techzone Quận 1",
+                "price": "1590000.00",
+                "inventory_value": "34980000.00"
+            },
+            {
+                "id": 9,
+                "name": "Asus Dual GeForce RTX 3060 12GB",
+                "sku": "ASUS-RTX3060-12GB",
+                "quantity": 9,
+                "reserved_quantity": 1,
+                "store_name": "Techzone Quận 1",
+                "price": "10990000.00",
+                "inventory_value": "98910000.00"
+            },
+            {
+                "id": 4,
+                "name": "Asus VivoBook 15 X515",
+                "sku": "ASUS-VIVOBOOK-15",
+                "quantity": 20,
+                "reserved_quantity": 3,
+                "store_name": "Techzone Quận 1",
+                "price": "12990000.00",
+                "inventory_value": "259800000.00"
+            },
+            {
+                "id": 8,
+                "name": "Corsair Vengeance LPX 16GB DDR4",
+                "sku": "CORSAIR-VENGEANCE-16GB",
+                "quantity": 60,
+                "reserved_quantity": 5,
+                "store_name": "Techzone Quận 1",
+                "price": "1690000.00",
+                "inventory_value": "101400000.00"
+            },
+            {
+                "id": 1,
+                "name": "Dell Latitude 5420",
+                "sku": "DELL-LAT-5420",
+                "quantity": 23,
+                "reserved_quantity": 2,
+                "store_name": "Techzone Quận 1",
+                "price": "18990000.00",
+                "inventory_value": "436770000.00"
+            },
+            {
+                "id": 2,
+                "name": "HP EliteBook 840 G8",
+                "sku": "HP-ELITEBOOK-840",
+                "quantity": 12,
+                "reserved_quantity": 1,
+                "store_name": "Techzone Quận 1",
+                "price": "26990000.00",
+                "inventory_value": "323880000.00"
+            },
+            {
+                "id": 6,
+                "name": "Intel Core i5-12400F",
+                "sku": "INTEL-I5-12400F",
+                "quantity": 44,
+                "reserved_quantity": 4,
+                "store_name": "Techzone Quận 1",
+                "price": "4490000.00",
+                "inventory_value": "197560000.00"
+            },
+            {
+                "id": 7,
+                "name": "Intel Core i7-12700K",
+                "sku": "INTEL-I7-12700K",
+                "quantity": 15,
+                "reserved_quantity": 2,
+                "store_name": "Techzone Quận 1",
+                "price": "9490000.00",
+                "inventory_value": "142350000.00"
+            },
+            {
+                "id": 3,
+                "name": "Lenovo ThinkPad X1 Carbon Gen 9",
+                "sku": "LENOVO-THINKPAD-X1",
+                "quantity": 5,
+                "reserved_quantity": 0,
+                "store_name": "Techzone Quận 1",
+                "price": "38990000.00",
+                "inventory_value": "194950000.00"
+            },
+            {
+                "id": 10,
+                "name": "LG 24MK430H-B 24 inch IPS",
+                "sku": "LG-24MK430H",
+                "quantity": 18,
+                "reserved_quantity": 2,
+                "store_name": "Techzone Quận 1",
+                "price": "2690000.00",
+                "inventory_value": "48420000.00"
+            },
+            {
+                "id": 11,
+                "name": "Logitech G102 Lightsync",
+                "sku": "LOGITECH-G102",
+                "quantity": 40,
+                "reserved_quantity": 6,
+                "store_name": "Techzone Quận 1",
+                "price": "390000.00",
+                "inventory_value": "15600000.00"
+            }
+        ]
+    }
+}
+8. http://localhost:8000/api/stats/export?report_type=sales&store_id=1
+{
+    "success": true,
+    "message": "Xuất báo cáo thành công",
+    "data": {
+        "orders": [
+            {
+                "id": 1,
+                "total_amount": "19040000.00",
+                "status": "completed",
+                "created_at": "2025-11-28T09:52:31.000Z",
+                "payment_method": "online",
+                "store_name": "Techzone Quận 1",
+                "customer_name": "Nguyễn Thị Hương"
+            },
+            {
+                "id": 3,
+                "total_amount": "31040000.00",
+                "status": "completed",
+                "created_at": "2025-11-28T09:52:31.000Z",
+                "payment_method": "online",
+                "store_name": "Techzone Quận 1",
+                "customer_name": "Lê Thị Mai"
+            },
+            {
+                "id": 22,
+                "total_amount": "8040000.00",
+                "status": "completed",
+                "created_at": "2024-12-04T03:00:00.000Z",
+                "payment_method": "online",
+                "store_name": "Techzone Quận 1",
+                "customer_name": "Vũ Thị Ngọc"
+            },
+            {
+                "id": 19,
+                "total_amount": "10040000.00",
+                "status": "completed",
+                "created_at": "2024-12-01T07:00:00.000Z",
+                "payment_method": "online",
+                "store_name": "Techzone Quận 1",
+                "customer_name": "Trần Văn Đức"
+            },
+            {
+                "id": 17,
+                "total_amount": "1740000.00",
+                "status": "completed",
+                "created_at": "2024-11-29T05:00:00.000Z",
+                "payment_method": "cod",
+                "store_name": "Techzone Quận 1",
+                "customer_name": "Ngô Văn Long"
+            },
+            {
+                "id": 14,
+                "total_amount": "4040000.00",
+                "status": "completed",
+                "created_at": "2024-11-26T06:00:00.000Z",
+                "payment_method": "cod",
+                "store_name": "Techzone Quận 1",
+                "customer_name": "Bùi Thị Thảo"
+            },
+            {
+                "id": 12,
+                "total_amount": "7490000.00",
+                "status": "completed",
+                "created_at": "2024-11-24T08:00:00.000Z",
+                "payment_method": "online",
+                "store_name": "Techzone Quận 1",
+                "customer_name": "Vũ Thị Ngọc"
+            },
+            {
+                "id": 10,
+                "total_amount": "4540000.00",
+                "status": "completed",
+                "created_at": "2024-11-22T02:00:00.000Z",
+                "payment_method": "online",
+                "store_name": "Techzone Quận 1",
+                "customer_name": "Lê Thị Mai"
+            },
+            {
+                "id": 8,
+                "total_amount": "24040000.00",
+                "status": "completed",
+                "created_at": "2024-11-20T03:00:00.000Z",
+                "payment_method": "online",
+                "store_name": "Techzone Quận 1",
+                "customer_name": "Nguyễn Thị Hương"
+            }
+        ]
+    }
+}
+9. http://localhost:8000/api/stats/cost?store_id=1&period=month
+{
+    "success": true,
+    "message": "Lấy báo cáo chi phí thành công",
+    "data": {
+        "summary": {
+            "period": "2024-12",
+            "store_id": 1,
+            "store_name": "Techzone Quận 1",
+            "purchase_count": 1,
+            "total_cost": "35000000.00",
+            "received_count": 0,
+            "pending_count": 1,
+            "cancelled_count": 0
+        },
+        "top_products": {
+            "id": 3,
+            "name": "Lenovo ThinkPad X1 Carbon Gen 9",
+            "sku": "LENOVO-THINKPAD-X1",
+            "total_quantity_purchased": "8",
+            "total_cost": "240000000.00",
+            "avg_purchase_price": "30000000.000000",
+            "purchase_times": 1
+        }
+    }
+}
+10. http://localhost:8000/api/stats/revenue/by-category
+
+{
+    "success": true,
+    "message": "Lấy thống kê doanh thu theo danh mục thành công",
+    "data": {
+        "id": 1,
+        "name": "Laptop",
+        "revenue": "125950000.00",
+        "quantity_sold": "5",
+        "orders": 2
+    }
+}
+
+11. http://localhost:8000/api/stats/revenue/by-store
+{
+    "success": true,
+    "message": "Lấy thống kê doanh thu theo chi nhánh thành công",
+    "data": {
+        "id": 1,
+        "name": "Techzone Quận 1",
+        "revenue": "110010000.00",
+        "order_count": 9,
+        "product_count": 12
+    }
+}
+12. http://localhost:8000/api/stats/revenue/over-time?period=day&store_id=1
+{
+    "success": true,
+    "message": "Lấy thống kê doanh thu theo thời gian thành công",
+    "data": {
+        "period": "2025-11-28",
+        "revenue": "50080000.00",
+        "orders": 2
+    }
+}
+13. http://localhost:8000/api/stats/profit?store_id=1&period=month
+{
+    "success": true,
+    "message": "Lấy báo cáo lợi nhuận thành công",
+    "data": {
+        "data": [
+            {
+                "period": "2025-11",
+                "store_id": 1,
+                "revenue": 50080000,
+                "cost": 0,
+                "profit": 50080000,
+                "order_count": 2,
+                "profit_margin": "100.00"
+            },
+            {
+                "period": "2024-12",
+                "store_id": 1,
+                "revenue": 18080000,
+                "cost": 0,
+                "profit": 18080000,
+                "order_count": 2,
+                "profit_margin": "100.00"
+            },
+            {
+                "period": "2024-11",
+                "store_id": 1,
+                "revenue": 41850000,
+                "cost": 75000000,
+                "profit": -33150000,
+                "order_count": 5,
+                "profit_margin": "-79.21"
+            }
+        ],
+        "totals": {
+            "total_revenue": 110010000,
+            "total_cost": 75000000,
+            "total_profit": 35010000,
+            "total_orders": 9,
+            "total_profit_margin": "31.82"
+        }
+    }
+}
+14. http://localhost:8000/api/stats/dashboard
+{
+    "success": true,
+    "message": "Lấy thống kê dashboard thành công",
+    "data": {
+        "total_revenue": "211724000.00",
+        "total_orders": 20,
+        "new_customers": 21,
+        "top_products": {
+            "id": 22,
+            "name": "Asus TUF Gaming VG27AQ 27 inch",
+            "total_sold": "3",
+            "revenue": "23970000.00"
+        }
+    }
+}

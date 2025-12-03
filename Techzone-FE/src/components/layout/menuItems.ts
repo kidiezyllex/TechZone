@@ -7,6 +7,7 @@ import {
   mdiDesk,
   mdiOrderBoolDescendingVariant,
   mdiAccount,
+  mdiStore,
 } from '@mdi/js';
 
 export const menuItems: MenuItem[] = [
@@ -49,45 +50,18 @@ export const menuItems: MenuItem[] = [
         name: 'Danh mục',
         path: '/admin/products/categories',
       },
-      // {
-      //   id: 'products-materials',
-      //   name: 'Chất liệu',
-      //   path: '/admin/products/materials',
-      // },
-      // {
-      //   id: 'products-colors',
-      //   name: 'Màu sắc',
-      //   path: '/admin/products/colors',
-      // },
-      // {
-      //   id: 'products-sizes',
-      //   name: 'Kích thước',
-      //   path: '/admin/products/sizes',
-      // },
     ],
   },
-  // {
-  //   id: 'discounts',
-  //   name: 'Giảm giá',
-  //   path: '/admin/discounts',
-  //   icon: mdiTagMultiple,
-  //   subMenu: [
-  //     {
-  //       id: 'discounts-vouchers',
-  //       name: 'Mã giảm giá',
-  //       path: '/admin/discounts/vouchers',
-  //     },
-  //     {
-  //       id: 'discounts-promotions', 
-  //       name: 'Đợt khuyến mãi',
-  //       path: '/admin/discounts/promotions',
-  //     },
-  //   ],
-  // },
   {
     id: 'accounts',
     name: 'Quản lý người dùng',
     path: '/admin/accounts',
     icon: mdiAccount,
   },
+  {
+    id: 'stores',
+    name: 'Quản lý cửa hàng',
+    path: '/admin/stores',
+    icon: mdiStore,
+  }
 ]; 

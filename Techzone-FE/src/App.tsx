@@ -62,6 +62,7 @@ const AdminProductSizesPage = React.lazy(() => import('@/pages/admin/AdminProduc
 const AdminReturnsPage = React.lazy(() => import('@/pages/admin/AdminReturnsPage'))
 const AdminReturnCreatePage = React.lazy(() => import('@/pages/admin/AdminReturnCreatePage'))
 const AdminReturnEditPage = React.lazy(() => import('@/pages/admin/AdminReturnEditPage'))
+const AdminStoresPage = React.lazy(() => import('@/pages/admin/AdminStoresPage'))
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[400px]">
@@ -329,6 +330,11 @@ function App() {
               <Route path="returns/edit/:id" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminReturnEditPage />
+                </LazyComponentLoader>
+              } />
+              <Route path="stores" element={
+                <LazyComponentLoader fallback={<PageLoader />}>
+                  <AdminStoresPage />
                 </LazyComponentLoader>
               } />
             </Route>
