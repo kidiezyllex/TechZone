@@ -7,6 +7,7 @@ import { ValidationError, NotFoundError, ConflictError } from '../utils/errors.j
 export const getUsers = async (req, res, next) => {
   try {
     const { 
+      role,        // admin | staff | customer
       role_id, 
       store_id, 
       page = 1, 
@@ -30,10 +31,24 @@ export const getUsers = async (req, res, next) => {
     `;
     const params = [];
 
+    // Chuẩn hóa role -> role_id nếu FE truyền role dạng text
+    let resolvedRoleId = role_id;
+    if (!resolvedRoleId && role) {
+      const roleMap = {
+        admin: 1,
+        staff: 2,
+        customer: 3
+      };
+      const normalized = String(role).toLowerCase();
+      if (roleMap[normalized]) {
+        resolvedRoleId = roleMap[normalized];
+      }
+    }
+
     // Filter by role
-    if (role_id) {
+    if (resolvedRoleId) {
       sql += ' AND u.role_id = ?';
-      params.push(role_id);
+      params.push(parseInt(resolvedRoleId));
     } else {
       // Default: show all roles except admin (role_id 1)
       sql += ' AND u.role_id != 1';
@@ -52,10 +67,10 @@ export const getUsers = async (req, res, next) => {
       params.push(term, term, term);
     }
 
-    // Count total
-    const countSql = sql.replace(/SELECT.*FROM/, 'SELECT COUNT(DISTINCT u.id) as total FROM');
+    // Count total (dựa trên cùng câu query nhưng không có ORDER BY / LIMIT)
+    const countSql = `SELECT COUNT(*) as total FROM (${sql}) as t`;
     const [countResult] = await query(countSql, params);
-    const total = countResult.total;
+    const total = countResult?.total ?? 0;
 
     // Sorting
     const validSort = ['created_at', 'full_name', 'email', 'total_spent', 'total_orders'];

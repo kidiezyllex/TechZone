@@ -202,15 +202,12 @@ UPDATE `customers` SET
   `last_order_date` = (SELECT MAX(`created_at`) FROM `orders` WHERE `customer_id` = `customers`.`id`)
 WHERE `id` IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
--- 8. CẬP NHẬT SỐ LƯỢNG BÁN CỦA SẢN PHẨM
 UPDATE `products` SET 
   `sold_count` = (SELECT COALESCE(SUM(`quantity`), 0) FROM `order_items` oi 
                   JOIN `orders` o ON oi.`order_id` = o.`id` 
                   WHERE oi.`product_id` = `products`.`id` AND o.`status` IN ('completed', 'processing'))
 WHERE `id` IN (1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 16, 17, 18, 22, 23, 24, 25, 26, 28);
 
--- 9. SỬA LỖI SUBTOTAL TRONG ORDER_ITEMS (nếu có)
--- Đảm bảo subtotal khớp với discount_price (nếu có) hoặc unit_price
 UPDATE `order_items` oi
 JOIN `orders` o ON oi.`order_id` = o.`id`
 SET oi.`subtotal` = COALESCE(oi.`discount_price`, oi.`unit_price`) * oi.`quantity`

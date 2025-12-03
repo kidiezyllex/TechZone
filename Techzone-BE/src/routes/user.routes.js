@@ -14,10 +14,16 @@ const router = express.Router();
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *           enum: [admin, staff, customer]
+ *           description: Lọc theo tên role (admin, staff, customer)
+ *       - in: query
  *         name: role_id
  *         schema:
  *           type: integer
- *           description: 2 = Staff, 3 = Customer
+ *           description: 1 = Admin, 2 = Staff, 3 = Customer
  *       - in: query
  *         name: store_id
  *         schema:
