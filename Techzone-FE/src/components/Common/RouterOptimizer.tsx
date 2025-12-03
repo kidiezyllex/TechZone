@@ -16,7 +16,7 @@ const routeImports: Record<string, () => Promise<any>> = {
   '/': () => import('@/pages/HomePage'),
   '/about-us': () => import('@/pages/AboutUsPage'),
   '/products': () => import('@/pages/ProductsPage'),
-  '/profile': () => import('@/pages/ProfilePage'),
+  '/account': () => import('@/pages/AccountPage'),
   '/orders': () => import('@/pages/OrdersPage'),
   '/returns': () => import('@/pages/ReturnsPage'),
   '/checkout/shipping': () => import('@/pages/CheckoutShippingPage'),

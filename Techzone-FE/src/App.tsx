@@ -13,16 +13,13 @@ import AdminLayout from '@/layouts/AdminLayout'
 const HomePage = React.lazy(() => import('@/pages/HomePage'))
 const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'))
 const AboutUsPage = React.lazy(() => import('@/pages/AboutUsPage'))
-const AccountPage = React.lazy(() => import('@/pages/AccountPage'))
-
-
 const LoginPage = React.lazy(() => import('@/pages/auth/LoginPage'))
 const RegisterPage = React.lazy(() => import('@/pages/auth/RegisterPage'))
 
 
 const ProductsPage = React.lazy(() => import('@/pages/ProductsPage'))
 const ProductDetailPage = React.lazy(() => import('@/pages/ProductDetailPage'))
-const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'))
+const AccountPage = React.lazy(() => import('@/pages/AccountPage'))
 const OrdersPage = React.lazy(() => import('@/pages/OrdersPage'))
 const OrderDetailPage = React.lazy(() => import('@/pages/OrderDetailPage'))
 const ReturnsPage = React.lazy(() => import('@/pages/ReturnsPage'))
@@ -121,9 +118,9 @@ function App() {
                   <ProductDetailPage />
                 </LazyComponentLoader>
               } />
-              <Route path="profile" element={
+              <Route path="account" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
-                  <ProfilePage />
+                  <AccountPage />
                 </LazyComponentLoader>
               } />
               <Route path="orders" element={

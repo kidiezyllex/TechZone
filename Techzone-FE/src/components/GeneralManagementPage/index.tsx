@@ -35,6 +35,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { useUser } from '@/context/useUserContext';
+import { useUser as useClerkUser } from '@clerk/clerk-react';
 import { useOrdersByUser, useOrderDetail } from '@/hooks/order';
 import { useToast } from '@/hooks/useToast';
 import { useUpdateUserProfile, useChangePassword } from '@/hooks/account';
@@ -1047,9 +1048,21 @@ const ReturnDetailDialog: React.FC<ReturnDetailDialogProps> = ({
 const ProfileTab = () => {
   const { profile } = useUser();
   const userData = profile?.data;
+  const { user: clerkUser } = useClerkUser();
   const { showToast } = useToast();
   const updateProfileMutation = useUpdateUserProfile();
 
+  const clerkFullName = clerkUser?.externalAccounts?.[0]?.firstName
+    || clerkUser?.fullName
+    || (clerkUser?.firstName && clerkUser?.lastName ? `${clerkUser.firstName} ${clerkUser.lastName}`.trim() : clerkUser?.firstName || '');
+  const clerkEmail = clerkUser?.primaryEmailAddress?.emailAddress || clerkUser?.emailAddresses?.[0]?.emailAddress || '';
+  const clerkPhoneNumber = clerkUser?.primaryPhoneNumber?.phoneNumber || clerkUser?.phoneNumbers?.[0]?.phoneNumber || '';
+  const clerkImageUrl = clerkUser?.externalAccounts?.[0]?.imageUrl || clerkUser?.imageUrl || '';
+
+  const displayFullName = clerkFullName || userData?.fullName || "";
+  const displayEmail = clerkEmail || userData?.email || "";
+  const displayPhoneNumber = clerkPhoneNumber || userData?.phoneNumber || "";
+  const displayImageUrl = clerkImageUrl || "";
 
   const formSchema = z.object({
     fullName: z.string().min(2, { message: "Họ và tên phải có ít nhất 2 ký tự" }),
@@ -1061,22 +1074,24 @@ const ProfileTab = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: userData?.fullName || "",
-      email: userData?.email || "",
-      phoneNumber: userData?.phoneNumber || ""
+      fullName: displayFullName,
+      email: displayEmail,
+      phoneNumber: displayPhoneNumber
     }
   });
 
 
   useEffect(() => {
-    if (userData) {
-      form.reset({
-        fullName: userData.fullName || "",
-        email: userData.email || "",
-        phoneNumber: userData.phoneNumber || ""
-      });
-    }
-  }, [userData, form]);
+    const fullName = clerkFullName || userData?.fullName || "";
+    const email = clerkEmail || userData?.email || "";
+    const phoneNumber = clerkPhoneNumber || userData?.phoneNumber || "";
+
+    form.reset({
+      fullName,
+      email,
+      phoneNumber
+    });
+  }, [clerkUser, userData, form, clerkFullName, clerkEmail, clerkPhoneNumber]);
 
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -1117,9 +1132,19 @@ const ProfileTab = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
               <div className="sm:w-1/3 flex flex-col items-center space-y-4">
-                <div className="h-32 w-32 rounded-full bg-primary/10 flex items-center justify-center text-primary text-4xl font-semibold">
-                  {userData?.fullName?.charAt(0) || userData?.email?.charAt(0) || "U"}
-                </div>
+                {displayImageUrl ? (
+                  <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-primary/20">
+                    <img
+                      src={displayImageUrl}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-32 w-32 rounded-full bg-primary/10 flex items-center justify-center text-primary text-4xl font-semibold">
+                    {displayFullName?.charAt(0)?.toUpperCase() || displayEmail?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                )}
                 <Button variant="outline" className="w-full max-w-[160px]" type="button">
                   Thay đổi ảnh
                 </Button>
@@ -1654,6 +1679,7 @@ export default function GeneralManagementPage() {
   const location = useLocation(); const pathname = location.pathname;
   const [activeTab, setActiveTab] = useState('profile');
   const { isAuthenticated, profile, isLoadingProfile } = useUser();
+  const { user: clerkUser, isSignedIn: isClerkSignedIn } = useClerkUser();
   const [currentPage, setCurrentPage] = useState(1);
   const userId = profile?.data?.id;
   const { data: ordersData, isLoading, isError, refetch } = useOrdersByUser(userId || '');
@@ -1662,6 +1688,14 @@ export default function GeneralManagementPage() {
   const [createReturnOrderId, setCreateReturnOrderId] = useState<string | null>(null);
   const [createReturnOpen, setCreateReturnOpen] = useState(false);
   const { data: returnableOrdersData, refetch: refetchReturnableOrders } = useReturnableOrders();
+
+  // Console.log Clerk user data
+  useEffect(() => {
+    if (clerkUser) {
+      console.log('Clerk User All Data:', JSON.stringify(clerkUser, null, 2));
+
+    }
+  }, [clerkUser, isClerkSignedIn]);
 
   useEffect(() => {
     const updateActiveTabFromHash = () => {
@@ -1684,11 +1718,12 @@ export default function GeneralManagementPage() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!isAuthenticated && !isLoadingProfile) {
-      navigate('/auth/login');
-    }
-  }, [isAuthenticated, isLoadingProfile, navigate]);
+  // Tạm thời tắt redirect
+  // useEffect(() => {
+  //   if (!isAuthenticated && !isLoadingProfile) {
+  //     navigate('/auth/login');
+  //   }
+  // }, [isAuthenticated, isLoadingProfile, navigate]);
 
   if (isLoadingProfile) {
     return (
@@ -1698,9 +1733,10 @@ export default function GeneralManagementPage() {
     );
   }
 
-  if (!isAuthenticated) {
-    return null;
-  }
+  // Tạm thời tắt check authentication
+  // if (!isAuthenticated) {
+  //   return null;
+  // }
 
   const tabs = [
     {
@@ -1708,11 +1744,11 @@ export default function GeneralManagementPage() {
       icon: mdiAccountEdit,
       value: 'profile',
     },
-    {
-      title: 'Đổi mật khẩu',
-      icon: mdiLock,
-      value: 'password',
-    },
+    // {
+    //   title: 'Đổi mật khẩu',
+    //   icon: mdiLock,
+    //   value: 'password',
+    // },
     {
       title: 'Đơn hàng của bạn',
       icon: mdiOrderBoolAscending,
@@ -1723,11 +1759,11 @@ export default function GeneralManagementPage() {
       icon: mdiKeyboardReturn,
       value: 'returns',
     },
-    {
-      title: 'Mã giảm giá',
-      icon: mdiTicketPercentOutline,
-      value: 'vouchers',
-    },
+    // {
+    //   title: 'Mã giảm giá',
+    //   icon: mdiTicketPercentOutline,
+    //   value: 'vouchers',
+    // },
   ];
 
   const handleViewOrderDetails = (orderId: string) => {
@@ -1788,7 +1824,7 @@ export default function GeneralManagementPage() {
 
   return (
     <AccountTabContext.Provider value={{ activeTab, setActiveTab }}>
-      <div className="container mx-auto py-8 relative">
+      <div className="w-full mx-auto p-8 relative">
         <Breadcrumb className="mb-4">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -1848,7 +1884,7 @@ export default function GeneralManagementPage() {
             </Card>
           </motion.div>
           <motion.div
-            className="md:col-span-9"
+            className="md:col-span-9 -mt-2"
             initial="hidden"
             animate="visible"
           >

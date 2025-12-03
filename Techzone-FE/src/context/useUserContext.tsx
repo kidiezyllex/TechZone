@@ -145,7 +145,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     navigate("/auth/login")
   }, [navigate])
 
-  
+
   const contextValue = useMemo(() => ({
     user,
     profile,

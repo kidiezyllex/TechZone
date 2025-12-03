@@ -8,6 +8,7 @@ import { useUser } from '@/context/useUserContext';
 import AccountDropdown from './AccountDropdown';
 import { useCartStore } from '@/stores/useCartStore';
 import CartSheet from '../ui/CartSheet';
+import { useNavigate } from 'react-router-dom';
 
 const tabs = [
     { text: 'Trang chủ', href: '/' },
@@ -46,6 +47,7 @@ export const NavigationBar = () => {
     const { isAuthenticated, user } = useUser();
     const { user: clerkUser } = useClerkUser();
     const { totalItems } = useCartStore();
+    const navigate = useNavigate();
     const checkPath = () => {
         const currentPath = window.location.pathname;
         const activeTab = tabs.find(tab => tab.href === currentPath);
@@ -57,6 +59,10 @@ export const NavigationBar = () => {
     useEffect(() => {
         checkPath();
     }, []);
+
+    // Get avatar image from externalAccounts
+    const avatarImageUrl = clerkUser?.externalAccounts?.[0]?.imageUrl || clerkUser?.imageUrl || '';
+    const displayName = clerkUser?.externalAccounts?.[0]?.firstName || clerkUser?.fullName || clerkUser?.firstName || 'Khách hàng';
 
     return (
         <header className="sticky top-0 z-50 bg-white shadow-sm py-3">
@@ -103,22 +109,29 @@ export const NavigationBar = () => {
                     <SignedIn>
                         <div className="hidden md:flex items-center gap-3">
                             <span className="text-base font-medium text-maintext">
-                                Xin chào, <span className='text-primary font-bold'>{clerkUser?.fullName || clerkUser?.firstName || 'Khách hàng'}</span>
+                                Xin chào, <span className='text-primary font-bold'>{displayName}</span>
                             </span>
                         </div>
                     </SignedIn>
                     <div className="flex items-center gap-3">
                         <SignedIn>
-                            <UserButton
-                                appearance={{
-                                    elements: {
-                                        avatarBox: "h-8 w-8",
-                                        userButtonPopoverCard: "shadow-lg",
-                                        userButtonPopoverActionButton: "hover:bg-primary/10",
-                                    }
-                                }}
-                                afterSignOutUrl="/"
-                            />
+                            <button
+                                onClick={() => navigate('/account')}
+                                className="relative h-9 w-9 rounded-full overflow-hidden border-2 border-primary/20 hover:border-primary/50 transition-all cursor-pointer"
+                                title="Tài khoản"
+                            >
+                                {avatarImageUrl ? (
+                                    <img
+                                        src={avatarImageUrl}
+                                        alt="Avatar"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold">
+                                        {displayName?.charAt(0)?.toUpperCase() || 'U'}
+                                    </div>
+                                )}
+                            </button>
                         </SignedIn>
                         <SignedOut>
                             {isAuthenticated && <AccountDropdown />}
