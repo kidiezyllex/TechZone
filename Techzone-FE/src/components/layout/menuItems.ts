@@ -3,7 +3,7 @@ import {
   mdiChartBar,
   mdiTagMultiple,
   mdiRestart,
-  mdiHanger,
+  mdiLaptop,
   mdiDesk,
   mdiOrderBoolDescendingVariant,
   mdiAccount,
@@ -32,7 +32,7 @@ export const menuItems: MenuItem[] = [
     id: 'products',
     name: 'Quản lý sản phẩm',
     path: '/admin/products',
-    icon: mdiHanger,
+    icon: mdiLaptop,
     subMenu: [
       {
         id: 'products-list',
@@ -66,27 +66,27 @@ export const menuItems: MenuItem[] = [
       // },
     ],
   },
-  {
-    id: 'discounts',
-    name: 'Giảm giá',
-    path: '/admin/discounts',
-    icon: mdiTagMultiple,
-    subMenu: [
-      {
-        id: 'discounts-vouchers',
-        name: 'Mã giảm giá',
-        path: '/admin/discounts/vouchers',
-      },
-      {
-        id: 'discounts-promotions', 
-        name: 'Đợt khuyến mãi',
-        path: '/admin/discounts/promotions',
-      },
-    ],
-  },
+  // {
+  //   id: 'discounts',
+  //   name: 'Giảm giá',
+  //   path: '/admin/discounts',
+  //   icon: mdiTagMultiple,
+  //   subMenu: [
+  //     {
+  //       id: 'discounts-vouchers',
+  //       name: 'Mã giảm giá',
+  //       path: '/admin/discounts/vouchers',
+  //     },
+  //     {
+  //       id: 'discounts-promotions', 
+  //       name: 'Đợt khuyến mãi',
+  //       path: '/admin/discounts/promotions',
+  //     },
+  //   ],
+  // },
   {
     id: 'accounts',
-    name: 'Quản lý tài khoản',
+    name: 'Quản lý người dùng',
     path: '/admin/accounts',
     icon: mdiAccount,
   },

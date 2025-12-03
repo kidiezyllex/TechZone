@@ -82,7 +82,7 @@ export default function AccountsPage() {
 
   const { data, isLoading, error } = useAccounts(filters);
   const deleteAccount = useDeleteAccount();
-  const updateAccountStatus = useUpdateAccountStatus(accountToUpdateStatus?.id || '');
+  const updateAccountStatus = useUpdateAccountStatus(String(accountToUpdateStatus?.id || ''));
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -119,33 +119,45 @@ export default function AccountsPage() {
   };
 
 
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case 'ADMIN':
+  const getRoleBadge = (roleName: string) => {
+    switch (roleName?.toLowerCase()) {
+      case 'admin':
         return <Badge className="bg-purple-600 text-white hover:bg-purple-700">Quản trị viên</Badge>;
-      case 'STAFF':
+      case 'staff':
         return <Badge className="bg-blue-600 text-white hover:bg-blue-700">Nhân viên</Badge>;
-      case 'CUSTOMER':
+      case 'customer':
         return <Badge className="bg-slate-600 text-white hover:bg-slate-700">Khách hàng</Badge>;
       default:
-        return <Badge className="bg-gray-500 text-white hover:bg-gray-600">{role}</Badge>;
+        return <Badge className="bg-gray-500 text-white hover:bg-gray-600">{roleName || 'N/A'}</Badge>;
     }
   };
 
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'ACTIVE':
-        return <Badge className="bg-green-600 text-white hover:bg-green-700">Hoạt động</Badge>;
-      case 'INACTIVE':
-        return <Badge className="bg-red-600 text-white hover:bg-red-700">Không hoạt động</Badge>;
+  const getStatusBadge = (isActive: number) => {
+    return isActive === 1 ? (
+      <Badge className="bg-green-600 text-white hover:bg-green-700">Hoạt động</Badge>
+    ) : (
+      <Badge className="bg-red-600 text-white hover:bg-red-700">Không hoạt động</Badge>
+    );
+  };
+
+  const getClassificationBadge = (classification: string | null) => {
+    if (!classification) return null;
+    switch (classification) {
+      case 'vip':
+        return <Badge className="bg-yellow-600 text-white hover:bg-yellow-700">VIP</Badge>;
+      case 'regular':
+        return <Badge className="bg-blue-500 text-white hover:bg-blue-600">Thường xuyên</Badge>;
+      case 'new':
+        return <Badge className="bg-green-500 text-white hover:bg-green-600">Mới</Badge>;
       default:
-        return <Badge className="bg-gray-500 text-white hover:bg-gray-600">{status}</Badge>;
+        return null;
     }
   };
 
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | undefined) => {
+    if (!name) return 'NA';
     return name
       .split(' ')
       .map((word) => word[0])
@@ -169,7 +181,7 @@ export default function AccountsPage() {
     if (!accountToDelete) return;
 
     try {
-      await deleteAccount.mutateAsync(accountToDelete.id, {
+      await deleteAccount.mutateAsync(String(accountToDelete.id), {
         onSuccess: () => {
           toast.success('Xóa tài khoản thành công');
           setIsDeleteDialogOpen(false);
@@ -188,6 +200,14 @@ export default function AccountsPage() {
     setAccountToUpdateStatus(account);
     setNewStatus(status);
     setIsStatusDialogOpen(true);
+  };
+
+  const formatCurrency = (amount: string | null) => {
+    if (!amount) return '0 ₫';
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(parseFloat(amount));
   };
 
   const confirmUpdateStatus = async () => {
@@ -286,8 +306,9 @@ export default function AccountsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Tất cả vai trò</SelectItem>
-                        <SelectItem value="ADMIN">Quản trị viên</SelectItem>
-                        <SelectItem value="CUSTOMER">Khách hàng</SelectItem>
+                        <SelectItem value="admin">Quản trị viên</SelectItem>
+                        <SelectItem value="staff">Nhân viên</SelectItem>
+                        <SelectItem value="customer">Khách hàng</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -301,8 +322,8 @@ export default function AccountsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                        <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-                        <SelectItem value="INACTIVE">Không hoạt động</SelectItem>
+                        <SelectItem value="1">Hoạt động</SelectItem>
+                        <SelectItem value="0">Không hoạt động</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -333,45 +354,66 @@ export default function AccountsPage() {
                     <TableHead>Liên hệ</TableHead>
                     <TableHead>Vai trò</TableHead>
                     <TableHead>Trạng thái</TableHead>
+                    <TableHead>Phân loại</TableHead>
+                    <TableHead>Thống kê</TableHead>
                     <TableHead>Ngày tạo</TableHead>
                     <TableHead className="text-right">Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data?.data.accounts.length === 0 ? (
+                  {!data?.data || data.data.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-maintext">
+                      <TableCell colSpan={8} className="text-center py-8 text-maintext">
                         Không có tài khoản nào được tìm thấy
                       </TableCell>
                     </TableRow>
                   ) : (
-                    data?.data.accounts.map((account) => (
+                    data.data.map((account) => (
                       <TableRow key={account.id} className="hover:bg-gray-50">
                         <TableCell className="py-3 px-4">
                           <div className="flex items-center space-x-4">
                             <div className="p-0.5 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600">
                               <Avatar className="h-10 w-10 border-2 border-white rounded-full">
-                                <AvatarImage src={getRandomAvatar()} alt={`${account.fullName} avatar`} />
-                                <AvatarFallback className="bg-gray-200 text-maintext">{getInitials(account.fullName)}</AvatarFallback>
+                                <AvatarImage src={getRandomAvatar()} alt={`${account.full_name} avatar`} />
+                                <AvatarFallback className="bg-gray-200 text-maintext">{getInitials(account.full_name)}</AvatarFallback>
                               </Avatar>
                             </div>
                             <div>
-                              <div className="font-medium text-maintext">{account.fullName}</div>
+                              <div className="font-medium text-maintext">{account.full_name}</div>
                               <div className="text-sm text-maintext">{account.email}</div>
+                              {account.store_name && (
+                                <div className="text-xs text-gray-500 mt-1">📍 {account.store_name}</div>
+                              )}
                             </div>
                           </div>
                         </TableCell>
                         <TableCell className="py-3 px-4 text-sm text-maintext">
-                          {account.phoneNumber && (
+                          {account.phone && (
                             <div className="flex items-center">
                               <Icon path={mdiPhone} size={0.7} className="mr-2 text-maintext" />
-                              {account.phoneNumber}
+                              {account.phone}
                             </div>
                           )}
                         </TableCell>
-                        <TableCell className="py-3 px-4">{getRoleBadge(account.role)}</TableCell>
-                        <TableCell className="py-3 px-4">{getStatusBadge(account.status)}</TableCell>
-                        <TableCell className="py-3 px-4 text-sm text-maintext">{formatDate(account.createdAt)}</TableCell>
+                        <TableCell className="py-3 px-4">{getRoleBadge(account.role_name)}</TableCell>
+                        <TableCell className="py-3 px-4">{getStatusBadge(account.is_active)}</TableCell>
+                        <TableCell className="py-3 px-4">
+                          {getClassificationBadge(account.classification) || (
+                            <span className="text-gray-400 text-sm">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="py-3 px-4 text-sm text-maintext">
+                          {account.role_name === 'customer' && (
+                            <div className="space-y-1">
+                              <div>Đơn hàng: {account.total_orders || 0}</div>
+                              <div>Tổng chi: {formatCurrency(account.total_spent)}</div>
+                            </div>
+                          )}
+                          {account.role_name !== 'customer' && (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="py-3 px-4 text-sm text-maintext">{formatDate(account.created_at)}</TableCell>
                         <TableCell className="py-3 px-4 text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -383,14 +425,14 @@ export default function AccountsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <a href={`/admin/accounts/edit/${account.id}`}>
+                              <a href={`/admin/accounts/edit/${String(account.id)}`}>
                                 <DropdownMenuItem className="cursor-pointer text-maintext">
                                   <Icon path={mdiPencil} size={0.7} className="mr-2" />
                                   <span className="text-maintext">Chỉnh sửa</span>
                                 </DropdownMenuItem>
                               </a>
                               <DropdownMenuSeparator />
-                              {account.status === 'ACTIVE' ? (
+                              {account.is_active === 1 ? (
                                 <DropdownMenuItem
                                   className="cursor-pointer text-maintext"
                                   onClick={() => handleUpdateStatus(account, 'INACTIVE')}
@@ -425,26 +467,26 @@ export default function AccountsPage() {
                 </TableBody>
               </Table>
 
-              {data?.data.pagination && data.data.pagination.totalPages > 1 && (
+              {data?.pagination && data.pagination.totalPages > 1 && (
                 <div className="flex items-center justify-between px-4 py-3 border-t">
                   <div className="text-sm text-maintext">
-                    Hiển thị {(data.data.pagination.currentPage - 1) * (filters.limit || 10) + 1} đến{' '}
-                    {Math.min(data.data.pagination.currentPage * (filters.limit || 10), data.data.pagination.count)}{' '}
-                    trong tổng số {data.data.pagination.count} tài khoản
+                    Hiển thị {(data.pagination.page - 1) * (filters.limit || 10) + 1} đến{' '}
+                    {Math.min(data.pagination.page * (filters.limit || 10), data.pagination.total)}{' '}
+                    trong tổng số {data.pagination.total} tài khoản
                   </div>
                   <div className="flex space-x-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleChangePage(data.data.pagination.currentPage - 1)}
-                      disabled={data.data.pagination.currentPage === 1}
+                      onClick={() => handleChangePage(data.pagination.page - 1)}
+                      disabled={data.pagination.page === 1}
                     >
                       Trước
                     </Button>
-                    {Array.from({ length: data.data.pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                    {Array.from({ length: data.pagination.totalPages }, (_, i) => i + 1).map((page) => (
                       <Button
                         key={page}
-                        variant={page === data.data.pagination.currentPage ? 'default' : 'outline'}
+                        variant={page === data.pagination.page ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => handleChangePage(page)}
                       >
@@ -454,8 +496,8 @@ export default function AccountsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleChangePage(data.data.pagination.currentPage + 1)}
-                      disabled={data.data.pagination.currentPage === data.data.pagination.totalPages}
+                      onClick={() => handleChangePage(data.pagination.page + 1)}
+                      disabled={data.pagination.page === data.pagination.totalPages}
                     >
                       Sau
                     </Button>
@@ -473,7 +515,7 @@ export default function AccountsPage() {
           <DialogHeader>
             <DialogTitle>Xác nhận xóa tài khoản</DialogTitle>
             <DialogDescription>
-              Bạn có chắc chắn muốn xóa tài khoản <span className="font-semibold">{accountToDelete?.fullName}</span>?
+              Bạn có chắc chắn muốn xóa tài khoản <span className="font-semibold">{accountToDelete?.full_name}</span>?
               <br />
               Hành động này không thể hoàn tác.
             </DialogDescription>
@@ -517,13 +559,13 @@ export default function AccountsPage() {
             <DialogDescription>
               {newStatus === 'ACTIVE' ? (
                 <>
-                  Bạn có chắc chắn muốn kích hoạt tài khoản <span className="font-semibold">{accountToUpdateStatus?.fullName}</span>?
+                  Bạn có chắc chắn muốn kích hoạt tài khoản <span className="font-semibold">{accountToUpdateStatus?.full_name}</span>?
                   <br />
                   Tài khoản này sẽ có thể đăng nhập và sử dụng hệ thống.
                 </>
               ) : (
                 <>
-                  Bạn có chắc chắn muốn vô hiệu hóa tài khoản <span className="font-semibold">{accountToUpdateStatus?.fullName}</span>?
+                  Bạn có chắc chắn muốn vô hiệu hóa tài khoản <span className="font-semibold">{accountToUpdateStatus?.full_name}</span>?
                   <br />
                   Tài khoản này sẽ không thể đăng nhập và sử dụng hệ thống cho đến khi được kích hoạt lại.
                 </>

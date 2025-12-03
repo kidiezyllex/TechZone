@@ -1,25 +1,15 @@
 'use client';
 
-import { mdiAccount, mdiCog, mdiLock, mdiLogout } from '@mdi/js';
+import { mdiLogout } from '@mdi/js';
 import Icon from '@mdi/react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 import { useUser } from '@/context/useUserContext';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useUserProfile } from '@/hooks/account';
+
 export default function UserMenu() {
   const { logoutUser } = useUser();
-  const { data: profileData } = useUserProfile();
   const navigate = useNavigate();
   const handleLogout = () => {
     logoutUser();
@@ -28,44 +18,9 @@ export default function UserMenu() {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Avatar className="h-8 w-8 cursor-pointer">
-          <AvatarImage src={profileData?.data.avatar} alt={profileData?.data.fullName} />
-          <AvatarFallback>
-            {profileData?.data.fullName.split(' ').pop()?.charAt(0) || 'U'}
-          </AvatarFallback>
-        </Avatar>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{profileData?.data.fullName}</p>
-            <p className="text-xs leading-none text-maintext">{profileData?.data.email}</p>
-            <p className="text-xs leading-none text-primary mt-1">{profileData?.data.role}</p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Icon path={mdiAccount} size={0.8} className="mr-2" />
-            <span>Thông tin tài khoản</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Icon path={mdiCog} size={0.8} className="mr-2" />
-            <span>Cài đặt</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Icon path={mdiLock} size={0.8} className="mr-2" />
-            <span>Đổi mật khẩu</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-          <Icon path={mdiLogout} size={0.8} className="mr-2 text-red-600" />
-          <span>Đăng xuất</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button onClick={handleLogout} variant="outline" className="text-red-600 border-red-600 !bg-red-50">
+      <Icon path={mdiLogout} size={0.8} className="mr-2 text-red-600" />
+      <span className='text-red-600'>Đăng xuất</span>
+    </Button>
   );
 } 

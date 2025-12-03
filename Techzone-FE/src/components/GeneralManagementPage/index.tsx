@@ -1045,7 +1045,6 @@ const ReturnDetailDialog: React.FC<ReturnDetailDialogProps> = ({
   );
 };
 
-
 const ProfileTab = () => {
   const { profile } = useUser();
   const userData = profile?.data;
@@ -1220,12 +1219,9 @@ const ProfileTab = () => {
   );
 };
 
-
 const PasswordTab = () => {
   const changePasswordMutation = useChangePassword();
   const { showToast } = useToast();
-
-
   const formSchema = z
     .object({
       currentPassword: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
@@ -1357,7 +1353,6 @@ const PasswordTab = () => {
     </Card>
   );
 };
-
 
 const VouchersTab = () => {
   const { profile } = useUser();
@@ -1688,7 +1683,6 @@ export default function GeneralManagementPage() {
   const [createReturnOpen, setCreateReturnOpen] = useState(false);
   const { data: returnableOrdersData, refetch: refetchReturnableOrders } = useReturnableOrders();
 
-  // Console.log Clerk user data
   useEffect(() => {
     if (clerkUser) {
       console.log('Clerk User All Data:', JSON.stringify(clerkUser, null, 2));
@@ -1736,11 +1730,6 @@ export default function GeneralManagementPage() {
       title: 'Đơn hàng của bạn',
       icon: mdiOrderBoolAscending,
       value: 'orders',
-    },
-    {
-      title: 'Trả hàng',
-      icon: mdiKeyboardReturn,
-      value: 'returns',
     },
   ];
 

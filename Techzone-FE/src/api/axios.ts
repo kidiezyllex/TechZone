@@ -94,8 +94,8 @@ instance.interceptors.response.use(
 export function logout() {
   cookies.remove("accessToken");
   localStorage?.clear();
-
-  if (location.pathname !== "/auth/login") {
+  const currentPath = location.pathname;
+  if (currentPath !== "/auth/login" && !currentPath.includes("/checkout")) {
     window.location.replace("/auth/login");
   }
 }

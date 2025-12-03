@@ -2,35 +2,43 @@ import { IBaseResponse } from './authentication';
 import { IAddress } from '../request/account';
 
 export interface IAccount {
-  id: string;
-  fullName: string;
+  id: number;
   email: string;
-  phoneNumber: string;
-  role: 'CUSTOMER' | 'STAFF' | 'ADMIN';
-  gender?: 'Nam' | 'Nữ' | 'Khác';
-  birthday?: string | Date;
-  citizenId?: string;
-  status: 'ACTIVE' | 'INACTIVE';
-  avatar?: string;
-  addresses: IAddress[];
-  createdAt: string;
-  updatedAt: string;
+  full_name: string;
+  phone: string;
+  is_active: number; // 1 for active, 0 for inactive
+  created_at: string;
+  store_id: number | null;
+  role_name: string; // 'customer', 'staff', 'admin'
+  role_id: number;
+  store_name: string | null;
+  classification: 'new' | 'regular' | 'vip' | null;
+  total_orders: number | null;
+  total_spent: string | null;
+  last_order_date: string | null;
+  // Legacy fields for backward compatibility
+  fullName?: string;
+  phoneNumber?: string;
+  role?: 'CUSTOMER' | 'STAFF' | 'ADMIN';
+  status?: 'ACTIVE' | 'INACTIVE';
+  createdAt?: string;
 }
 
 export interface IAccountResponse extends IBaseResponse<IAccount> {}
 
 export interface IPagination {
-  count: number;
+  page: number;
+  limit: number;
+  total: number;
   totalPages: number;
-  currentPage: number;
 }
 
-export interface IAccountsData {
-  accounts: IAccount[];
+export interface IAccountsResponse {
+  success: boolean;
+  message: string;
+  data: IAccount[];
   pagination: IPagination;
 }
-
-export interface IAccountsResponse extends IBaseResponse<IAccountsData> {}
 
 export interface IProfileResponse extends IBaseResponse<IAccount> {}
 
