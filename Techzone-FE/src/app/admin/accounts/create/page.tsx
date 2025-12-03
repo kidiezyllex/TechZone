@@ -242,8 +242,8 @@ export default function CreateAccountPage() {
                     <SelectValue placeholder="Chọn vai trò" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ADMIN">Quản trị viên</SelectItem>
-                    <SelectItem value="CUSTOMER">Khách hàng</SelectItem>
+                    <SelectItem value="admin">Quản trị viên</SelectItem>
+                    <SelectItem value="customer">Khách hàng</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

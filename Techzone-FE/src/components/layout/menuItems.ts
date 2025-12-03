@@ -17,12 +17,12 @@ export const menuItems: MenuItem[] = [
     path: '/admin/statistics',
     icon: mdiChartBar,
   },
-  {
-    id: 'pos',
-    name: 'Bán hàng tại quầy',
-    path: '/admin/pos',
-    icon: mdiDesk,
-  },
+  // {
+  //   id: 'pos',
+  //   name: 'Bán hàng tại quầy',
+  //   path: '/admin/pos',
+  //   icon: mdiDesk,
+  // },
   {
     id: 'orders',
     name: 'Quản lý đơn hàng',

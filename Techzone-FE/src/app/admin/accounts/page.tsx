@@ -99,13 +99,16 @@ export default function AccountsPage() {
   }, [searchQuery]);
 
   const handleFilterChange = (key: keyof IAccountFilter, value: string | number | undefined) => {
-    if (value === '') {
-      const newFilters = { ...filters };
-      delete newFilters[key];
-      setFilters({ ...newFilters, page: 1 });
-    } else {
-      setFilters({ ...filters, [key]: value, page: 1 });
-    }
+    setFilters((prev) => {
+      const updatedFilters = { ...prev, page: 1 };
+
+      if (value === '' || value === undefined) {
+        const { [key]: _, ...rest } = updatedFilters;
+        return rest;
+      }
+
+      return { ...updatedFilters, [key]: value };
+    });
   };
 
   const handleChangePage = (newPage: number) => {
@@ -300,15 +303,18 @@ export default function AccountsPage() {
                     <label className="block text-sm text-maintext mb-2 font-semibold">
                       Vai trò
                     </label>
-                    <Select value={filters.role || ''} onValueChange={(value) => handleFilterChange('role', value === 'all' ? undefined : value)}>
+                    <Select
+                      value={filters.role ?? 'all'}
+                      onValueChange={(value) => handleFilterChange('role', value === 'all' ? undefined : value)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Tất cả vai trò" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Tất cả vai trò</SelectItem>
-                        <SelectItem value="admin">Quản trị viên</SelectItem>
-                        <SelectItem value="staff">Nhân viên</SelectItem>
-                        <SelectItem value="customer">Khách hàng</SelectItem>
+                        <SelectItem value="all" className="text-maintext font-semibold">Tất cả vai trò</SelectItem>
+                        <SelectItem value="admin" className="text-maintext font-medium">Quản trị viên</SelectItem>
+                        <SelectItem value="staff" className="text-maintext font-medium">Nhân viên</SelectItem>
+                        <SelectItem value="customer" className="text-maintext font-medium">Khách hàng</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
