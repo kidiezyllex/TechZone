@@ -69,6 +69,13 @@ export interface IOrderUpdateStatusPayload {
   status: IOrderStatusUpdate['status'];
 }
 
+export interface IMyOrdersRequest {
+  email: string;
+  page?: number;
+  limit?: number;
+  status?: string;
+}
+
 export interface IPOSOrderItem {
   product: string;      
   quantity: number;

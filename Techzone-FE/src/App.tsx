@@ -92,7 +92,6 @@ function App() {
             limit={3}
           />
           <Routes>
-            { }
             <Route path="/" element={<RootLayout />}>
               <Route index element={
                 <LazyComponentLoader fallback={<PageLoader />}>
@@ -155,8 +154,6 @@ function App() {
                 </LazyComponentLoader>
               } />
             </Route>
-
-            { }
             <Route path="auth/login/*" element={
               <LazyComponentLoader fallback={<PageLoader />}>
                 <LoginPage />
@@ -167,8 +164,6 @@ function App() {
                 <RegisterPage />
               </LazyComponentLoader>
             } />
-
-            { }
             <Route
               path="admin/login"
               element={
@@ -177,8 +172,6 @@ function App() {
                 </LazyComponentLoader>
               }
             />
-
-            { }
             <Route path="admin" element={<AdminLayout />}>
               <Route index element={
                 <LazyComponentLoader fallback={<PageLoader />}>
@@ -190,8 +183,6 @@ function App() {
                   <AdminStatisticsPage />
                 </LazyComponentLoader>
               } />
-
-              { }
               <Route path="accounts" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminAccountsPage />
@@ -207,8 +198,6 @@ function App() {
                   <AdminAccountEditPage />
                 </LazyComponentLoader>
               } />
-
-              { }
               <Route path="discounts" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminDiscountsPage />
@@ -244,8 +233,6 @@ function App() {
                   <AdminVoucherEditPage />
                 </LazyComponentLoader>
               } />
-
-              { }
               <Route path="orders" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminOrdersPage />
@@ -266,15 +253,11 @@ function App() {
                   <AdminOrderEditPage />
                 </LazyComponentLoader>
               } />
-
-              { }
               <Route path="pos" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminPosPage />
                 </LazyComponentLoader>
               } />
-
-              { }
               <Route path="products" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminProductsPage />
@@ -315,8 +298,6 @@ function App() {
                   <AdminProductSizesPage />
                 </LazyComponentLoader>
               } />
-
-              { }
               <Route path="returns" element={
                 <LazyComponentLoader fallback={<PageLoader />}>
                   <AdminReturnsPage />
@@ -338,8 +319,6 @@ function App() {
                 </LazyComponentLoader>
               } />
             </Route>
-
-            { }
             <Route path="*" element={
               <LazyComponentLoader fallback={<PageLoader />}>
                 <NotFoundPage />

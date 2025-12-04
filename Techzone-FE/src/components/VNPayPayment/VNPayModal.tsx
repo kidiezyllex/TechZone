@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
- 
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icon } from '@mdi/react';
-import { 
-  mdiBank, 
-  mdiShield, 
-  mdiLoading, 
-  mdiCheckCircle, 
+import {
+  mdiBank,
+  mdiShield,
+  mdiLoading,
+  mdiCheckCircle,
   mdiClose,
   mdiMagnify,
   mdiArrowLeft,
@@ -51,12 +51,12 @@ interface VNPayModalProps {
 
 type PaymentStep = 'bank-selection' | 'account-input' | 'otp-verification' | 'processing' | 'success' | 'error';
 
-export default function VNPayModal({ 
-  isOpen, 
-  onClose, 
-  orderData, 
-  onPaymentSuccess, 
-  onPaymentError 
+export default function VNPayModal({
+  isOpen,
+  onClose,
+  orderData,
+  onPaymentSuccess,
+  onPaymentError
 }: VNPayModalProps) {
   const [banks, setBanks] = useState<Bank[]>([]);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
@@ -65,39 +65,39 @@ export default function VNPayModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState<PaymentStep>('bank-selection');
   const [paymentResult, setPaymentResult] = useState<any>(null);
-  
-  
+
+
   const [accountNumber, setAccountNumber] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
-  
-  
+
+
   const [otpCode, setOtpCode] = useState('');
   const [otpTimer, setOtpTimer] = useState(60);
   const [canResendOtp, setCanResendOtp] = useState(false);
 
-  
+
   const filteredBanks = useMemo(() => {
     if (!searchTerm) return banks;
-    
+
     const term = searchTerm.toLowerCase();
-    return banks.filter(bank => 
+    return banks.filter(bank =>
       bank.name.toLowerCase().includes(term) ||
       bank.shortName.toLowerCase().includes(term) ||
       bank.code.toLowerCase().includes(term)
     );
   }, [banks, searchTerm]);
 
-  
+
   useEffect(() => {
     if (isOpen) {
       fetchBanks();
     }
   }, [isOpen]);
 
-  
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    
+
     if (currentStep === 'otp-verification' && otpTimer > 0) {
       interval = setInterval(() => {
         setOtpTimer(prev => {
@@ -109,7 +109,7 @@ export default function VNPayModal({
         });
       }, 1000);
     }
-    
+
     return () => clearInterval(interval);
   }, [currentStep, otpTimer]);
 
@@ -118,9 +118,9 @@ export default function VNPayModal({
       setIsLoadingBanks(true);
       const response = await fetch('https://api.vietqr.io/v2/banks');
       const result = await response.json();
-      
+
       if (result.code === '00' && result.data) {
-        
+
         const supportedBanks = result.data.filter((bank: Bank) => bank.transferSupported === 1);
         setBanks(supportedBanks);
       } else {
@@ -129,7 +129,7 @@ export default function VNPayModal({
     } catch (error) {
       console.error('Error fetching banks:', error);
       toast.error('Không thể tải danh sách ngân hàng');
-      
+
       setBanks([
         {
           id: 1,
@@ -190,10 +190,10 @@ export default function VNPayModal({
       return;
     }
 
-    
+
     setIsProcessing(true);
     setTimeout(() => {
-      setAccountHolder('NGUYEN VAN A'); 
+      setAccountHolder('NGUYEN VAN A');
       setCurrentStep('otp-verification');
       setOtpTimer(60);
       setCanResendOtp(false);
@@ -220,11 +220,7 @@ export default function VNPayModal({
     try {
       setIsProcessing(true);
       setCurrentStep('processing');
-
-      
       await new Promise(resolve => setTimeout(resolve, 3000));
-
-      
       const isSuccess = Math.random() > 0.05;
 
       if (isSuccess) {
@@ -238,11 +234,11 @@ export default function VNPayModal({
           paymentTime: new Date().toISOString(),
           status: 'SUCCESS'
         };
-        
+
         setPaymentResult(paymentData);
         setCurrentStep('success');
-        
-        
+
+
         setTimeout(() => {
           onPaymentSuccess(paymentData);
         }, 2000);
@@ -329,9 +325,9 @@ export default function VNPayModal({
     <div className="space-y-4">
       <div className="text-center">
         <div className="flex items-center justify-center mb-4">
-         <img
-         draggable="false"
-         src="/images/vnpay-logo.png" alt="bank" width={500} height={500} className='h-16 object-contain w-auto' />
+          <img
+            draggable="false"
+            src="/images/vnpay-logo.png" alt="bank" width={500} height={500} className='h-16 object-contain w-auto' />
         </div>
         <h3 className="text-lg font-semibold mb-2">Thanh toán qua VNPay</h3>
         <p className="text-maintext">Chọn ngân hàng để thực hiện thanh toán</p>
@@ -643,18 +639,18 @@ export default function VNPayModal({
             Quay lại
           </Button>
         )}
-        
-       <div className='w-full flex justify-end'>
-       {currentStep === 'bank-selection' && (
-          <Button variant="default" onClick={handleClose} className='w-32'>
-            Hủy
-          </Button>
-        )}
-       </div>
+
+        <div className='w-full flex justify-end'>
+          {currentStep === 'bank-selection' && (
+            <Button variant="default" onClick={handleClose} className='w-32'>
+              Hủy
+            </Button>
+          )}
+        </div>
 
         {currentStep === 'account-input' && (
-          <Button 
-            onClick={handleAccountSubmit} 
+          <Button
+            onClick={handleAccountSubmit}
             disabled={!accountNumber || accountNumber.length < 8 || isProcessing}
             className="w-32"
           >
@@ -663,8 +659,8 @@ export default function VNPayModal({
         )}
 
         {currentStep === 'otp-verification' && (
-          <Button 
-            onClick={handleOtpSubmit} 
+          <Button
+            onClick={handleOtpSubmit}
             disabled={!otpCode || otpCode.length !== 4 || isProcessing}
             className="flex-1"
           >

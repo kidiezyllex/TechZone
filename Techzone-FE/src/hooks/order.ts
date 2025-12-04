@@ -12,7 +12,8 @@ import {
   updateOrderStatus,
   cancelOrder,
   getOrdersByUser,
-  createPOSOrder
+  createPOSOrder,
+  postMyOrders
 } from "@/api/order";
 import {
   IOrderFilter,
@@ -24,8 +25,10 @@ import {
 import {
   IOrdersResponse,
   IOrderResponse,
-  IPOSOrderCreateResponse
+  IPOSOrderCreateResponse,
+  IMyOrdersResponse
 } from "@/interface/response/order";
+import { IMyOrdersRequest } from "@/interface/request/order";
 
 export const useOrders = (params: IOrderFilter = {}): UseQueryResult<IOrdersResponse, Error> => {
   return useQuery<IOrdersResponse, Error>({
@@ -100,3 +103,15 @@ export const useCreatePOSOrder = (): UseMutationResult<
     mutationFn: (payload) => createPOSOrder(payload),
   });
 }; 
+
+export const useMyOrders = (
+  payload: IMyOrdersRequest
+): UseQueryResult<IMyOrdersResponse, Error> => {
+  return useQuery<IMyOrdersResponse, Error>({
+    queryKey: ["myOrders", payload],
+    queryFn: () => postMyOrders(payload),
+    enabled: !!payload?.email,
+    refetchInterval: 4000,
+    refetchIntervalInBackground: true,
+  });
+};

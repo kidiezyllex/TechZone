@@ -3,14 +3,16 @@ import {
   IOrderCreate,
   IOrderUpdate,
   IOrderStatusUpdate,
-  IPOSOrderCreateRequest
+  IPOSOrderCreateRequest,
+  IMyOrdersRequest
 } from "@/interface/request/order";
 
 import {
   IOrdersResponse,
   IOrderResponse,
   IActionResponse,
-  IPOSOrderCreateResponse
+  IPOSOrderCreateResponse,
+  IMyOrdersResponse
 } from "@/interface/response/order";
 
 import { sendGet, sendPost, sendPut, sendPatch, sendDelete } from "./axios";
@@ -57,6 +59,11 @@ export const getOrdersByUser = async (
 ): Promise<IOrdersResponse> => {
   const res = await sendGet(`/orders/user/${userId}`, params);
   return res as IOrdersResponse;
+};
+
+export const postMyOrders = async (payload: IMyOrdersRequest): Promise<IMyOrdersResponse> => {
+  const res = await sendPost("/orders/my-orders", payload);
+  return res as IMyOrdersResponse;
 };
 
 export const createPOSOrder = async (

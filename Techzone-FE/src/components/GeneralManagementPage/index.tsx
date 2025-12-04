@@ -1,12 +1,10 @@
 "use client"
-
-import React, { useEffect, useState, createContext } from 'react';
+import React, { useEffect, useState, createContext, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Icon } from '@mdi/react';
 import {
-  mdiLock,
   mdiAccountEdit,
   mdiChevronRight,
   mdiOrderBoolAscending,
@@ -14,20 +12,13 @@ import {
   mdiMapMarker,
   mdiCreditCardOutline,
   mdiCashMultiple,
-  mdiAlertCircleOutline,
   mdiContentSaveOutline,
-  mdiTicketPercentOutline,
-  mdiContentCopy,
   mdiTruck,
   mdiPackageVariant,
   mdiCheckCircle,
   mdiClockOutline,
   mdiCancel,
-  mdiKeyboardReturn,
-  mdiPlus,
-  mdiDelete,
-  mdiMinus,
-  mdiLogout
+  mdiLogout,
 } from '@mdi/js';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -37,19 +28,13 @@ import { useForm } from 'react-hook-form';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { useUser } from '@/context/useUserContext';
 import { useUser as useClerkUser, useClerk } from '@clerk/clerk-react';
-import { useOrdersByUser, useOrderDetail } from '@/hooks/order';
+import { useOrderDetail, useMyOrders } from '@/hooks/order';
 import { useToast } from '@/hooks/useToast';
-import { useUpdateUserProfile, useChangePassword } from '@/hooks/account';
-import { useAvailableVouchersForUser } from '@/hooks/voucher';
-import { useReturnableOrders, useCreateReturnRequest, useMyReturns, useMyReturnDetail, useCancelMyReturn } from '@/hooks/return';
-import { IVoucher } from '@/interface/response/voucher';
-import { IOrder } from '@/interface/response/order';
-import { IReturn, IReturnableOrder } from '@/interface/response/return';
-import { ICustomerReturnRequest } from '@/interface/request/return';
+import { useUpdateUserProfile } from '@/hooks/account';
+import { IMyOrder } from '@/interface/response/order';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
@@ -83,10 +68,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
-import { formatDate } from '@/lib/utils';
-import { formatPrice } from '@/utils/formatters';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 
@@ -586,465 +567,6 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
     </Dialog>
   );
 };
-const ReturnStatusBadge = ({ status }: { status: string }) => {
-  const statusConfig: Record<string, { label: string; className: string }> = {
-    'CHO_XU_LY': { label: 'Chờ xử lý', className: '!bg-yellow-400 !text-white !border-yellow-500 text-nowrap' },
-    'DA_HOAN_TIEN': { label: 'Đã hoàn tiền', className: '!bg-green-400 !text-white !border-green-500 text-nowrap' },
-    'DA_HUY': { label: 'Đã hủy', className: '!bg-red-400 !text-white !border-red-500 text-nowrap' },
-  };
-
-  const config = statusConfig[status] || { label: status, className: 'bg-gray-400 text-maintext border-gray-500' };
-
-  return (
-    <Badge className={`${config.className} rounded-[4px] font-normal`}>
-      {config.label}
-    </Badge>
-  );
-};
-
-interface CreateReturnDialogProps {
-  orderId: string | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
-}
-
-const CreateReturnDialog: React.FC<CreateReturnDialogProps> = ({
-  orderId,
-  open,
-  onOpenChange,
-  onSuccess
-}) => {
-  const createReturnMutation = useCreateReturnRequest();
-  const { data: returnableOrdersData } = useReturnableOrders();
-  const { profile } = useUser();
-  const userId = profile?.data?.id;
-  const { data: ordersData } = useOrdersByUser(userId || '');
-
-  const [selectedItems, setSelectedItems] = useState<Array<{
-    product: string;
-    variant: { colorId: string; sizeId: string };
-    quantity: number;
-    maxQuantity: number;
-    productName: string;
-    price: number;
-  }>>([]);
-  const [reason, setReason] = useState('');
-
-  const returnableOrder = returnableOrdersData?.data?.orders?.find(o => o.id === orderId);
-  const displayOrder = ordersData?.data?.orders?.find(o => o.id === orderId);
-  const order = displayOrder || returnableOrder;
-
-  const handleAddItem = (item: any) => {
-    const productVariant = item.productVariant as any;
-    const product = productVariant?.product;
-
-    if (!product || !productVariant) {
-      toast.error("Không thể xác định thông tin sản phẩm");
-      return;
-    }
-
-    const existingIndex = selectedItems.findIndex(
-      si => si.product === product.id &&
-        si.variant.colorId === productVariant.colorId &&
-        si.variant.sizeId === productVariant.sizeId
-    );
-
-    if (existingIndex >= 0) {
-      const newItems = [...selectedItems];
-      if (newItems[existingIndex].quantity < item.quantity) {
-        newItems[existingIndex].quantity += 1;
-        setSelectedItems(newItems);
-      }
-    } else {
-      setSelectedItems([...selectedItems, {
-        product: product.id,
-        variant: {
-          colorId: productVariant.colorId,
-          sizeId: productVariant.sizeId
-        },
-        quantity: 1,
-        maxQuantity: item.quantity,
-        productName: product.name,
-        price: item.price
-      }]);
-    }
-  };
-
-  const handleRemoveItem = (index: number) => {
-    const newItems = [...selectedItems];
-    if (newItems[index].quantity > 1) {
-      newItems[index].quantity -= 1;
-    } else {
-      newItems.splice(index, 1);
-    }
-    setSelectedItems(newItems);
-  };
-
-  const handleSubmit = () => {
-    if (!orderId || selectedItems.length === 0 || !reason.trim()) {
-      toast.error("Vui lòng chọn sản phẩm và nhập lý do trả hàng");
-      return;
-    }
-
-    const payload: ICustomerReturnRequest = {
-      originalOrder: orderId,
-      items: selectedItems.map(item => ({
-        product: item.product,
-        variant: item.variant,
-        quantity: item.quantity
-      })),
-      reason: reason.trim()
-    };
-
-    createReturnMutation.mutate(payload, {
-      onSuccess: () => {
-        toast.success("Yêu cầu trả hàng đã được gửi thành công");
-        setSelectedItems([]);
-        setReason('');
-        onOpenChange(false);
-        onSuccess?.();
-      },
-      onError: (error) => {
-        toast.error("Đã xảy ra lỗi khi tạo yêu cầu trả hàng");
-      }
-    });
-  };
-
-  if (!open || !orderId || !order) return null;
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-        <DialogHeader>
-          <DialogTitle>Tạo yêu cầu trả hàng - Đơn #{order.code}</DialogTitle>
-          <DialogDescription>
-            Chọn sản phẩm bạn muốn trả và nhập lý do trả hàng
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          <div>
-            <h4 className="font-medium mb-3">Sản phẩm trong đơn hàng:</h4>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {order.items.map((item, index) => {
-                const productVariant = item.productVariant as any;
-                const product = productVariant?.product;
-                const imageUrl = productVariant?.images?.[0]?.imageUrl;
-                const color = productVariant?.color;
-                const size = productVariant?.size;
-
-                if (!product) {
-                  return (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
-                      <div className="flex items-center space-x-3">
-                        <img
-                          src="/images/white-image.png"
-                          alt="Sản phẩm không xác định"
-                          className="w-12 h-12 object-contain rounded"
-                        />
-                        <div>
-                          <p className="font-medium text-muted-foreground">Sản phẩm không xác định</p>
-                          <p className="text-sm text-muted-foreground">
-                            Số lượng: {item.quantity} | Giá: {formatPrice(item.price)}
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled
-                        className="gap-2"
-                      >
-                        Không thể trả
-                      </Button>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <img
-                        src={imageUrl || "/images/white-image.png"}
-                        alt={product?.name || 'Sản phẩm'}
-                        className="w-12 h-12 object-contain rounded"
-                      />
-                      <div>
-                        <p className="font-medium">{product?.name || 'Sản phẩm không xác định'}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Số lượng: {item.quantity} | Giá: {formatPrice(item.price)}
-                        </p>
-                        {product?.code && (
-                          <p className="text-xs text-muted-foreground">
-                            Mã: {product.code}
-                          </p>
-                        )}
-                        {color && (
-                          <p className="text-xs text-muted-foreground">
-                            Màu: {color.name}
-                          </p>
-                        )}
-                        {size && (
-                          <p className="text-xs text-muted-foreground">
-                            Size: {size.value}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleAddItem(item)}
-                      className="gap-2"
-                    >
-                      <Icon path={mdiPlus} size={0.7} />
-                      Thêm
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          {selectedItems.length > 0 && (
-            <div>
-              <h4 className="font-medium mb-3">Sản phẩm trả hàng:</h4>
-              <div className="space-y-2">
-                {selectedItems.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div>
-                      <p className="font-medium">{item.productName}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Số lượng: {item.quantity} | Giá: {formatPrice(item.price)}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleRemoveItem(index)}
-                        className="gap-1"
-                      >
-                        <Icon path={mdiMinus} size={0.7} />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const newItems = [...selectedItems];
-                          newItems.splice(index, 1);
-                          setSelectedItems(newItems);
-                        }}
-                        className="gap-1 text-red-600 hover:text-red-700"
-                      >
-                        <Icon path={mdiDelete} size={0.7} />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          <div>
-            <label className="block text-sm font-medium mb-2">Lý do trả hàng *</label>
-            <Textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Nhập lý do bạn muốn trả hàng..."
-              rows={3}
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Hủy
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={createReturnMutation.isPending || selectedItems.length === 0 || !reason.trim()}
-            className="gap-2"
-          >
-            {createReturnMutation.isPending ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-transparent border-white" />
-            ) : (
-              <Icon path={mdiKeyboardReturn} size={0.7} />
-            )}
-            Gửi yêu cầu trả hàng
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-interface ReturnDetailDialogProps {
-  returnId: string | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCancel?: () => void;
-}
-
-const ReturnDetailDialog: React.FC<ReturnDetailDialogProps> = ({
-  returnId,
-  open,
-  onOpenChange,
-  onCancel
-}) => {
-  const { data: returnData, isLoading, isError } = useMyReturnDetail(returnId || '');
-  const cancelReturnMutation = useCancelMyReturn();
-
-  const handleCancelReturn = () => {
-    if (!returnId) return;
-
-    cancelReturnMutation.mutate(returnId, {
-      onSuccess: () => {
-        toast.success("Đã hủy yêu cầu trả hàng");
-        onCancel?.();
-        onOpenChange(false);
-      },
-      onError: (error) => {
-        toast.error("Đã xảy ra lỗi khi hủy yêu cầu");
-      }
-    });
-  };
-
-  if (!open || !returnId) return null;
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-auto">
-        {isLoading ? (
-          <div className="flex items-center justify-center p-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-          </div>
-        ) : isError ? (
-          <div className="p-8 text-center">
-            <p className="text-red-500">Đã xảy ra lỗi khi tải thông tin trả hàng.</p>
-          </div>
-        ) : returnData && returnData.data ? (
-          <>
-            <DialogHeader>
-              <DialogTitle>Chi tiết trả hàng #{returnData.data.code}</DialogTitle>
-              <DialogDescription>
-                Ngày tạo: {format(new Date(returnData.data.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })}
-              </DialogDescription>
-              <div className="mt-2">
-                <ReturnStatusBadge status={returnData.data.status} />
-              </div>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Thông tin đơn hàng gốc</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">
-                    Mã đơn hàng: <span className="font-medium">
-                      {typeof returnData.data.originalOrder === 'string'
-                        ? returnData.data.originalOrder
-                        : returnData.data.originalOrder.code}
-                    </span>
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Sản phẩm trả hàng</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {returnData.data.items.map((item: any, index) => {
-
-                      const productVariant = item.productVariant as any;
-                      const product = productVariant?.product || item.product;
-                      const imageUrl = productVariant?.images?.[0]?.imageUrl || product?.variants?.[0]?.images?.[0];
-                      const color = productVariant?.color;
-                      const size = productVariant?.size;
-
-                      return (
-                        <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg">
-                          <img
-                            src={imageUrl || "/images/white-image.png"}
-                            alt={product?.name || 'Sản phẩm'}
-                            className="w-12 h-12 object-contain rounded"
-                          />
-                          <div className="flex-1">
-                            <p className="font-medium">{product?.name || 'Sản phẩm không xác định'}</p>
-                            <p className="text-sm text-muted-foreground">
-                              Số lượng: {item.quantity} | Giá: {formatPrice(item.price)}
-                            </p>
-                            {product?.code && (
-                              <p className="text-xs text-muted-foreground">
-                                Mã: {product.code}
-                              </p>
-                            )}
-                            {color && (
-                              <p className="text-xs text-muted-foreground">
-                                Màu: {color.name}
-                              </p>
-                            )}
-                            {size && (
-                              <p className="text-xs text-muted-foreground">
-                                Size: {size.value}
-                              </p>
-                            )}
-                            {item.reason && (
-                              <p className="text-sm text-muted-foreground">
-                                Lý do: {item.reason}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Thông tin hoàn tiền</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center text-lg font-bold">
-                    <span>Tổng tiền hoàn:</span>
-                    <span className="text-primary">{formatPrice(returnData.data.totalRefund)}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <DialogFooter>
-              {returnData.data.status === 'CHO_XU_LY' && (
-                <Button
-                  variant="destructive"
-                  onClick={handleCancelReturn}
-                  disabled={cancelReturnMutation.isPending}
-                  className="gap-2"
-                >
-                  {cancelReturnMutation.isPending ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-transparent border-white" />
-                  ) : (
-                    <Icon path={mdiCancel} size={0.7} />
-                  )}
-                  Hủy yêu cầu
-                </Button>
-              )}
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Đóng
-              </Button>
-            </DialogFooter>
-          </>
-        ) : (
-          <div className="p-8 text-center">
-            <p className="text-muted-foreground">Không tìm thấy thông tin trả hàng.</p>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-};
-
 const ProfileTab = () => {
   const { profile } = useUser();
   const userData = profile?.data;
@@ -1219,454 +741,6 @@ const ProfileTab = () => {
   );
 };
 
-const PasswordTab = () => {
-  const changePasswordMutation = useChangePassword();
-  const { showToast } = useToast();
-  const formSchema = z
-    .object({
-      currentPassword: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
-      newPassword: z.string().min(6, { message: "Mật khẩu mới phải có ít nhất 6 ký tự" }),
-      confirmPassword: z.string().min(6, { message: "Mật khẩu xác nhận phải có ít nhất 6 ký tự" }),
-    })
-    .refine((data) => data.newPassword === data.confirmPassword, {
-      message: "Mật khẩu xác nhận không khớp",
-      path: ["confirmPassword"],
-    });
-
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    },
-  });
-
-
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    changePasswordMutation.mutate(
-      {
-        currentPassword: values.currentPassword,
-        newPassword: values.newPassword,
-        confirmPassword: values.newPassword
-      },
-      {
-        onSuccess: (response) => {
-          showToast({
-            title: "Thành công",
-            message: "Đổi mật khẩu thành công",
-            type: "success",
-          });
-          form.reset();
-        },
-        onError: (error) => {
-          showToast({
-            title: "Lỗi",
-            message: error.message || "Đã xảy ra lỗi khi đổi mật khẩu",
-            type: "error",
-          });
-        },
-      }
-    );
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Icon path={mdiLock} size={0.7} className='text-primary' />
-          <span>Đổi mật khẩu</span>
-        </CardTitle>
-        <CardDescription>
-          Cập nhật mật khẩu để bảo vệ tài khoản của bạn
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="currentPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mật khẩu hiện tại</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="Nhập mật khẩu hiện tại" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="newPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mật khẩu mới</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="Nhập mật khẩu mới" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Mật khẩu phải có ít nhất 6 ký tự
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Xác nhận mật khẩu mới</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="Nhập lại mật khẩu mới" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="outline" type="button" onClick={() => form.reset()}>
-                Hủy
-              </Button>
-              <Button
-                type="submit"
-                disabled={changePasswordMutation.isPending}
-                className="gap-2"
-              >
-                {changePasswordMutation.isPending ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-transparent border-white" />
-                ) : (
-                  <Icon path={mdiLock} size={0.7} />
-                )}
-                Cập nhật mật khẩu
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
-  );
-};
-
-const VouchersTab = () => {
-  const { profile } = useUser();
-  const userId = profile?.data?.id;
-  const { data: vouchersData, isLoading, isError } = useAvailableVouchersForUser(userId || '', {});
-
-  const formatDiscountValue = (discountType: 'PERCENTAGE' | 'FIXED_AMOUNT', discountValue: number) => {
-    if (discountType === 'PERCENTAGE') {
-      return `${discountValue}%`;
-    }
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discountValue);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[...Array(3)].map((_, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-1/2 mt-2" />
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-2/3" />
-              <Skeleton className="h-10 w-1/3 mt-2" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Icon path={mdiAlertCircleOutline} size={0.7} className='text-primary' />
-            <span>Lỗi tải mã giảm giá</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-red-500">Đã xảy ra lỗi khi tải danh sách mã giảm giá của bạn. Vui lòng thử lại sau.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const vouchers = vouchersData?.data?.vouchers;
-  if (!vouchers || vouchers.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Icon path={mdiTicketPercentOutline} size={0.7} />
-            <span>Mã giảm giá</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Bạn không có mã giảm giá nào hiện có.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Icon path={mdiTicketPercentOutline} size={0.7} className="text-primary" />
-            <span>Mã giảm giá của bạn</span>
-          </CardTitle>
-          <CardDescription>
-            Danh sách các mã giảm giá bạn có thể sử dụng để tiết kiệm khi mua sắm.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
-            {vouchers.map((voucher: IVoucher) => (
-              <Card
-                key={voucher.id}
-                className={`relative overflow-hidden shadow-lg transition-all hover:shadow-xl group
-                                ${voucher.status === 'INACTIVE' || new Date(voucher.endDate) < new Date()
-                    ? 'bg-muted/30 border-dashed'
-                    : 'bg-card border-primary/20 hover:border-primary/50'}`}
-              >
-                {(voucher.status === 'INACTIVE' || new Date(voucher.endDate) < new Date()) && (
-                  <div className="absolute top-3 right-3 z-10">
-                    <Badge variant="destructive" className="text-xs px-2 py-1 rounded-full shadow-md">
-                      {new Date(voucher.endDate) < new Date() ? 'Đã hết hạn' : 'Ngừng hoạt động'}
-                    </Badge>
-                  </div>
-                )}
-                <CardHeader className="pb-3 relative">
-                  {!(voucher.status === 'INACTIVE' || new Date(voucher.endDate) < new Date()) && (
-                    <div className="absolute -top-4 -left-5 w-16 h-16 bg-primary/10 rounded-full transform rotate-45 group-hover:scale-110 transition-transform duration-300"></div>
-                  )}
-                  <div className="relative z-0">
-                    <CardTitle className="text-lg font-bold flex items-center gap-2.5 text-primary tracking-wide">
-                      {voucher.name}
-                    </CardTitle>
-                    <CardDescription className="text-xs mt-1">
-                      Mã: <span className="font-semibold text-foreground tracking-wider bg-primary/10 px-1.5 py-0.5 rounded">{voucher.code}</span>
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4.5 text-sm pt-2">
-                  <div className="border-t border-border pt-3 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium text-muted-foreground">Giá trị giảm:</span>
-                      <span className="font-bold text-lg text-primary">{formatDiscountValue(voucher.discountType, voucher.discountValue)}</span>
-                    </div>
-                    {voucher.discountType === 'PERCENTAGE' && voucher.maxDiscount && (
-                      <div className="flex justify-between items-center text-xs text-muted-foreground">
-                        <span>Tối đa:</span>
-                        <span>{formatPrice(voucher.maxDiscount)}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-muted-foreground">Đơn tối thiểu:</span>
-                    <span className="font-semibold">{formatPrice(voucher.minOrderValue || 0)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-muted-foreground">Hiệu lực:</span>
-                    <span className="font-semibold">{formatDate(voucher.startDate)} - {formatDate(voucher.endDate)}</span>
-                  </div>
-                  {voucher.quantity - voucher.usedCount > 0 && voucher.quantity < Infinity && (
-                    <div className="text-xs text-blue-600 flex justify-between items-center">
-                      <span className="font-medium text-muted-foreground">Lượt sử dụng còn lại:</span>
-                      <span className="font-semibold">{voucher.quantity - voucher.usedCount}</span>
-                    </div>
-                  )}
-
-                  {(voucher.status === 'ACTIVE' && new Date(voucher.endDate) >= new Date()) ? (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="w-full mt-4 bg-primary hover:bg-primary/80 text-primary-foreground gap-2 shadow-md hover:shadow-lg transition-shadow"
-                      onClick={() => {
-                        navigator.clipboard.writeText(voucher.code).then(() => {
-                          toast.success(`Đã sao chép mã: ${voucher.code}`, {
-                            position: "top-right",
-                            autoClose: 3000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
-                        }).catch(err => {
-                          toast.error("Không thể sao chép mã giảm giá.", {
-                            position: "top-right",
-                            autoClose: 3000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
-                        });
-                      }}
-                    >
-                      <Icon path={mdiContentCopy} size={0.7} />
-                      Sao chép mã
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full mt-4 cursor-not-allowed"
-                      disabled
-                    >
-                      Không thể sử dụng
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-const ReturnsTab = () => {
-  const { data: returnsData, isLoading, isError, refetch } = useMyReturns();
-  const [selectedReturnId, setSelectedReturnId] = useState<string | null>(null);
-  const [returnDetailOpen, setReturnDetailOpen] = useState(false);
-
-  const handleViewReturnDetails = (returnId: string) => {
-    setSelectedReturnId(returnId);
-    setReturnDetailOpen(true);
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'dd/MM/yyyy', { locale: vi });
-    } catch (error) {
-      return dateString;
-    }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-  };
-
-  return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <Icon path={mdiKeyboardReturn} size={0.7} className='text-primary' />
-            <span>Đơn trả hàng của bạn</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-            </div>
-          ) : isError ? (
-            <div className="py-8 text-center">
-              <p className="text-red-500">Đã xảy ra lỗi khi tải đơn trả hàng. Vui lòng thử lại sau.</p>
-            </div>
-          ) : !returnsData || !returnsData.data || !returnsData.data.returns || returnsData.data.returns.length === 0 ? (
-            <div className="py-8 text-center">
-              <p className="text-muted-foreground mb-4">Bạn chưa có đơn trả hàng nào.</p>
-            </div>
-          ) : (
-            <div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[120px] px-3 py-2">Mã trả hàng</TableHead>
-                    <TableHead className="px-3 py-2">Ngày tạo</TableHead>
-                    <TableHead className="px-3 py-2">Đơn hàng gốc</TableHead>
-                    <TableHead className="px-3 py-2">Sản phẩm</TableHead>
-                    <TableHead className="text-right px-3 py-2">Số tiền hoàn</TableHead>
-                    <TableHead className="px-3 py-2">Trạng thái</TableHead>
-                    <TableHead className="text-center px-3 py-2">Thao tác</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {returnsData.data.returns.map((returnItem: IReturn) => (
-                    <TableRow key={(returnItem as any)?.id}>
-                      <TableCell className="font-medium px-3 py-2">{returnItem.code}</TableCell>
-                      <TableCell className="px-3 py-2">{formatDate(returnItem.createdAt)}</TableCell>
-                      <TableCell className="px-3 py-2">
-                        {typeof returnItem.originalOrder === 'string'
-                          ? returnItem.originalOrder
-                          : returnItem.originalOrder.code}
-                      </TableCell>
-                      <TableCell className="px-3 py-2">
-                        <div className="flex flex-col gap-1">
-                          {returnItem.items.slice(0, 2).map((item: any, index) => (
-                            <div key={index} className="text-xs">
-                              {item.product?.name || 'Sản phẩm không xác định'} x{item.quantity}
-                            </div>
-                          ))}
-                          {returnItem.items.length > 2 && (
-                            <div className="text-xs text-muted-foreground">
-                              +{returnItem.items.length - 2} sản phẩm khác
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right font-medium px-3 py-2">
-                        {formatPrice(returnItem.totalRefund)}
-                      </TableCell>
-                      <TableCell className="px-3 py-2">
-                        <ReturnStatusBadge status={returnItem.status} />
-                      </TableCell>
-                      <TableCell className="text-center px-3 py-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleViewReturnDetails((returnItem as any)?.id)}
-                          title="Xem chi tiết"
-                        >
-                          <Icon path={mdiEye} size={0.7} />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              {returnsData.data.pagination && returnsData.data.pagination.totalPages > 1 && (
-                <div className="flex items-center justify-center space-x-2 py-4">
-                  <div className="text-sm text-muted-foreground">
-                    Trang {returnsData.data.pagination.currentPage} / {returnsData.data.pagination.totalPages}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      <ReturnDetailDialog
-        returnId={selectedReturnId}
-        open={returnDetailOpen}
-        onOpenChange={setReturnDetailOpen}
-        onCancel={() => refetch()}
-      />
-    </>
-  );
-};
-
 export default function GeneralManagementPage() {
   const navigate = useNavigate();
   const location = useLocation(); const pathname = location.pathname;
@@ -1675,20 +749,28 @@ export default function GeneralManagementPage() {
   const { user: clerkUser, isSignedIn: isClerkSignedIn } = useClerkUser();
   const { signOut } = useClerk();
   const [currentPage, setCurrentPage] = useState(1);
-  const userId = profile?.data?.id;
-  const { data: ordersData, isLoading, isError, refetch } = useOrdersByUser(userId || '');
+  const clerkPrimaryEmail =
+    clerkUser?.primaryEmailAddress?.emailAddress ||
+    clerkUser?.emailAddresses?.[0]?.emailAddress ||
+    '';
+  const profileEmail = profile?.data?.email || '';
+  const customerEmail = clerkPrimaryEmail || profileEmail || '';
+  const ordersQueryPayload = useMemo(
+    () => ({
+      email: customerEmail,
+      page: currentPage,
+      limit: 10,
+    }),
+    [customerEmail, currentPage]
+  );
+  const {
+    data: myOrdersData,
+    isLoading: isMyOrdersLoading,
+    isError: isMyOrdersError,
+    refetch: refetchMyOrders,
+  } = useMyOrders(ordersQueryPayload);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [orderDetailOpen, setOrderDetailOpen] = useState(false);
-  const [createReturnOrderId, setCreateReturnOrderId] = useState<string | null>(null);
-  const [createReturnOpen, setCreateReturnOpen] = useState(false);
-  const { data: returnableOrdersData, refetch: refetchReturnableOrders } = useReturnableOrders();
-
-  useEffect(() => {
-    if (clerkUser) {
-      console.log('Clerk User All Data:', JSON.stringify(clerkUser, null, 2));
-
-    }
-  }, [clerkUser, isClerkSignedIn]);
 
   useEffect(() => {
     const updateActiveTabFromHash = () => {
@@ -1719,7 +801,6 @@ export default function GeneralManagementPage() {
     );
   }
 
-
   const tabs = [
     {
       title: 'Thông tin cá nhân',
@@ -1738,11 +819,6 @@ export default function GeneralManagementPage() {
     setOrderDetailOpen(true);
   };
 
-  const handleCreateReturn = (orderId: string) => {
-    setCreateReturnOrderId(orderId);
-    setCreateReturnOpen(true);
-  };
-
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -1753,18 +829,24 @@ export default function GeneralManagementPage() {
     }
   };
 
-  const isOrderReturnable = (order: IOrder) => {
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [customerEmail]);
 
-    return order.orderStatus === 'HOAN_THANH' &&
-      returnableOrdersData?.data?.orders?.some(ro => ro.id === order.id);
+  const isOrderReturnable = (order: IMyOrder) => {
+    const normalizedStatus = order.status?.toLowerCase();
+    return normalizedStatus === 'completed';
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  const formatPrice = (price: number | string) => {
+    const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+    const safeValue = typeof numericPrice === 'number' && Number.isFinite(numericPrice) ? numericPrice : 0;
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(safeValue);
   };
 
   const getPaymentMethodName = (method: string) => {
-    switch (method) {
+    const normalizedMethod = method?.toUpperCase?.() || method;
+    switch (normalizedMethod) {
       case 'COD':
         return 'Thanh toán khi nhận hàng';
       case 'VNPAY':
@@ -1777,7 +859,8 @@ export default function GeneralManagementPage() {
   };
 
   const getPaymentStatusName = (status: string) => {
-    switch (status) {
+    const normalizedStatus = status?.toUpperCase?.() || status;
+    switch (normalizedStatus) {
       case 'PENDING':
         return 'Chờ thanh toán';
       case 'PAID':
@@ -1788,6 +871,53 @@ export default function GeneralManagementPage() {
         return 'Đã hoàn tiền';
       default:
         return status;
+    }
+  };
+
+  const getPaymentStatusBadgeClass = (status: string) => {
+    const normalizedStatus = status?.toUpperCase?.() || status;
+    if (normalizedStatus === 'PAID') {
+      return '!bg-emerald-400 !text-white !border-emerald-500 text-nowrap !rounded';
+    }
+    if (normalizedStatus === 'PENDING') {
+      return '!bg-yellow-400 !text-white !border-yellow-500 text-nowrap !rounded';
+    }
+    if (normalizedStatus === 'FAILED') {
+      return '!bg-red-400 !text-white !border-red-500 text-nowrap !rounded';
+    }
+    if (normalizedStatus === 'REFUNDED') {
+      return '!bg-blue-500 !text-white !border-blue-600 text-nowrap !rounded';
+    }
+    return 'bg-muted text-maintext border-muted text-nowrap !rounded';
+  };
+
+  const getCustomerOrderStatusConfig = (status: string) => {
+    const normalizedStatus = status?.toLowerCase?.() || '';
+    const configs: Record<string, { label: string; className: string }> = {
+      pending: { label: 'Chờ xác nhận', className: '!bg-yellow-400 !text-white !border-yellow-500 text-nowrap' },
+      confirmed: { label: 'Đã xác nhận', className: '!bg-blue-400 !text-white !border-blue-500 text-nowrap' },
+      shipping: { label: 'Đang giao', className: '!bg-orange-400 !text-white !border-orange-500 text-nowrap' },
+      completed: { label: 'Hoàn thành', className: '!bg-emerald-400 !text-white !border-emerald-500 text-nowrap' },
+      cancelled: { label: 'Đã hủy', className: '!bg-red-400 !text-white !border-red-500 text-nowrap' },
+    };
+    return configs[normalizedStatus] || { label: status || 'Không xác định', className: 'bg-gray-400 text-white border-gray-500' };
+  };
+
+  const getDeliveryTypeLabel = (type: string) => {
+    if (type === 'pickup') {
+      return 'Nhận tại cửa hàng';
+    }
+    return 'Giao hàng tận nơi';
+  };
+
+  const formatOrderDateTime = (dateString?: string | null) => {
+    if (!dateString) {
+      return 'Không xác định';
+    }
+    try {
+      return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: vi });
+    } catch (error) {
+      return 'Không xác định';
     }
   };
 
@@ -1875,9 +1005,6 @@ export default function GeneralManagementPage() {
               <TabsContent value="profile">
                 {activeTab === 'profile' && <ProfileTab />}
               </TabsContent>
-              <TabsContent value="password">
-                {activeTab === 'password' && <PasswordTab />}
-              </TabsContent>
               <TabsContent value="orders">
                 <Card>
                   <CardHeader>
@@ -1887,15 +1014,24 @@ export default function GeneralManagementPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {isLoading ? (
+                    {!customerEmail ? (
+                      <div className="py-8 text-center">
+                        <p className="text-muted-foreground mb-4">
+                          Vui lòng cập nhật email đăng nhập để xem lịch sử đơn hàng của bạn.
+                        </p>
+                        <Button variant="outline" asChild>
+                          <a href="#account-tabs?tab=profile">Cập nhật hồ sơ</a>
+                        </Button>
+                      </div>
+                    ) : isMyOrdersLoading ? (
                       <div className="flex items-center justify-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                       </div>
-                    ) : isError ? (
+                    ) : isMyOrdersError ? (
                       <div className="py-8 text-center">
                         <p className="text-red-500">Đã xảy ra lỗi khi tải đơn hàng. Vui lòng thử lại sau.</p>
                       </div>
-                    ) : !ordersData || !ordersData.data || !ordersData.data.orders || ordersData.data.orders.length === 0 ? (
+                    ) : !myOrdersData || !myOrdersData.data || myOrdersData.data.length === 0 ? (
                       <div className="py-8 text-center">
                         <p className="text-muted-foreground mb-4">Bạn chưa có đơn hàng nào.</p>
                         <Button variant="outline" asChild>
@@ -1904,113 +1040,96 @@ export default function GeneralManagementPage() {
                       </div>
                     ) : (
                       <div className="overflow-x-auto">
-                        <Table className="min-w-[1200px]">
+                        <Table className="min-w-[1100px]">
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="w-[120px] px-3 py-2 whitespace-nowrap">Mã đơn hàng</TableHead>
-                              <TableHead className="w-[180px] px-3 py-2 whitespace-nowrap">Ngày đặt</TableHead>
-                              <TableHead className="w-[200px] px-3 py-2 whitespace-nowrap">Sản phẩm</TableHead>
-                              <TableHead className="w-[120px] text-right px-3 py-2 whitespace-nowrap">Tổng tiền</TableHead>
-                              <TableHead className="w-[140px] px-3 py-2 whitespace-nowrap">Trạng thái đơn hàng</TableHead>
+                              <TableHead className="w-[140px] px-3 py-2 whitespace-nowrap">Mã đơn hàng</TableHead>
+                              <TableHead className="w-[160px] px-3 py-2 whitespace-nowrap">Ngày đặt</TableHead>
+                              <TableHead className="w-[260px] px-3 py-2 whitespace-nowrap">Thông tin giao hàng</TableHead>
+                              <TableHead className="w-[140px] text-right px-3 py-2 whitespace-nowrap">Tổng tiền</TableHead>
+                              <TableHead className="w-[160px] px-3 py-2 whitespace-nowrap">Trạng thái đơn</TableHead>
                               <TableHead className="w-[180px] px-3 py-2 whitespace-nowrap">Phương thức thanh toán</TableHead>
-                              <TableHead className="w-[140px] px-3 py-2 whitespace-nowrap">Trạng thái thanh toán</TableHead>
+                              <TableHead className="w-[160px] px-3 py-2 whitespace-nowrap">Trạng thái thanh toán</TableHead>
                               <TableHead className="w-[120px] text-center px-3 py-2 whitespace-nowrap">Thao tác</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {ordersData.data.orders.map((order: IOrder) => (
-                              <TableRow key={order.id}>
-                                <TableCell className="font-medium px-3 py-2 whitespace-nowrap text-maintext">{order.code}</TableCell>
-                                <TableCell className="px-3 py-2 whitespace-nowrap text-maintext">
-                                  {format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })}
-                                </TableCell>
-                                <TableCell className="px-3 py-2">
-                                  <div className="flex gap-1 flex-wrap">
-                                    {order.items.slice(0, 3).map((item, index) => {
-                                      const productVariant = item.productVariant as any;
-                                      const product = productVariant?.product;
-                                      const imageUrl = productVariant?.images?.[0]?.imageUrl;
-
-                                      return (
-                                        <div key={index} className="relative">
-                                          <img
-                                            src={imageUrl || "/images/white-image.png"}
-                                            alt={product?.name || 'Sản phẩm'}
-                                            className="w-12 h-12 object-contain rounded border"
-                                            title={product?.name || 'Sản phẩm không xác định'}
-                                          />
-                                          <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                            {item.quantity}
-                                          </span>
-                                        </div>
-                                      );
-                                    })}
-                                    {order.items.length > 3 && (
-                                      <div className="w-12 h-12 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
-                                        +{order.items.length - 3}
+                            {myOrdersData.data.map((order: IMyOrder) => {
+                              const statusConfig = getCustomerOrderStatusConfig(order.status);
+                              return (
+                                <TableRow key={order.id}>
+                                  <TableCell className="font-medium px-3 py-2 whitespace-nowrap text-maintext">
+                                    {order.order_number || `#${order.id}`}
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2 whitespace-nowrap text-maintext">
+                                    {formatOrderDateTime(order.created_at)}
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2">
+                                    <div className="text-sm text-maintext">
+                                      {order.delivery_address || 'Chưa cập nhật địa chỉ'}
+                                    </div>
+                                    {order.delivery_phone && (
+                                      <div className="text-xs text-muted-foreground mt-1">
+                                        SĐT: {order.delivery_phone}
                                       </div>
                                     )}
-                                  </div>
-                                </TableCell>
-                                <TableCell className="text-right font-medium px-3 py-2 whitespace-nowrap text-maintext">
-                                  {formatPrice(parseFloat(order.total.toString()))}
-                                </TableCell>
-                                <TableCell className="px-3 py-2 ">
-                                  <OrderStatusBadge status={order.orderStatus} />
-                                </TableCell>
-                                <TableCell className="px-3 py-2 whitespace-nowrap text-maintext">
-                                  {getPaymentMethodName(order.paymentMethod)}
-                                </TableCell>
-                                <TableCell className="px-3 py-2">
-                                  <Badge className={order.paymentStatus === 'PAID' ? '!bg-emerald-400 !text-white !border-emerald-500 text-nowrap !rounded' : '!bg-extra text-nowrap text-white px-2 py-1 rounded'}>
-                                    {getPaymentStatusName(order.paymentStatus)}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell className="text-center px-3 py-2">
-                                  <div className="flex items-center justify-start space-x-2">
-                                    <Button
-                                      variant="outline"
-                                      size="icon"
-                                      onClick={() => handleViewOrderDetails(order.id)}
-                                      title="Xem chi tiết"
-                                    >
-                                      <Icon path={mdiEye} size={0.7} />
-                                    </Button>
-                                    {isOrderReturnable(order) && (
+                                  </TableCell>
+                                  <TableCell className="text-right font-medium px-3 py-2 whitespace-nowrap text-maintext">
+                                    {formatPrice(order.total_amount)}
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2">
+                                    <Badge className={`${statusConfig.className} rounded-[4px] font-normal`}>
+                                      {statusConfig.label}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2 whitespace-nowrap text-maintext font-semibold">
+                                    {getPaymentMethodName(order.payment_method)}
+                                  </TableCell>
+                                  <TableCell className="px-3 py-2">
+                                    <Badge className={getPaymentStatusBadgeClass(order.payment_status)}>
+                                      {getPaymentStatusName(order.payment_status)}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-center px-3 py-2">
+                                    <div className="flex items-center justify-start space-x-2">
                                       <Button
                                         variant="outline"
                                         size="icon"
-                                        onClick={() => handleCreateReturn(order.id)}
-                                        title="Yêu cầu trả hàng"
+                                        onClick={() => handleViewOrderDetails(String(order.id))}
+                                        title="Xem chi tiết"
                                       >
-                                        <Icon path={mdiKeyboardReturn} size={0.7} />
+                                        <Icon path={mdiEye} size={0.7} />
                                       </Button>
-                                    )}
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))}
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
                           </TableBody>
                         </Table>
 
-                        {ordersData.data.pagination && ordersData.data.pagination.totalPages > 1 && (
+                        {myOrdersData.pagination && myOrdersData.pagination.totalPages > 1 && (
                           <div className="flex items-center justify-center space-x-2 py-4">
                             <Button
                               variant="outline"
                               size="sm"
                               disabled={currentPage === 1}
-                              onClick={() => setCurrentPage(currentPage - 1)}
+                              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                             >
                               Trang trước
                             </Button>
                             <div className="text-sm text-muted-foreground">
-                              Trang {currentPage} / {ordersData.data.pagination.totalPages}
+                              Trang {currentPage} / {myOrdersData.pagination.totalPages}
                             </div>
                             <Button
                               variant="outline"
                               size="sm"
-                              disabled={currentPage === ordersData.data.pagination.totalPages}
-                              onClick={() => setCurrentPage(currentPage + 1)}
+                              disabled={currentPage === myOrdersData.pagination.totalPages}
+                              onClick={() =>
+                                setCurrentPage((prev) =>
+                                  myOrdersData.pagination ? Math.min(prev + 1, myOrdersData.pagination.totalPages) : prev + 1
+                                )
+                              }
                             >
                               Trang sau
                             </Button>
@@ -2021,12 +1140,6 @@ export default function GeneralManagementPage() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              <TabsContent value="returns">
-                {activeTab === 'returns' && <ReturnsTab />}
-              </TabsContent>
-              <TabsContent value="vouchers">
-                {activeTab === 'vouchers' && <VouchersTab />}
-              </TabsContent>
             </Tabs>
           </motion.div>
         </div>
@@ -2035,15 +1148,6 @@ export default function GeneralManagementPage() {
         orderId={selectedOrderId}
         open={orderDetailOpen}
         onOpenChange={setOrderDetailOpen}
-      />
-      <CreateReturnDialog
-        orderId={createReturnOrderId}
-        open={createReturnOpen}
-        onOpenChange={setCreateReturnOpen}
-        onSuccess={() => {
-          refetch();
-          refetchReturnableOrders();
-        }}
       />
     </AccountTabContext.Provider>
   );

@@ -410,7 +410,8 @@ export default function ShippingPage() {
           specificAddress: `${formValues.address}, ${selectedWardName}, ${selectedDistrictName}, ${selectedProvinceName}, Việt Nam`
         },
         paymentMethod: 'BANK_TRANSFER',
-        paymentInfo: paymentData
+        paymentInfo: paymentData,
+        payment_status: 'paid'
       };
 
       const response = await createOrderMutation.mutateAsync(orderData as any);
@@ -762,8 +763,6 @@ export default function ShippingPage() {
                 <span className="text-muted-foreground font-semibold text-sm">Tạm tính</span>
                 <span className='text-maintext'>{formatPrice(subtotal + voucherDiscount)}</span>
               </div>
-
-              { }
               {appliedVoucher && voucherDiscount > 0 && (
                 <div className="flex justify-between w-full text-green-600">
                   <span className="text-sm font-semibold">Giảm giá voucher ({appliedVoucher.code})</span>
@@ -787,8 +786,6 @@ export default function ShippingPage() {
           </Card>
         </div>
       </div>
-
-      { }
       <VNPayModal
         isOpen={showVNPayModal}
         onClose={() => setShowVNPayModal(false)}
@@ -801,8 +798,6 @@ export default function ShippingPage() {
         onPaymentSuccess={handleVNPaySuccess}
         onPaymentError={handleVNPayError}
       />
-
-      { }
       {orderResult && (
         <SuccessModal
           isOpen={showSuccessModal}

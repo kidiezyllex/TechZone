@@ -170,3 +170,39 @@ export interface IPOSOrderCreateResponse {
   message: string;
   data: IOrder;
 } 
+
+export interface IMyOrder {
+  id: number;
+  order_number: string;
+  customer_id: number;
+  store_id?: number | null;
+  delivery_type: string;
+  delivery_address?: string | null;
+  delivery_city?: string | null;
+  delivery_phone?: string | null;
+  payment_method: string;
+  payment_status: string;
+  subtotal: string;
+  discount_amount: string;
+  shipping_fee: string;
+  total_amount: string;
+  status: string;
+  notes?: string | null;
+  cancelled_reason?: string | null;
+  created_at: string;
+  updated_at: string;
+  confirmed_at?: string | null;
+  completed_at?: string | null;
+}
+
+export interface IMyOrdersResponse {
+  success: boolean;
+  message: string;
+  data: IMyOrder[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
