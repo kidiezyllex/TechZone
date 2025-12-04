@@ -4,12 +4,30 @@ import { successResponse, errorResponse } from '../utils/response.js';
 // LẤY TẤT CẢ DANH MỤC
 export const getAllCategories = async (req, res, next) => {
   try {
+    const { status } = req.query;
+
+    // Xây dựng điều kiện lọc theo status nếu có
+    const whereClauses = [];
+    const values = [];
+
+    if (status !== undefined) {
+      const normalized = String(status).toUpperCase();
+      if (normalized === 'ACTIVE') {
+        whereClauses.push('c.is_active = 1');
+      } else if (normalized === 'INACTIVE') {
+        whereClauses.push('c.is_active = 0');
+      }
+    }
+
+    const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
     const categories = await query(
       `SELECT c.*, 
               (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.is_active = TRUE) as product_count
        FROM categories c
-       WHERE c.is_active = TRUE
-       ORDER BY c.display_order, c.name`
+       ${whereSql}
+       ORDER BY c.display_order, c.name`,
+      values
     );
     
     return successResponse(res, categories, 'Lấy danh sách danh mục thành công');
@@ -44,11 +62,14 @@ export const getCategoryById = async (req, res, next) => {
 // TẠO DANH MỤC MỚI
 export const createCategory = async (req, res, next) => {
   try {
-    const { name, description, icon, display_order } = req.body;
+    const { name, description, icon, image_url, display_order } = req.body;
+    
+    // Hỗ trợ cả trường cũ `icon` và trường đúng trong DB là `image_url`
+    const finalImageUrl = image_url || icon || null;
     
     const result = await query(
-      'INSERT INTO categories (name, description, icon, display_order) VALUES (?, ?, ?, ?)',
-      [name, description || null, icon || null, display_order || 0]
+      'INSERT INTO categories (name, description, image_url, display_order) VALUES (?, ?, ?, ?)',
+      [name, description || null, finalImageUrl, display_order || 0]
     );
     
     const [newCategory] = await query('SELECT * FROM categories WHERE id = ?', [result.insertId]);
@@ -63,7 +84,7 @@ export const createCategory = async (req, res, next) => {
 export const updateCategory = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, description, icon, display_order, is_active } = req.body;
+    const { name, description, icon, image_url, display_order, is_active, status } = req.body;
     
     const [category] = await query('SELECT id FROM categories WHERE id = ?', [id]);
     if (!category) {
@@ -75,9 +96,30 @@ export const updateCategory = async (req, res, next) => {
     
     if (name) { updates.push('name = ?'); values.push(name); }
     if (description !== undefined) { updates.push('description = ?'); values.push(description); }
-    if (icon !== undefined) { updates.push('icon = ?'); values.push(icon); }
+    
+    // Tương thích cả `icon` (từ FE cũ) và `image_url` (đúng với DB)
+    if (image_url !== undefined || icon !== undefined) {
+      updates.push('image_url = ?');
+      values.push(image_url !== undefined ? image_url : icon);
+    }
     if (display_order !== undefined) { updates.push('display_order = ?'); values.push(display_order); }
-    if (is_active !== undefined) { updates.push('is_active = ?'); values.push(is_active); }
+
+    // Map trường `status` (ACTIVE/INACTIVE) sang `is_active` trong DB
+    let finalIsActive;
+    if (status !== undefined) {
+      // Chuẩn hóa string, chấp nhận cả 'ACTIVE' | 'INACTIVE' | 'active' | 'inactive'
+      const normalized = String(status).toUpperCase();
+      if (normalized === 'ACTIVE') finalIsActive = 1;
+      else if (normalized === 'INACTIVE') finalIsActive = 0;
+    } else if (is_active !== undefined) {
+      // Nếu FE cũ gửi trực tiếp is_active
+      finalIsActive = is_active;
+    }
+
+    if (finalIsActive !== undefined) {
+      updates.push('is_active = ?');
+      values.push(finalIsActive);
+    }
     
     if (updates.length === 0) {
       return errorResponse(res, 'Không có thông tin cần cập nhật', 400);

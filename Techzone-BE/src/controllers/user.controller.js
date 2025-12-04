@@ -3,13 +3,13 @@ import { successResponse, errorResponse, paginatedResponse } from '../utils/resp
 import { hashPassword } from '../utils/bcrypt.js';
 import { ValidationError, NotFoundError, ConflictError } from '../utils/errors.js';
 
-// LẤY DANH SÁCH USERS (Staff và Customer)
 export const getUsers = async (req, res, next) => {
   try {
     const { 
       role,        // admin | staff | customer
       role_id, 
       store_id, 
+      classification, // new | regular | vip | inactive
       page = 1, 
       limit = 20, 
       search,
@@ -58,6 +58,12 @@ export const getUsers = async (req, res, next) => {
     if (store_id) {
       sql += ' AND u.store_id = ?';
       params.push(store_id);
+    }
+
+    // Filter by customer classification (chỉ áp dụng cho khách hàng)
+    if (classification) {
+      sql += ' AND c.classification = ?';
+      params.push(String(classification).toLowerCase());
     }
 
     // Search

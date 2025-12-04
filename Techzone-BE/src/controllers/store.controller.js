@@ -30,7 +30,7 @@ export const getStores = async (req, res, next) => {
     sql += ' ORDER BY name LIMIT ? OFFSET ?';
     params.push(limit, offset);
 
-    const [data] = await query(sql, params);
+    const data = await query(sql, params);
 
     return paginatedResponse(res, data, page, limit, total, 'Lấy danh sách cửa hàng thành công');
   } catch (error) {
@@ -41,15 +41,23 @@ export const getStores = async (req, res, next) => {
 // TẠO CỬA HÀNG
 export const createStore = async (req, res, next) => {
   try {
-    const { name, address, city, district, phone, manager_id, is_active } = req.body;
+    const { name, address, city, district, phone, manager_id, is_active, email, google_maps_url } = req.body;
 
     if (!name || !address || !city) {
       return errorResponse(res, 'Thông tin không đầy đủ', 400);
     }
 
-    const [result] = await query(
-      'INSERT INTO stores (name, address, city, district, phone, manager_id, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [name, address, city, district || null, phone || null, manager_id || null, is_active ?? true]
+    const result = await query(
+      'INSERT INTO stores (name, address, city, phone, email, google_maps_url, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [
+        name,
+        address,
+        city,
+        phone || null,
+        email || null,
+        google_maps_url || null,
+        is_active ?? true
+      ]
     );
 
     const [store] = await query('SELECT * FROM stores WHERE id = ?', [result.insertId]);
@@ -159,7 +167,7 @@ export const getStoreDetail = async (req, res, next) => {
 // LẤY DANH SÁCH CỬA HÀNG (cho dropdown, minimal data)
 export const getStoresForDropdown = async (req, res, next) => {
   try {
-    const [data] = await query('SELECT id, name FROM stores WHERE is_active = TRUE ORDER BY name');
+    const data = await query('SELECT id, name FROM stores WHERE is_active = TRUE ORDER BY name');
 
     return successResponse(res, data, 'Lấy danh sách cửa hàng thành công');
   } catch (error) {
