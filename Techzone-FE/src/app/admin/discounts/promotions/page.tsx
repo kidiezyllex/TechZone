@@ -433,7 +433,7 @@ export default function PromotionsPage() {
 
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Xác nhận xóa chiến dịch khuyến mãi</DialogTitle>
           </DialogHeader>

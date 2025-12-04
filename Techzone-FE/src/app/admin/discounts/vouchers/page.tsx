@@ -452,8 +452,8 @@ export default function VouchersPage() {
 
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader >
             <DialogTitle>Xác nhận xóa mã giảm giá</DialogTitle>
           </DialogHeader>
           <p className="py-4">Bạn có chắc chắn muốn xóa mã giảm giá này không? Hành động này không thể hoàn tác.</p>

@@ -430,8 +430,8 @@ export default function ProductsPage() {
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap">
                         <span className={`px-2 py-1 text-xs rounded-full ${product.status === 'ACTIVE' || product.is_active === 1
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-green-100 text-green-800 border border-green-500'
+                          : 'bg-red-100 text-red-800 border border-red-500'
                           }`}>
                           {product.status === 'ACTIVE' || product.is_active === 1 ? 'Hoạt động' : 'Không hoạt động'}
                         </span>
@@ -465,7 +465,7 @@ export default function ProductsPage() {
                               </Button>
                             </DialogTrigger>
                             {isDeleteDialogOpen && productToDelete === product.id && (
-                              <DialogContent>
+                              <DialogContent className="max-w-2xl">
                                 <DialogHeader>
                                   <DialogTitle>Xác nhận xóa sản phẩm</DialogTitle>
                                 </DialogHeader>

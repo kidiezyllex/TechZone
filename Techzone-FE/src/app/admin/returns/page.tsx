@@ -546,7 +546,7 @@ export default function ReturnsPage() {
 
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-4xl">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Xác nhận xóa yêu cầu trả hàng</DialogTitle>
           </DialogHeader>

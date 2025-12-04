@@ -279,64 +279,37 @@ export default function AccountsPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <Button
-              variant="outline"
-              className="flex items-center"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Icon path={mdiFilterOutline} size={0.7} className="mr-2" />
-              {showFilters ? 'Ẩn bộ lọc' : 'Hiện bộ lọc'}
-            </Button>
-          </div>
-
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="mt-4 pt-4 border-t"
+            <div className="flex gap-2">
+              <Select
+                value={filters.role ?? 'all'}
+                onValueChange={(value) => handleFilterChange('role', value === 'all' ? undefined : value)}
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-maintext mb-2 font-semibold">
-                      Vai trò
-                    </label>
-                    <Select
-                      value={filters.role ?? 'all'}
-                      onValueChange={(value) => handleFilterChange('role', value === 'all' ? undefined : value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Tất cả vai trò" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all" className="text-maintext font-semibold">Tất cả vai trò</SelectItem>
-                        <SelectItem value="admin" className="text-maintext font-medium">Quản trị viên</SelectItem>
-                        <SelectItem value="staff" className="text-maintext font-medium">Nhân viên</SelectItem>
-                        <SelectItem value="customer" className="text-maintext font-medium">Khách hàng</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="block text-sm text-maintext mb-2 font-semibold">
-                      Trạng thái
-                    </label>
-                    <Select value={filters.status || ''} onValueChange={(value) => handleFilterChange('status', value === 'all' ? undefined : value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Tất cả trạng thái" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                        <SelectItem value="1">Hoạt động</SelectItem>
-                        <SelectItem value="0">Không hoạt động</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <SelectTrigger className='w-48'>
+                  <SelectValue placeholder="Tất cả vai trò" />
+                </SelectTrigger>
+                <SelectContent className='w-48'>
+                  <SelectItem value="all" className="text-maintext font-semibold">Tất cả vai trò</SelectItem>
+                  <SelectItem value="admin" className="text-maintext font-medium">Quản trị viên</SelectItem>
+                  <SelectItem value="staff" className="text-maintext font-medium">Nhân viên</SelectItem>
+                  <SelectItem value="customer" className="text-maintext font-medium">Khách hàng</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select
+                value={filters.classification ?? 'all'}
+                onValueChange={(value) => handleFilterChange('classification', value === 'all' ? undefined : value)}
+              >
+                <SelectTrigger className='w-48'>
+                  <SelectValue placeholder="Phân loại khách hàng" />
+                </SelectTrigger>
+                <SelectContent className='w-48'>
+                  <SelectItem value="all" className="text-maintext font-semibold">Phân loại khách hàng</SelectItem>
+                  <SelectItem value="vip" className="text-maintext font-medium">VIP</SelectItem>
+                  <SelectItem value="regular" className="text-maintext font-medium">Thường xuyên</SelectItem>
+                  <SelectItem value="new" className="text-maintext font-medium">Mới</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -517,7 +490,7 @@ export default function AccountsPage() {
 
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Xác nhận xóa tài khoản</DialogTitle>
             <DialogDescription>

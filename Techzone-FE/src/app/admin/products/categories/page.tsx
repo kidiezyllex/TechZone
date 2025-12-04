@@ -219,8 +219,8 @@ export default function CategoriesPage() {
                       </TableCell>
                       <TableCell className="px-4 py-4 whitespace-nowrap">
                         <span className={`px-2 py-1 text-xs rounded-full ${category.status === 'ACTIVE'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-green-100 text-green-800 border border-green-500'
+                          : 'bg-red-100 text-red-800 border border-red-500'
                           }`}>
                           {category.status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
                         </span>
@@ -272,7 +272,7 @@ export default function CategoriesPage() {
                                 <Icon path={mdiDeleteCircle} size={0.7} />
                               </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="max-w-2xl">
                               <DialogHeader>
                                 <DialogTitle>Xác nhận xóa danh mục</DialogTitle>
                               </DialogHeader>
@@ -566,7 +566,7 @@ function CreateCategoryDialog({ isOpen, onClose }: CreateCategoryDialogProps) {
   };
 
   return (
-    <DialogContent className="sm:max-w-4xl">
+    <DialogContent className="max-w-2xl">
       <DialogHeader>
         <DialogTitle>Thêm danh mục mới</DialogTitle>
       </DialogHeader>

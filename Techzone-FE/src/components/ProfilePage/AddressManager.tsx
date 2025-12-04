@@ -450,7 +450,7 @@ export default function AddressManager() {
 
 
       <Dialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-center">Xác nhận xóa địa chỉ</DialogTitle>
             <DialogDescription className="text-center">

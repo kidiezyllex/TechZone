@@ -2,6 +2,7 @@ export interface IAccountFilter {
   role?: string;
   status?: string;
   search?: string;
+  classification?: string;
   page?: number;
   limit?: number;
 }
