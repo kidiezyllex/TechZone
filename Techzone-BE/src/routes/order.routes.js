@@ -90,27 +90,35 @@ router.post('/', createOrder);
 /**
  * @swagger
  * /api/orders/my-orders:
- *   get:
- *     summary: Lấy danh sách đơn hàng của người dùng hiện tại
+ *   post:
+ *     summary: Lấy danh sách đơn hàng theo email
  *     tags: [3. Cart & Orders - Quản lý Đơn Hàng]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 20
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               page:
+ *                 type: integer
+ *                 default: 1
+ *               limit:
+ *                 type: integer
+ *                 default: 10
+ *               status:
+ *                 type: string
+ *                 description: Lọc theo trạng thái đơn hàng
  *     responses:
  *       200:
  *         description: Danh sách đơn hàng
  */
-router.get('/my-orders', authenticate, getUserOrders);
+router.post('/my-orders', getUserOrders);
 
 /**
  * @swagger

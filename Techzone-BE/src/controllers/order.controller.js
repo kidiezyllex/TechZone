@@ -3,6 +3,71 @@ import { successResponse, errorResponse, paginatedResponse } from '../utils/resp
 import { ValidationError, NotFoundError } from '../utils/errors.js';
 import { hashPassword } from '../utils/bcrypt.js';
 
+const PAYMENT_METHOD_INPUT_MAP = {
+  COD: 'cod',
+  BANK_TRANSFER: 'online',
+  ONLINE: 'online'
+};
+
+const PAYMENT_METHOD_RESPONSE_MAP = {
+  cod: 'COD',
+  online: 'BANK_TRANSFER'
+};
+
+const normalizePaymentMethodInput = (method) => {
+  if (!method) {
+    throw new ValidationError('Phương thức thanh toán không được để trống');
+  }
+  
+  const formatted = method.toString().trim().toUpperCase();
+  if (PAYMENT_METHOD_INPUT_MAP[formatted]) {
+    return PAYMENT_METHOD_INPUT_MAP[formatted];
+  }
+  
+  throw new ValidationError('Phương thức thanh toán không hợp lệ. Chỉ hỗ trợ COD hoặc BANK_TRANSFER');
+};
+
+const normalizePaymentStatusInput = (status) => {
+  const fallback = 'pending';
+  
+  if (!status) {
+    return fallback;
+  }
+  
+  const normalized = status.toString().trim().toLowerCase();
+  const validStatuses = ['pending', 'paid', 'refunded'];
+  
+  if (!validStatuses.includes(normalized)) {
+    throw new ValidationError('Trạng thái thanh toán không hợp lệ');
+  }
+  
+  return normalized;
+};
+
+const derivePaymentStatusFromInfo = (paymentInfo) => {
+  if (!paymentInfo || !paymentInfo.status) {
+    return null;
+  }
+  
+  return paymentInfo.status.toString().trim().toUpperCase() === 'SUCCESS' ? 'paid' : 'pending';
+};
+
+const mapPaymentMethodForResponse = (dbValue) => PAYMENT_METHOD_RESPONSE_MAP[dbValue] || 'BANK_TRANSFER';
+
+const mapOrderResponse = (order) => {
+  if (!order) {
+    return order;
+  }
+  
+  const mapped = { ...order };
+  
+  if (Object.prototype.hasOwnProperty.call(mapped, 'payment_method')) {
+    mapped.payment_method = mapPaymentMethodForResponse(mapped.payment_method);
+  }
+  
+  return mapped;
+};
+
 export const createOrder = async (req, res, next) => {
   try {
     const userId = req.user?.id; // Optional: user might not be authenticated
@@ -17,6 +82,9 @@ export const createOrder = async (req, res, next) => {
       total,
       shippingAddress,
       paymentMethod,
+      paymentInfo,
+      payment_status,
+      paymentStatus,
       notes
     } = req.body;
     
@@ -135,7 +203,10 @@ export const createOrder = async (req, res, next) => {
     const deliveryCity = shippingAddress.provinceId ? null : (shippingAddress.city != null ? String(shippingAddress.city) : null);
     const deliveryPhone = shippingAddress.phoneNumber != null ? String(shippingAddress.phoneNumber) : null;
     
-    const paymentMethodNormalized = paymentMethod.toLowerCase() === 'cod' ? 'cod' : 'online';
+    const paymentMethodNormalized = normalizePaymentMethodInput(paymentMethod);
+    
+    const paymentStatusPayload = payment_status ?? paymentStatus ?? derivePaymentStatusFromInfo(paymentInfo);
+    const paymentStatusNormalized = normalizePaymentStatusInput(paymentStatusPayload);
     
     const subtotalValue = parseFloat(subTotal);
     const discountAmount = discount != null ? parseFloat(discount) : 0;
@@ -205,9 +276,9 @@ export const createOrder = async (req, res, next) => {
         `INSERT INTO orders (
           order_number, customer_id, store_id, delivery_type, 
           delivery_address, delivery_city, delivery_phone, 
-          payment_method, subtotal, discount_amount, shipping_fee, total_amount, 
+          payment_method, payment_status, subtotal, discount_amount, shipping_fee, total_amount, 
           status, notes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
         [
           orderNumber,
           customerId_db,
@@ -217,6 +288,7 @@ export const createOrder = async (req, res, next) => {
           deliveryCity,
           deliveryPhone,
           paymentMethodNormalized,
+          paymentStatusNormalized,
           subtotalValue,
           discountAmount,
           shippingFee,
@@ -264,8 +336,9 @@ export const createOrder = async (req, res, next) => {
     });
     
     const [order] = await query('SELECT * FROM orders WHERE id = ?', [result]);
+    const mappedOrder = mapOrderResponse(order);
     
-    return successResponse(res, order, 'Đặt hàng thành công', 201);
+    return successResponse(res, mappedOrder, 'Đặt hàng thành công', 201);
   } catch (error) {
     // Handle custom validation errors
     if (error instanceof ValidationError || error instanceof NotFoundError) {
@@ -278,15 +351,26 @@ export const createOrder = async (req, res, next) => {
 // LẤY DANH SÁCH ĐƠN HÀNG CỦA USER
 export const getUserOrders = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-    const { page = 1, limit = 10, status } = req.query;
-    const offset = (page - 1) * limit;
+    const { email, page = 1, limit = 10, status } = req.body || {};
+    
+    if (!email) {
+      return errorResponse(res, 'Email là bắt buộc', 400);
+    }
+    
+    const [user] = await query('SELECT id FROM users WHERE email = ?', [email]);
+    if (!user) {
+      return errorResponse(res, 'Không tìm thấy người dùng với email này', 404);
+    }
     
     // Get customer_id from user_id
-    const [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
+    const [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [user.id]);
     if (!customer) {
       return errorResponse(res, 'Không tìm thấy thông tin khách hàng', 404);
     }
+    
+    const pageNum = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
+    const limitNum = parseInt(limit, 10) > 0 ? parseInt(limit, 10) : 10;
+    const offset = (pageNum - 1) * limitNum;
     
     let sql = 'SELECT * FROM orders WHERE customer_id = ?';
     const params = [customer.id];
@@ -300,11 +384,12 @@ export const getUserOrders = async (req, res, next) => {
     const [{ total }] = await query(countSql, params);
     
     sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), offset);
+    params.push(limitNum, offset);
     
     const orders = await query(sql, params);
+    const mappedOrders = orders.map(mapOrderResponse);
     
-    return paginatedResponse(res, orders, page, limit, total, 'Lấy danh sách đơn hàng thành công');
+    return paginatedResponse(res, mappedOrders, pageNum, limitNum, total, 'Lấy danh sách đơn hàng thành công');
   } catch (error) {
     next(error);
   }
@@ -369,8 +454,9 @@ export const getOrderById = async (req, res, next) => {
     );
     
     order.items = items;
+    const mappedOrder = mapOrderResponse(order);
     
-    return successResponse(res, order, 'Lấy chi tiết đơn hàng thành công');
+    return successResponse(res, mappedOrder, 'Lấy chi tiết đơn hàng thành công');
   } catch (error) {
     next(error);
   }
@@ -437,8 +523,9 @@ export const updateOrderStatus = async (req, res, next) => {
     );
     
     const [updated] = await query('SELECT * FROM orders WHERE id = ?', [id]);
+    const mappedOrder = mapOrderResponse(updated);
     
-    return successResponse(res, updated, 'Cập nhật trạng thái đơn hàng thành công');
+    return successResponse(res, mappedOrder, 'Cập nhật trạng thái đơn hàng thành công');
   } catch (error) {
     next(error);
   }
@@ -513,8 +600,9 @@ export const getAllOrders = async (req, res, next) => {
     params.push(parseInt(limit), offset);
     
     const orders = await query(sql, params);
+    const mappedOrders = orders.map(mapOrderResponse);
     
-    return paginatedResponse(res, orders, page, limit, total, 'Lấy danh sách đơn hàng thành công');
+    return paginatedResponse(res, mappedOrders, page, limit, total, 'Lấy danh sách đơn hàng thành công');
   } catch (error) {
     next(error);
   }
