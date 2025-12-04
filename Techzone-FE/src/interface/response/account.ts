@@ -22,6 +22,7 @@ export interface IAccount {
   role?: 'CUSTOMER' | 'STAFF' | 'ADMIN';
   status?: 'ACTIVE' | 'INACTIVE';
   createdAt?: string;
+  addresses?: IAddress[];
 }
 
 export interface IAccountResponse extends IBaseResponse<IAccount> {}

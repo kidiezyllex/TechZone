@@ -233,15 +233,22 @@ export default function ShippingPage() {
   }, [userProfile, form]);
 
   useEffect(() => {
-    if (clerkUser?.externalAccounts && clerkUser.externalAccounts.length > 0) {
-      const externalAccount = clerkUser.externalAccounts[0];
+    if (clerkUser && !userProfile?.data) {
+      const firstName = clerkUser.firstName || '';
+      const lastName = clerkUser.lastName || '';
+      const fullName = `${firstName} ${lastName}`.trim();
 
-      if (externalAccount.firstName) {
-        form.setValue("fullName", externalAccount.firstName, { shouldValidate: false });
+      if (fullName) {
+        form.setValue("fullName", fullName, { shouldValidate: false });
       }
 
-      if (externalAccount.emailAddress) {
-        form.setValue("email", externalAccount.emailAddress, { shouldValidate: false });
+      // Lấy email từ Clerk User
+      const email = clerkUser.primaryEmailAddress?.emailAddress ||
+        clerkUser.emailAddresses?.[0]?.emailAddress ||
+        '';
+
+      if (email) {
+        form.setValue("email", email, { shouldValidate: false });
       }
     }
   }, [clerkUser, userProfile, form]);
@@ -338,6 +345,7 @@ export default function ShippingPage() {
         total: Number(total.toFixed(2)),
         shippingAddress: {
           name: values.fullName,
+          email: values.email,
           phoneNumber: values.phoneNumber,
           provinceId: selectedProvince,
           districtId: selectedDistrict,
@@ -394,6 +402,7 @@ export default function ShippingPage() {
         total: Number(total.toFixed(2)),
         shippingAddress: {
           name: formValues.fullName,
+          email: formValues.email,
           phoneNumber: formValues.phoneNumber,
           provinceId: selectedProvince,
           districtId: selectedDistrict,
