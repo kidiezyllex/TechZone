@@ -28,7 +28,7 @@ import { useForm } from 'react-hook-form';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { useUser } from '@/context/useUserContext';
 import { useUser as useClerkUser, useClerk } from '@clerk/clerk-react';
-import { useOrderDetail, useMyOrders } from '@/hooks/order';
+import { useMyOrders, useOrderDetail } from '@/hooks/order';
 import { useToast } from '@/hooks/useToast';
 import { useUpdateUserProfile } from '@/hooks/account';
 import { IMyOrder } from '@/interface/response/order';
@@ -56,7 +56,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -108,6 +107,8 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
 }) => {
   const { data: orderData, isLoading, isError } = useOrderDetail(orderId || '');
 
+  const order = orderData?.data as any;
+
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: vi });
@@ -134,6 +135,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
   };
 
   const getPaymentStatusName = (status: string) => {
+    const normalizedStatus = status?.toUpperCase?.() || status;
     switch (status) {
       case 'PENDING':
         return 'Chờ thanh toán';
@@ -144,7 +146,18 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
       case 'REFUNDED':
         return 'Đã hoàn tiền';
       default:
-        return status;
+        switch (normalizedStatus) {
+          case 'PENDING':
+            return 'Chờ thanh toán';
+          case 'PAID':
+            return 'Đã thanh toán';
+          case 'FAILED':
+            return 'Thanh toán thất bại';
+          case 'REFUNDED':
+            return 'Đã hoàn tiền';
+          default:
+            return status;
+        }
     }
   };
 
@@ -178,7 +191,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
     ];
 
     switch (orderStatus) {
-      case 'CHO_XAC_NHAN':
+      case 'pending':
         return [
           {
             time: generateTimestamp(0),
@@ -190,7 +203,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
           }
         ];
 
-      case 'CHO_GIAO_HANG':
+      case 'confirmed':
         return [
           ...baseProgress,
           {
@@ -211,7 +224,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
           }
         ];
 
-      case 'DANG_VAN_CHUYEN':
+      case 'shipping':
         return [
           ...baseProgress,
           {
@@ -248,8 +261,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
           }
         ];
 
-      case 'DA_GIAO_HANG':
-      case 'HOAN_THANH':
+      case 'completed':
         return [
           ...baseProgress,
           {
@@ -310,7 +322,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
           }
         ];
 
-      case 'DA_HUY':
+      case 'cancelled':
         return [
           {
             time: generateTimestamp(0),
@@ -337,6 +349,20 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
 
   if (!open || !orderId) return null;
 
+  const getCustomerOrderStatusConfig = (status: string) => {
+    const normalizedStatus = status?.toLowerCase?.() || '';
+    const configs: Record<string, { label: string; className: string }> = {
+      pending: { label: 'Chờ xác nhận', className: '!bg-yellow-400 !text-white !border-yellow-500 text-nowrap' },
+      confirmed: { label: 'Đã xác nhận', className: '!bg-blue-400 !text-white !border-blue-500 text-nowrap' },
+      shipping: { label: 'Đang giao', className: '!bg-orange-400 !text-white !border-orange-500 text-nowrap' },
+      completed: { label: 'Hoàn thành', className: '!bg-emerald-400 !text-white !border-emerald-500 text-nowrap' },
+      cancelled: { label: 'Đã hủy', className: '!bg-red-400 !text-white !border-red-500 text-nowrap' },
+    };
+    return configs[normalizedStatus] || { label: status || 'Không xác định', className: 'bg-gray-400 text-white border-gray-500' };
+  };
+
+  const statusConfig = order ? getCustomerOrderStatusConfig(order.status) : null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
@@ -348,17 +374,21 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
           <div className="p-8 text-center">
             <p className="text-red-500">Đã xảy ra lỗi khi tải thông tin đơn hàng.</p>
           </div>
-        ) : orderData && orderData.data ? (
+        ) : order ? (
           <>
             <DialogHeader className="border-b pb-4">
               <DialogTitle>
-                Chi tiết đơn hàng #{(orderData.data as any)?.code}
+                Chi tiết đơn hàng #{order.order_number || order.id}
               </DialogTitle>
               <DialogDescription className="mt-2">
-                Ngày đặt: {formatDate(orderData.data.createdAt)}
+                Ngày đặt: {formatDate(order.created_at)}
               </DialogDescription>
               <div className="mt-2">
-                <OrderStatusBadge status={orderData.data.orderStatus} />
+                {statusConfig && (
+                  <Badge className={`${statusConfig.className} rounded-[4px] font-normal`}>
+                    {statusConfig.label}
+                  </Badge>
+                )}
               </div>
             </DialogHeader>
             <div className="py-4 space-y-4">
@@ -374,19 +404,19 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                     <div className="flex items-start">
                       <span className="text-muted-foreground w-32">Người nhận:</span>
                       <span className="font-medium">
-                        {(orderData.data as any).shippingName || orderData.data.customer?.fullName || 'Chưa cập nhật'}
+                        {order.delivery_name || 'Chưa cập nhật'}
                       </span>
                     </div>
                     <div className="flex items-start">
                       <span className="text-muted-foreground w-32">Số điện thoại:</span>
                       <span>
-                        {(orderData.data as any).shippingPhoneNumber || orderData.data.customer?.phoneNumber || 'Chưa cập nhật'}
+                        {order.delivery_phone || 'Chưa cập nhật'}
                       </span>
                     </div>
                     <div className="flex items-start">
                       <span className="text-muted-foreground w-32">Địa chỉ:</span>
                       <span>
-                        {(orderData.data as any).shippingSpecificAddress || 'Chưa cập nhật địa chỉ giao hàng'}
+                        {order.delivery_address || 'Chưa cập nhật địa chỉ giao hàng'}
                       </span>
                     </div>
                   </CardContent>
@@ -403,18 +433,18 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                       <span className="text-muted-foreground w-32">Phương thức:</span>
                       <div className="flex items-center">
                         <Icon
-                          path={orderData.data.paymentMethod === 'COD' ? mdiCashMultiple : mdiCreditCardOutline}
+                          path={order.payment_method === 'COD' ? mdiCashMultiple : mdiCreditCardOutline}
                           size={0.7}
                           className="mr-2 text-primary"
                         />
-                        <span>{getPaymentMethodName(orderData.data.paymentMethod)}</span>
+                        <span>{getPaymentMethodName(order.payment_method)}</span>
                       </div>
                     </div>
                     <div className="flex items-start">
                       <span className="text-muted-foreground w-32">Trạng thái:</span>
                       <span>
-                        <Badge className={orderData.data.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800 border-green-200' : '!bg-extra text-white'}>
-                          {getPaymentStatusName(orderData.data.paymentStatus)}
+                        <Badge className={order.payment_status?.toUpperCase?.() === 'PAID' ? 'bg-green-100 text-green-800 border-green-200' : '!bg-extra text-white'}>
+                          {getPaymentStatusName(order.payment_status)}
                         </Badge>
                       </span>
                     </div>
@@ -440,72 +470,52 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {orderData.data.items.map((item, index) => {
-                        const productVariant = item.productVariant as any;
-                        const product = productVariant?.product;
-                        const imageUrl = productVariant?.images?.[0]?.imageUrl;
-                        const color = productVariant?.color;
-                        const size = productVariant?.size;
-
-                        return (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <img
-                                src={imageUrl || "/images/white-image.png"}
-                                alt={product?.name || ''}
-                                className="w-16 h-16 object-contain rounded-md"
-                              />
-                            </TableCell>
-                            <TableCell className="font-medium">
-                              <div>
-                                <div className="font-medium">{product?.name || 'Sản phẩm không xác định'}</div>
-                                <div className="text-xs text-muted-foreground">
-                                  Mã: {product?.code || 'N/A'}
-                                </div>
-                                {product?.brand && (
-                                  <div className="text-xs text-muted-foreground">
-                                    Thương hiệu: {product.brand.name}
-                                  </div>
-                                )}
-                                {color && (
-                                  <div className="text-xs text-muted-foreground">
-                                    Màu: {color.name}
-                                  </div>
-                                )}
-                                {size && (
-                                  <div className="text-xs text-muted-foreground">
-                                    Size: {size.value}
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right">{formatPrice(parseFloat(item.price.toString()))}</TableCell>
-                            <TableCell className="text-center">{item.quantity}</TableCell>
-                            <TableCell className="text-right font-medium">{formatPrice(parseFloat(item.price.toString()) * item.quantity)}</TableCell>
-                          </TableRow>
-                        );
-                      })}
+                      {order.items?.map((item: any, index: number) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            <img
+                              src={item.image_url || "/images/white-image.png"}
+                              alt={item.product_name || ''}
+                              className="w-16 h-16 object-contain rounded-md"
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            <div>
+                              <div className="font-medium">{item.product_name || 'Sản phẩm không xác định'}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {formatPrice(parseFloat(item.unit_price?.toString() || '0'))}
+                          </TableCell>
+                          <TableCell className="text-center">{item.quantity}</TableCell>
+                          <TableCell className="text-right font-medium">
+                            {formatPrice(parseFloat(item.subtotal?.toString() || '0'))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
 
                   <div className="mt-6 space-y-4 border-t pt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Tạm tính:</span>
-                      <span>{formatPrice(parseFloat(orderData.data.subTotal.toString()))}</span>
+                      <span>{formatPrice(parseFloat(order.subtotal?.toString() || '0'))}</span>
                     </div>
-                    {parseFloat(orderData.data.discount.toString()) > 0 && (
+                    {parseFloat(order.discount_amount?.toString() || '0') > 0 && (
                       <div className="flex justify-between items-center text-green-600">
                         <span>Giảm giá:</span>
-                        <span>-{formatPrice(parseFloat(orderData.data.discount.toString()))}</span>
+                        <span>-{formatPrice(parseFloat(order.discount_amount?.toString() || '0'))}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Phí vận chuyển:</span>
-                      <span>{formatPrice((parseFloat(orderData.data.total.toString()) - parseFloat(orderData.data.subTotal.toString()) + parseFloat(orderData.data.discount.toString())) || 0)}</span>
+                      <span>{formatPrice(parseFloat(order.shipping_fee?.toString() || '0'))}</span>
                     </div>
                     <div className="flex justify-between items-center text-lg font-bold border-t pt-3">
                       <span>Tổng tiền:</span>
-                      <span className="text-primary">{formatPrice(parseFloat(orderData.data.total.toString()))}</span>
+                      <span className="text-primary">
+                        {formatPrice(parseFloat(order.total_amount?.toString() || '0'))}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -519,7 +529,7 @@ const OrderDetailDialog: React.FC<OrderDetailDialogProps> = ({
                 </CardHeader>
                 <CardContent className="p-4">
                   <div className="relative">
-                    {getShippingProgress(orderData.data.orderStatus, orderData.data.createdAt).map((step, index, array) => (
+                    {getShippingProgress(order.status, order.created_at).map((step, index, array) => (
                       <div key={index} className="relative flex items-start pb-8 last:pb-0">
                         {index < array.length - 1 && (
                           <div className="absolute left-6 top-12 w-0.5 h-full bg-gradient-to-b from-gray-300 to-gray-200"></div>
@@ -903,13 +913,6 @@ export default function GeneralManagementPage() {
     return configs[normalizedStatus] || { label: status || 'Không xác định', className: 'bg-gray-400 text-white border-gray-500' };
   };
 
-  const getDeliveryTypeLabel = (type: string) => {
-    if (type === 'pickup') {
-      return 'Nhận tại cửa hàng';
-    }
-    return 'Giao hàng tận nơi';
-  };
-
   const formatOrderDateTime = (dateString?: string | null) => {
     if (!dateString) {
       return 'Không xác định';
@@ -1043,13 +1046,13 @@ export default function GeneralManagementPage() {
                         <Table className="min-w-[1100px]">
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="w-[140px] px-3 py-2 whitespace-nowrap">Mã đơn hàng</TableHead>
-                              <TableHead className="w-[160px] px-3 py-2 whitespace-nowrap">Ngày đặt</TableHead>
-                              <TableHead className="w-[260px] px-3 py-2 whitespace-nowrap">Thông tin giao hàng</TableHead>
-                              <TableHead className="w-[140px] text-right px-3 py-2 whitespace-nowrap">Tổng tiền</TableHead>
-                              <TableHead className="w-[160px] px-3 py-2 whitespace-nowrap">Trạng thái đơn</TableHead>
-                              <TableHead className="w-[180px] px-3 py-2 whitespace-nowrap">Phương thức thanh toán</TableHead>
-                              <TableHead className="w-[160px] px-3 py-2 whitespace-nowrap">Trạng thái thanh toán</TableHead>
+                              <TableHead className="w-[140px] text-maintext px-3 py-2 whitespace-nowrap">Mã đơn hàng</TableHead>
+                              <TableHead className="w-[160px] px-3 text-maintext py-2 whitespace-nowrap">Ngày đặt</TableHead>
+                              <TableHead className="w-[260px] px-3 text-maintext py-2 whitespace-nowrap">Thông tin giao hàng</TableHead>
+                              <TableHead className="w-[140px] text-right px-3 py-2 whitespace-nowrap text-maintext">Tổng tiền</TableHead>
+                              <TableHead className="w-[160px] px-3 text-maintext py-2 whitespace-nowrap">Trạng thái đơn</TableHead>
+                              <TableHead className="w-[180px] px-3 py-2 whitespace-nowrap text-maintext">Phương thức thanh toán</TableHead>
+                              <TableHead className="w-[160px] px-3 py-2 whitespace-nowrap text-maintext">Trạng thái thanh toán</TableHead>
                               <TableHead className="w-[120px] text-center px-3 py-2 whitespace-nowrap">Thao tác</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -1074,7 +1077,7 @@ export default function GeneralManagementPage() {
                                       </div>
                                     )}
                                   </TableCell>
-                                  <TableCell className="text-right font-medium px-3 py-2 whitespace-nowrap text-maintext">
+                                  <TableCell className="text-right px-3 font-semibold py-2 whitespace-nowrap text-maintext">
                                     {formatPrice(order.total_amount)}
                                   </TableCell>
                                   <TableCell className="px-3 py-2">
