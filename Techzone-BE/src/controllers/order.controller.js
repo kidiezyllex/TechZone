@@ -398,45 +398,14 @@ export const getUserOrders = async (req, res, next) => {
 // LẤY CHI TIẾT ĐƠN HÀNG
 export const getOrderById = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-    const userRole = req.user.role_name?.toLowerCase();
     const { id } = req.params;
-    
-    const isAdminOrStaff = userRole === 'admin' || userRole === 'staff';
-    
-    let order;
+        
     let sql = `SELECT o.*, s.name as store_name, s.address as store_address
                FROM orders o
                LEFT JOIN stores s ON o.store_id = s.id
                WHERE o.id = ?`;
-    let params = [id];
-    
-    if (!isAdminOrStaff) {
-      let [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
-      
-      if (!customer) {
-        try {
-          await query(
-            'INSERT INTO customers (user_id, classification) VALUES (?, ?)',
-            [userId, 'new']
-          );
-          [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
-        } catch (error) {
-          [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
-        }
-        
-        if (!customer) {
-          return errorResponse(res, 'Không tìm thấy thông tin khách hàng', 404);
-        }
-      }
-      
-      sql += ' AND o.customer_id = ?';
-      params.push(customer.id);
-    }
-    
-    const [orderResult] = await query(sql, params);
-    order = orderResult;
-    
+    const params = [id];
+    const [order] = await query(sql, params);
     if (!order) {
       return errorResponse(res, 'Không tìm thấy đơn hàng', 404);
     }

@@ -126,9 +126,12 @@ router.post('/my-orders', getUserOrders);
  *   get:
  *     summary: Lấy chi tiết đơn hàng
  *     tags: [3. Cart & Orders - Quản lý Đơn Hàng]
- *     security:
- *       - bearerAuth: []
  *     parameters:
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         description: Email khách hàng (bắt buộc nếu không đăng nhập)
  *       - in: path
  *         name: id
  *         required: true
@@ -138,7 +141,7 @@ router.post('/my-orders', getUserOrders);
  *       200:
  *         description: Chi tiết đơn hàng
  */
-router.get('/:id', authenticate, getOrderById);
+router.get('/:id', getOrderById);
 
 /**
  * @swagger
