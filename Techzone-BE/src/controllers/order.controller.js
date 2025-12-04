@@ -8,7 +8,9 @@ export const createOrder = async (req, res, next) => {
     const userId = req.user?.id; // Optional: user might not be authenticated
     const {
       orderId,
-      customerId,
+      email,
+      name,
+      phoneNumber,
       items,
       subTotal,
       discount,
@@ -35,24 +37,30 @@ export const createOrder = async (req, res, next) => {
       return errorResponse(res, 'Phương thức thanh toán không được để trống', 400);
     }
     
-    // customerId is required if user is not authenticated
-    if (!userId && !customerId) {
-      return errorResponse(res, 'customerId là bắt buộc khi không có xác thực', 400);
+    // Get customer info from payload (prioritize root level, fallback to shippingAddress)
+    const customerEmail = email || shippingAddress?.email;
+    const customerName = name || shippingAddress?.name;
+    const customerPhone = phoneNumber || shippingAddress?.phoneNumber;
+    
+    // Email is required if user is not authenticated
+    if (!userId && !customerEmail) {
+      return errorResponse(res, 'Email là bắt buộc khi không có xác thực', 400);
+    }
+    
+    // Name is required
+    if (!customerName) {
+      return errorResponse(res, 'Tên khách hàng là bắt buộc', 400);
     }
     
     let user_id_to_use = userId;
     let customerId_db;
     
-    if (customerId) {
-      const firebaseEmail = `${customerId}@firebase.user`;
-      
-      let [existingUser] = await query('SELECT id FROM users WHERE email = ?', [firebaseEmail]);
+    // If user is not authenticated, create or find user by email
+    if (!userId && customerEmail) {
+      let [existingUser] = await query('SELECT id FROM users WHERE email = ?', [customerEmail]);
       
       if (!existingUser) {
-        // Create new user from customerId and name
-        const customerName = shippingAddress?.name || 'Khách hàng';
-        const customerPhone = shippingAddress?.phoneNumber || null;
-        
+        // Create new user from email, name, phoneNumber
         // Get customer role
         const [customerRole] = await query(
           'SELECT id FROM roles WHERE name = ?',
@@ -63,15 +71,15 @@ export const createOrder = async (req, res, next) => {
           return errorResponse(res, 'Không tìm thấy role customer', 500);
         }
         
-        // Generate a random password hash (since it's Firebase auth, password is not used)
-        const randomPassword = `firebase_${customerId}_${Date.now()}`;
+        // Generate a random password hash (user can reset password later)
+        const randomPassword = `temp_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
         const hashedPassword = await hashPassword(randomPassword);
         
         // Create user
         const userResult = await query(
           `INSERT INTO users (email, password_hash, full_name, phone, role_id, is_verified) 
            VALUES (?, ?, ?, ?, ?, TRUE)`,
-          [firebaseEmail, hashedPassword, customerName, customerPhone, customerRole.id]
+          [customerEmail, hashedPassword, customerName, customerPhone || null, customerRole.id]
         );
         
         user_id_to_use = userResult.insertId;
@@ -84,32 +92,31 @@ export const createOrder = async (req, res, next) => {
       } else {
         user_id_to_use = existingUser.id;
         
-        // Update user info if provided (name and phone from shippingAddress)
-        if (shippingAddress?.name || shippingAddress?.phoneNumber) {
-          const updateFields = [];
-          const updateValues = [];
-          
-          if (shippingAddress.name) {
-            updateFields.push('full_name = ?');
-            updateValues.push(shippingAddress.name);
-          }
-          
-          if (shippingAddress.phoneNumber) {
-            updateFields.push('phone = ?');
-            updateValues.push(shippingAddress.phoneNumber);
-          }
-          
-          if (updateFields.length > 0) {
-            updateValues.push(user_id_to_use);
-            await query(
-              `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`,
-              updateValues
-            );
-          }
+        // Update user info if provided (name and phone)
+        const updateFields = [];
+        const updateValues = [];
+        
+        if (customerName) {
+          updateFields.push('full_name = ?');
+          updateValues.push(customerName);
+        }
+        
+        if (customerPhone) {
+          updateFields.push('phone = ?');
+          updateValues.push(customerPhone);
+        }
+        
+        if (updateFields.length > 0) {
+          updateValues.push(user_id_to_use);
+          await query(
+            `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`,
+            updateValues
+          );
         }
       }
     }
     
+    // Ensure customer record exists
     const [customerCheck] = await query('SELECT id FROM customers WHERE user_id = ?', [user_id_to_use]);
     if (!customerCheck) {
       await query(

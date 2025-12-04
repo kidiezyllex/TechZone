@@ -23,20 +23,64 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - items
+ *               - subTotal
+ *               - total
+ *               - shippingAddress
+ *               - paymentMethod
  *             properties:
- *               store_id:
- *                 type: integer
- *               shipping_address:
+ *               orderId:
  *                 type: string
- *               shipping_city:
+ *                 description: Mã đơn hàng (tự động tạo nếu không có)
+ *               email:
  *                 type: string
- *               shipping_district:
+ *                 description: Email khách hàng (bắt buộc nếu không có xác thực)
+ *               name:
  *                 type: string
- *               phone:
+ *                 description: Tên khách hàng
+ *               phoneNumber:
  *                 type: string
- *               payment_method:
+ *                 description: Số điện thoại khách hàng
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     product:
+ *                       type: string
+ *                     quantity:
+ *                       type: integer
+ *                     price:
+ *                       type: number
+ *               subTotal:
+ *                 type: number
+ *               discount:
+ *                 type: number
+ *               total:
+ *                 type: number
+ *               shippingAddress:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   phoneNumber:
+ *                     type: string
+ *                   provinceId:
+ *                     type: string
+ *                   districtId:
+ *                     type: string
+ *                   wardId:
+ *                     type: string
+ *                   specificAddress:
+ *                     type: string
+ *               paymentMethod:
  *                 type: string
- *                 enum: [cod, bank_transfer, momo, zalopay]
+ *                 enum: [COD, cod, online]
+ *               notes:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Đơn hàng được tạo thành công
