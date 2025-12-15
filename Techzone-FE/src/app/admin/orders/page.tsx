@@ -411,7 +411,7 @@ export default function OrdersPage() {
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="mb-4 border-t pt-4"
+                  className="mb-4 border-t border-b border-b-[#ccc] border-t-[#ccc] py-4"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
