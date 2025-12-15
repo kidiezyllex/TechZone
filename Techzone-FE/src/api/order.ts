@@ -49,7 +49,7 @@ export const updateOrderStatus = async (
 };
 
 export const cancelOrder = async (orderId: string): Promise<IOrderResponse> => {
-  const res = await sendPatch(`/orders/${orderId}/cancel`);
+  const res = await sendPut(`/orders/${orderId}/cancel`);
   return res as IOrderResponse;
 };
 

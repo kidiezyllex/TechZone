@@ -441,7 +441,7 @@ function EditCategoryDialog({ categoryId, isOpen, onClose }: EditCategoryDialogP
   }
 
   return (
-    <DialogContent className="sm:max-w-4xl">
+    <DialogContent className="max-w-2xl">
       <DialogHeader>
         <DialogTitle>Chỉnh sửa danh mục: {categoryData.data.name}</DialogTitle>
       </DialogHeader>

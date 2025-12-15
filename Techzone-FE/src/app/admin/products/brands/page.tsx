@@ -437,7 +437,7 @@ function EditBrandDialog({ brandId, isOpen, onClose }: EditBrandDialogProps) {
     }
 
     return (
-        <DialogContent className="sm:max-w-4xl">
+        <DialogContent className="max-w-2xl">
             <DialogHeader>
                 <DialogTitle>Chỉnh sửa thương hiệu: {brandData.data.name}</DialogTitle>
             </DialogHeader>
@@ -562,7 +562,7 @@ function CreateBrandDialog({ isOpen, onClose }: CreateBrandDialogProps) {
     };
 
     return (
-        <DialogContent className="sm:max-w-4xl">
+        <DialogContent className="max-w-2xl">
             <DialogHeader>
                 <DialogTitle>Thêm thương hiệu mới</DialogTitle>
             </DialogHeader>

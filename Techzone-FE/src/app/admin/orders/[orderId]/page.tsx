@@ -971,7 +971,7 @@ export default function OrderDetailPage() {
 
 
             <Dialog open={isConfirmCancelDialogOpen} onOpenChange={setIsConfirmCancelDialogOpen}>
-                <DialogContent>
+                <DialogContent className="max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>Xác nhận hủy đơn hàng</DialogTitle>
                     </DialogHeader>

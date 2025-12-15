@@ -481,7 +481,7 @@ export default function VouchersPage() {
 
 
       <Dialog open={isNotifyDialogOpen} onOpenChange={setIsNotifyDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Xác nhận gửi thông báo</DialogTitle>
           </DialogHeader>

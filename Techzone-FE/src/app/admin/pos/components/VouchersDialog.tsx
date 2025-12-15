@@ -62,14 +62,14 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
     return isVoucherExpired(voucher.endDate) || isVoucherOutOfStock(voucher);
   };
 
-  
+
   const mapVoucherData = (voucher: any) => {
     return {
       ...voucher,
-      discountType: voucher.type, 
-      discountValue: parseFloat(voucher.value), 
-      maxValue: voucher.maxDiscount ? parseFloat(voucher.maxDiscount) : null, 
-      minOrderValue: parseFloat(voucher.minOrderValue) 
+      discountType: voucher.type,
+      discountValue: parseFloat(voucher.value),
+      maxValue: voucher.maxDiscount ? parseFloat(voucher.maxDiscount) : null,
+      minOrderValue: parseFloat(voucher.minOrderValue)
     };
   };
 
@@ -115,7 +115,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                 <Icon path={mdiTag} size={2} className="text-red-500" />
               </div>
               <h3 className="text-xl font-semibold text-red-600 mb-2">Lỗi khi tải dữ liệu</h3>
-              <p className="text-maintext text-center max-w-md">
+              <p className="text-maintext text-center max-w-2xl">
                 Không thể tải danh sách mã giảm giá. Vui lòng kiểm tra kết nối mạng và thử lại.
               </p>
               <Button
@@ -132,13 +132,13 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                 <Icon path={mdiTag} size={2} className="text-maintext" />
               </div>
               <h3 className="text-xl font-semibold text-maintext mb-2">Chưa có mã giảm giá</h3>
-              <p className="text-maintext text-center max-w-md">
+              <p className="text-maintext text-center max-w-2xl">
                 Hiện tại không có mã giảm giá nào đang hoạt động trong hệ thống.
               </p>
             </div>
           ) : (
             <div className="py-0">
-              {}
+              { }
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-6">
                   <div className="text-sm text-maintext">
@@ -157,7 +157,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                 </div>
               </div>
 
-              {}
+              { }
               <div className="border border-border rounded-xl overflow-hidden shadow-sm bg-white">
                 <ScrollArea className="max-h-[50vh]">
                   <Table>
@@ -192,7 +192,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               isDisabled && "bg-gray-50/30 opacity-75"
                             )}
                           >
-                            {}
+                            { }
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <div className={cn(
@@ -213,7 +213,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               </div>
                             </TableCell>
 
-                            {}
+                            { }
                             <TableCell>
                               <div className={cn(
                                 "font-medium text-sm leading-tight",
@@ -226,7 +226,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               </div>
                             </TableCell>
 
-                            {}
+                            { }
                             <TableCell className="text-center">
                               <Badge
                                 variant={voucher.discountType === 'PERCENTAGE' ? 'default' : 'secondary'}
@@ -241,7 +241,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               </Badge>
                             </TableCell>
 
-                            {}
+                            { }
                             <TableCell className="text-right">
                               <div className={cn(
                                 "font-bold text-sm",
@@ -256,14 +256,14 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               )}
                             </TableCell>
 
-                            {}
+                            { }
                             <TableCell className="text-right">
                               <div className="font-semibold text-sm text-maintext">
                                 {formatCurrency(voucher.minOrderValue)}
                               </div>
                             </TableCell>
 
-                            {}
+                            { }
                             <TableCell className="text-center">
                               <Badge
                                 variant={remainingQuantity <= 5 ? 'destructive' : remainingQuantity <= 20 ? 'outline' : 'secondary'}
@@ -280,7 +280,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               </Badge>
                             </TableCell>
 
-                            {}
+                            { }
                             <TableCell className="text-center">
                               <div className={cn(
                                 "text-xs font-medium",
@@ -295,7 +295,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                               )}
                             </TableCell>
 
-                            {}
+                            { }
                             <TableCell className="text-center">
                               <motion.div
                                 whileHover={!isDisabled ? { scale: 1.05 } : {}}
@@ -331,7 +331,7 @@ const VouchersDialog: React.FC<VouchersDialogProps> = ({
                 </ScrollArea>
               </div>
 
-              {}
+              { }
               <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-border">
                 <div className="flex items-center justify-between text-sm text-maintext">
                   <div className="flex items-center gap-4">

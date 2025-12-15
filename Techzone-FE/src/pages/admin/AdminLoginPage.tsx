@@ -84,7 +84,7 @@ const AdminLoginPage: React.FC = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="w-full max-w-md"
+                    className="w-full max-w-2xl"
                 >
                     <Card className="w-full shadow-lg bg-white backdrop-blur-md border border-white/40 dark:border-gray-700/60">
                         <CardHeader className="pb-4 flex flex-col items-center space-y-3 border-b border-gray-200">

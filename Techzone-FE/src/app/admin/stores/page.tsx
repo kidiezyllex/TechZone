@@ -849,7 +849,7 @@ export default function StoresPage() {
             </Dialog>
 
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>Xác nhận ngưng hoạt động</DialogTitle>
                         <DialogDescription>
