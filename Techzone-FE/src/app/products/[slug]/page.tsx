@@ -1,9 +1,44 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import CartIcon from "@/components/ui/CartIcon"
-import { useNavigate } from 'react-router-dom';
-
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { motion } from 'framer-motion';
+import { Icon } from '@mdi/react';
+import {
+  mdiCartOutline,
+  mdiHeartOutline,
+  mdiCheck,
+  mdiChevronLeft,
+  mdiChevronRight,
+  mdiStar,
+  mdiStarOutline,
+  mdiTruck,
+  mdiShield,
+  mdiCreditCard,
+  mdiRefresh,
+  mdiRuler,
+  mdiPalette,
+  mdiInformation,
+  mdiCartPlus,
+  mdiMagnify,
+} from '@mdi/js';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import CartIcon from "@/components/ui/CartIcon";
+import { ProductCard, Product as ProductCardType } from '@/components/HomePage/ProductCard';
+import { useProductDetail, useProducts } from '@/hooks/product';
+import { usePromotions } from '@/hooks/promotion';
+import { calculateProductDiscount, filterActivePromotions } from '@/lib/promotions';
+import { getSizeLabel } from '@/utils/sizeMapping';
+import { checkImageUrl } from '@/lib/utils';
+import { useCartStore } from '@/stores/useCartStore';
+import { IProduct, IPopulatedProductVariant, IProductImage } from '@/interface/response/product';
 
 const zoomStyles = `
   .cursor-zoom-in {
@@ -36,51 +71,12 @@ const zoomStyles = `
   }
 `;
 
-
 if (typeof document !== 'undefined') {
   const styleSheet = document.createElement('style');
   styleSheet.type = 'text/css';
   styleSheet.innerText = zoomStyles;
   document.head.appendChild(styleSheet);
 }
-import { useProductDetail, useProducts } from '@/hooks/product';
-import { usePromotions } from '@/hooks/promotion';
-import { calculateProductDiscount, formatPrice as formatPromotionPrice, applyPromotionsToProducts, filterActivePromotions } from '@/lib/promotions';
-import { getSizeLabel } from '@/utils/sizeMapping';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Icon } from '@mdi/react';
-import {
-  mdiCartOutline,
-  mdiHeartOutline,
-  mdiShareVariant,
-  mdiCheck,
-  mdiChevronLeft,
-  mdiChevronRight,
-  mdiStar,
-  mdiStarOutline,
-  mdiTruck,
-  mdiShield,
-  mdiCreditCard,
-  mdiRefresh,
-  mdiRuler,
-  mdiWeight,
-  mdiPalette,
-  mdiInformation,
-  mdiCartPlus,
-  mdiMagnify,
-  mdiEye
-} from '@mdi/js';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { checkImageUrl } from '@/lib/utils';
-import { useCartStore } from '@/stores/useCartStore';
-import { IProduct, IBrand, ICategory, IPopulatedProductVariant, IProductImage } from '@/interface/response/product';
-import { motion, AnimatePresence } from 'framer-motion';
 const ImageZoom = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
   const [isZooming, setIsZooming] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -91,10 +87,10 @@ const ImageZoom = ({ src, alt, className }: { src: string; alt: string; classNam
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -110,22 +106,22 @@ const ImageZoom = ({ src, alt, className }: { src: string; alt: string; classNam
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isMobile) return;
-    
+
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
-    
+
+
     const xPercent = (x / rect.width) * 100;
     const yPercent = (y / rect.height) * 100;
-    
+
     setMousePosition({ x: xPercent, y: yPercent });
-    
-    
-    const lensSize = 150; 
+
+
+    const lensSize = 150;
     const lensX = Math.max(lensSize / 2, Math.min(rect.width - lensSize / 2, x));
     const lensY = Math.max(lensSize / 2, Math.min(rect.height - lensSize / 2, y));
-    
+
     setLensPosition({ x: lensX, y: lensY });
   };
 
@@ -135,9 +131,10 @@ const ImageZoom = ({ src, alt, className }: { src: string; alt: string; classNam
     }
   };
 
+
   return (
     <div className="relative overflow-visible group zoom-container">
-      {}
+      { }
       <div
         className={`relative ${className} transition-all duration-300 ${!isMobile && !isZooming ? 'cursor-zoom-in' : ''} ${!isMobile && isZooming ? 'cursor-none' : ''}`}
         onMouseEnter={handleMouseEnter}
@@ -151,8 +148,8 @@ const ImageZoom = ({ src, alt, className }: { src: string; alt: string; classNam
           draggable="false"
           className="object-contain p-4 transition-transform duration-300"
         />
-        
-        {}
+
+        { }
         {isZooming && !isMobile && (
           <motion.div
             className="absolute pointer-events-none border-4 border-white rounded-full shadow-2xl z-30 overflow-hidden zoom-lens"
@@ -167,8 +164,8 @@ const ImageZoom = ({ src, alt, className }: { src: string; alt: string; classNam
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2 }}
           >
-            {}
-            <div 
+            { }
+            <div
               className="w-full h-full relative bg-white"
               style={{
                 backgroundImage: `url(${src})`,
@@ -177,21 +174,21 @@ const ImageZoom = ({ src, alt, className }: { src: string; alt: string; classNam
                 backgroundRepeat: 'no-repeat',
               }}
             />
-            {}
+            { }
             <div className="absolute inset-2 border border-white/30 rounded-full pointer-events-none"></div>
           </motion.div>
         )}
       </div>
-      {}
+      { }
       {isZooming && isMobile && (
-        <motion.div 
+        <motion.div
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
           onClick={() => setIsZooming(false)}
         >
-          <motion.div 
+          <motion.div
             className="relative w-full max-w-lg aspect-square bg-white rounded-xl overflow-hidden"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
@@ -218,365 +215,34 @@ const ImageZoom = ({ src, alt, className }: { src: string; alt: string; classNam
         </motion.div>
       )}
 
-             {}
-       {isMobile && (
-         <motion.div 
-           className="absolute bottom-2 right-2 bg-primary/90 text-white px-2 py-1 rounded text-xs font-medium opacity-70"
-           initial={{ opacity: 0, y: 10 }}
-           animate={{ opacity: 0.7, y: 0 }}
-           transition={{ delay: 1, duration: 0.5 }}
-         >
-           <Icon path={mdiMagnify} size={0.7} className="inline mr-1" />
-           Nhấn để phóng to
-         </motion.div>
-       )}
+      { }
+      {isMobile && (
+        <motion.div
+          className="absolute bottom-2 right-2 bg-primary/90 text-white px-2 py-1 rounded text-xs font-medium opacity-70"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 0.7, y: 0 }}
+          transition={{ delay: 1, duration: 0.5 }}
+        >
+          <Icon path={mdiMagnify} size={0.7} className="inline mr-1" />
+          Nhấn để phóng to
+        </motion.div>
+      )}
 
-       {}
-       {!isMobile && !isZooming && (
-         <motion.div 
-           className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium opacity-0 group-hover:opacity-70 transition-opacity duration-300"
-           initial={{ opacity: 0, y: 10 }}
-           animate={{ opacity: 0, y: 0 }}
-           whileHover={{ opacity: 0.7 }}
-         >
-           <Icon path={mdiMagnify} size={0.7} className="inline mr-1" />
-           Hover để phóng to
-         </motion.div>
-       )}
+      { }
+      {!isMobile && !isZooming && (
+        <motion.div
+          className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium opacity-0 group-hover:opacity-70 transition-opacity duration-300"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 0, y: 0 }}
+          whileHover={{ opacity: 0.7 }}
+        >
+          <Icon path={mdiMagnify} size={0.7} className="inline mr-1" />
+          Hover để phóng to
+        </motion.div>
+      )}
     </div>
   );
 };
-
-
-const SimilarProductCard = ({ product, promotionsData }: { product: any; promotionsData?: any }) => {
-  const { addToCart } = useCartStore();
-  const [isHovered, setIsHovered] = useState(false);
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-  };
-
-  const handleAddToCart = () => {
-    if (!product.variants?.[0]) return;
-
-    const firstVariant = product.variants[0];
-    
-    if (firstVariant.stock === 0) {
-      toast.error('Sản phẩm đã hết hàng');
-      return;
-    }
-    
-    
-    let finalPrice = firstVariant.price;
-    let originalPrice = undefined;
-    let discountPercent = 0;
-    let hasDiscount = false;
-
-    
-    if (promotionsData?.data?.promotions) {
-      const activePromotions = filterActivePromotions(promotionsData.data.promotions);
-      const discount = calculateProductDiscount(
-        product.id,
-        firstVariant.price,
-        activePromotions
-      );
-      
-      if (discount.discountPercent > 0) {
-        finalPrice = discount.discountedPrice;
-        originalPrice = discount.originalPrice;
-        discountPercent = discount.discountPercent;
-        hasDiscount = true;
-      }
-    }
-
-    const cartItem = {
-      id: firstVariant.id, 
-      productId: product.id, 
-      name: product.name,
-      price: finalPrice,
-      originalPrice: originalPrice,
-      discountPercent: discountPercent,
-      hasDiscount: hasDiscount,
-      image: firstVariant.images?.[0] || '',
-      quantity: 1,
-      slug: product.code,
-      brand: typeof product.brand === 'string' ? product.brand : product.brand.name,
-      size: firstVariant.sizeId?.code,
-      colors: [firstVariant.colorId?.name || 'Default'],
-      stock: firstVariant.stock,
-      
-      colorId: firstVariant.colorId?.id || '',
-      sizeId: firstVariant.sizeId?.id || '',
-      colorName: firstVariant.colorId?.name || 'Default',
-      sizeName: firstVariant.sizeId?.value ? getSizeLabel(firstVariant.sizeId.value) : (firstVariant.sizeId?.name || firstVariant.sizeId?.code || '')
-    };
-
-    addToCart(cartItem, 1);
-    toast.success('Đã thêm sản phẩm vào giỏ hàng');
-  };
-
-  const handleQuickView = () => {
-    window.location.href = `/products/${product.name.toLowerCase().replace(/\s+/g, "-")}-${product.id}`;
-  };
-
-  const handleAddToWishlist = () => {
-    toast.success('Đã thêm vào danh sách yêu thích');
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-    >
-      <Card className="group overflow-hidden border rounded-lg hover:shadow-2xl shadow-lg transition-all duration-500 h-full flex flex-col transform hover:-translate-y-3 bg-white relative backdrop-blur-sm">
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg z-10 pointer-events-none" />
-        <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-t-2xl">
-          <a href={`/products/${product.name.toLowerCase().replace(/\s+/g, "-")}-${product.id}`} className="block">
-            <div className="aspect-square overflow-hidden relative flex items-center justify-center">
-              <motion.div
-                className="w-full h-full relative"
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              >
-                <img
-                  src={checkImageUrl(product.variants?.[0]?.images?.[0]) || "/placeholder.svg"}
-                  alt={product.name}
-                  className="object-contain w-full h-full drop-shadow-2xl filter group-hover:brightness-110 transition-all duration-500"
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                  draggable="false"
-                />
-              </motion.div>
-            </div>
-          </a>
-
-          {}
-          <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
-            {product.isNew && (
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-gradient-to-r from-emerald-500 to-teal-400 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xl border-2 border-white/50 backdrop-blur-sm"
-              >
-                ✨ Mới
-              </motion.div>
-            )}
-            {(() => {
-              
-              if (promotionsData?.data?.promotions && product.variants?.[0]) {
-                const activePromotions = filterActivePromotions(promotionsData.data.promotions);
-                const discount = calculateProductDiscount(
-                  product.id,
-                  product.variants[0].price,
-                  activePromotions
-                );
-                
-                if (discount.discountPercent > 0) {
-                  return (
-                    <motion.div
-                      initial={{ scale: 0, rotate: 180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ duration: 0.5, delay: 0.3 }}
-                      className="bg-gradient-to-r from-green-500 via-emerald-500 to-lime-500 text-white text-xs font-bold px-3 rounded-full shadow-xl border border-white/50 backdrop-blur-sm animate-pulse flex-shrink-0 w-fit flex items-center justify-center gap-1"
-                    >
-                      💥
-                      <span className="text-base">-{discount.discountPercent}%</span>
-                    </motion.div>
-                  );
-                }
-              }
-              return null;
-            })()}
-          </div>
-
-          {}
-          <motion.div
-            className="absolute right-2 top-2 transform -translate-y-1/2 flex flex-col gap-4 z-30"
-            initial={{ x: 60, opacity: 0 }}
-            animate={{
-              x: isHovered ? 0 : 60,
-              opacity: isHovered ? 1 : 0,
-            }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-          >
-            <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-10 w-10 bg-white/90 backdrop-blur-md hover:!bg-primary hover:text-white shadow-xl border-0 hover:shadow-2xl transition-all duration-300 group/btn"
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleAddToCart()
-                }}
-                aria-label="Thêm vào giỏ hàng"
-              >
-                <Icon path={mdiCartOutline} size={0.7} className="group-hover/btn:animate-bounce" />
-              </Button>
-            </motion.div>
-
-            <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-10 w-10 bg-white/90 backdrop-blur-md hover:!bg-pink-500 hover:text-white shadow-xl border-0 hover:shadow-2xl transition-all duration-300 group/btn"
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleAddToWishlist()
-                }}
-                aria-label="Yêu thích"
-              >
-                <Icon path={mdiHeartOutline} size={0.7} className="group-hover/btn:animate-pulse" />
-              </Button>
-            </motion.div>
-
-            <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-10 w-10 bg-white/90 backdrop-blur-md hover:!bg-primary hover:text-white shadow-xl border-0 hover:shadow-2xl transition-all duration-300 group/btn"
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleQuickView()
-                }}
-                aria-label="Xem nhanh"
-              >
-                <Icon path={mdiEye} size={0.7} className="group-hover/btn:animate-ping" />
-              </Button>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        <div className="p-4 flex flex-col flex-grow bg-gradient-to-b from-white via-gray-50/30 to-white border-t border-gray-100/50 rounded-b-2xl relative">
-          <div className="text-xs text-primary/80 mb-2 uppercase tracking-wider font-bold flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-pink-400 animate-pulse"></div>
-            <span className="bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
-              {typeof product.brand === "string" ? product.brand : product.brand?.name}
-            </span>
-          </div>
-
-          <a
-            href={`/products/${product.name.toLowerCase().replace(/\s+/g, "-")}-${product.id}`}
-            className="hover:text-primary transition-colors group/a"
-          >
-            <h3 className="font-bold text-base mb-3 line-clamp-2 leading-tight group-hover:text-primary/90 transition-colors duration-300 text-maintext group-hover/link:underline decoration-primary/50 underline-offset-2">
-              {product.name}
-            </h3>
-          </a>
-
-          <div className="mt-auto">
-            {}
-            <div className="flex items-center justify-between">
-              <motion.div
-                className="font-extrabold text-lg text-active"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
-              >
-                {(() => {
-                  
-                  if (promotionsData?.data?.promotions && product.variants?.[0]) {
-                    const discount = calculateProductDiscount(
-                      product.id,
-                      product.variants[0].price,
-                      promotionsData.data.promotions
-                    );
-                    
-                    if (discount.discountPercent > 0) {
-                      return formatPrice(discount.discountedPrice);
-                    }
-                  }
-                  
-                  return product.variants?.[0] && formatPrice(product.variants[0].price);
-                })()}
-              </motion.div>
-              {(() => {
-                
-                if (promotionsData?.data?.promotions && product.variants?.[0]) {
-                  const discount = calculateProductDiscount(
-                    product.id,
-                    product.variants[0].price,
-                    promotionsData.data.promotions
-                  );
-                  
-                  if (discount.discountPercent > 0) {
-                    return (
-                      <div className="text-xs text-maintext line-through font-medium bg-gray-100 px-2 py-1 rounded-sm italic">
-                        {formatPrice(discount.originalPrice)}
-                      </div>
-                    );
-                  }
-                }
-                return null;
-              })()}
-            </div>
-
-            {}
-            {product.variants && product.variants.length > 0 && (
-              <div className="flex flex-col gap-1 items-start justify-start">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-maintext/70 font-semibold">Màu sắc:</span>
-                  <div className="flex gap-1 text-sm">
-                    {Array.from(
-                      new Set(
-                        product.variants.map((v: any) => v.colorId?.id).filter(Boolean)
-                      )
-                    )
-                      .slice(0, 4)
-                      .map((colorId: unknown, index: number) => {
-                        const variant = product.variants.find((v: any) => v.colorId?.id === colorId);
-                        const color = variant?.colorId || { code: "#000000", name: "Default" };
-
-                        return (
-                          <motion.div
-                            key={index}
-                            className="w-4 h-4 rounded-full border-2 border-white shadow-lg ring-2 ring-gray-200 cursor-pointer"
-                            style={{ backgroundColor: color.code }}
-                            title={color.name}
-                            whileHover={{ scale: 1.3, rotate: 360 }}
-                            transition={{ duration: 0.3 }}
-                          />
-                        )
-                      })}
-
-                    {Array.from(
-                      new Set(
-                        product.variants.map((v: any) => v.colorId?.id).filter(Boolean)
-                      )
-                    ).length > 4 && (
-                        <motion.span
-                          className="text-xs text-maintext ml-1 bg-gray-100 px-2 py-1 rounded-full font-medium"
-                          whileHover={{ scale: 1.1 }}
-                        >
-                          +{Array.from(new Set(product.variants.map((v: any) => v.colorId?.id).filter(Boolean))).length - 4}
-                        </motion.span>
-                      )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-maintext/70 font-semibold">Kích thước:</span>
-                  <div className="flex gap-1 text-maintext text-sm">
-                    {Array.from(
-                      new Set(
-                        product.variants.map((v: any) => (typeof v.sizeId === "object" ? getSizeLabel(v.sizeId.value) : getSizeLabel(v.sizeId)))
-                      )
-                    ).join(", ")}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-pink-400/20 to-orange-400/20 rounded-b-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        </div>
-      </Card>
-    </motion.div>
-  );
-};
-
-import { useParams } from 'react-router-dom';
 
 export default function ProductDetail() {
   const params = useParams<{ slug: string }>();
@@ -607,7 +273,7 @@ export default function ProductDetail() {
     }
   }, [slug]);
 
-  
+
   useEffect(() => {
     if (productData?.data?.variants?.length && productData.data.variants.length > 0) {
       const firstVariant = productData.data.variants[0];
@@ -618,7 +284,7 @@ export default function ProductDetail() {
     }
   }, [productData]);
 
-  
+
   useEffect(() => {
     if (productData?.data && selectedVariant && promotionsData?.data?.promotions) {
       const activePromotions = filterActivePromotions(promotionsData.data.promotions);
@@ -629,16 +295,16 @@ export default function ProductDetail() {
       );
       setProductDiscount(discount);
     } else {
-      
+
       setProductDiscount(null);
     }
   }, [productData, selectedVariant, promotionsData]);
 
-  
+
   const handleColorSelect = (colorId: string) => {
     setSelectedColor(colorId);
 
-    
+
     const matchingVariant = productData?.data?.variants.find(
       (v) => String(v.color?.id || v.colorId) === String(colorId) && String(v.size?.id || v.sizeId) === String(selectedSize)
     );
@@ -647,7 +313,7 @@ export default function ProductDetail() {
       setSelectedVariant(matchingVariant);
       setCurrentImageIndex(0);
     } else {
-      
+
       const firstVariantWithColor = productData?.data?.variants.find(
         (v) => String(v.color?.id || v.colorId) === String(colorId)
       );
@@ -659,7 +325,7 @@ export default function ProductDetail() {
     }
   };
 
-  
+
   const handleSizeSelect = (sizeId: string) => {
     setSelectedSize(sizeId);
 
@@ -669,14 +335,14 @@ export default function ProductDetail() {
 
     if (matchingVariant) {
       setSelectedVariant(matchingVariant);
-    } 
+    }
   };
 
-  
+
   const handleAddToCart = () => {
     if (!selectedVariant || !productData?.data) return;
 
-    
+
     if (selectedVariant.stock === 0) {
       toast.error('Sản phẩm đã hết hàng');
       return;
@@ -687,17 +353,17 @@ export default function ProductDetail() {
       return;
     }
 
-    const finalPrice = productDiscount && productDiscount.discountPercent > 0 
-      ? productDiscount.discountedPrice 
+    const finalPrice = productDiscount && productDiscount.discountPercent > 0
+      ? productDiscount.discountedPrice
       : selectedVariant.price;
-    
-    const originalPrice = productDiscount && productDiscount.discountPercent > 0 
-      ? productDiscount.originalPrice 
+
+    const originalPrice = productDiscount && productDiscount.discountPercent > 0
+      ? productDiscount.originalPrice
       : undefined;
 
     const cartItem = {
-      id: selectedVariant.id, 
-      productId: productData.data.id, 
+      id: selectedVariant.id,
+      productId: productData.data.id,
       name: productData.data.name,
       price: finalPrice,
       originalPrice: originalPrice,
@@ -710,7 +376,7 @@ export default function ProductDetail() {
       size: String(selectedVariant.size?.value || selectedVariant.sizeId || ''),
       colors: [selectedVariant.color?.name || 'Default'],
       stock: selectedVariant.stock,
-      
+
       colorId: String(selectedVariant.color?.id || selectedVariant.colorId || ''),
       sizeId: String(selectedVariant.size?.id || selectedVariant.sizeId || ''),
       colorName: selectedVariant.color?.name || 'Default',
@@ -721,7 +387,7 @@ export default function ProductDetail() {
     toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng${originalPrice ? ' với giá ưu đãi' : ''}`);
   };
 
-  
+
   const handleImageChange = (index: number) => {
     setCurrentImageIndex(index);
   };
@@ -746,18 +412,63 @@ export default function ProductDetail() {
     setQuantity(Math.max(1, Math.min(newQuantity, maxQuantity)));
   };
 
-  
+
   const similarProducts = useMemo(() => {
     if (!allProductsData?.data?.products || !productData?.data) return [];
-    
-    let filteredProducts = allProductsData.data.products.filter((p: IProduct) => p.id !== productData.data.id).slice(0, 4);
-    
-    
-    if (promotionsData?.data?.promotions) {
-      const activePromotions = filterActivePromotions(promotionsData.data.promotions);
-      filteredProducts = applyPromotionsToProducts(filteredProducts, activePromotions);
-    }
-    
+
+    const filteredProducts = allProductsData.data.products
+      .filter((p: any) => p.id !== productData.data.id)
+      .slice(0, 5)
+      .map((p: any): ProductCardType => {
+        const firstVariant = p.variants?.[0];
+        let primaryImageUrl = '';
+        if (firstVariant?.images && firstVariant.images.length > 0) {
+          const primaryImg = firstVariant.images.find((img: any) => img.is_primary === 1) || firstVariant.images[0];
+          primaryImageUrl = primaryImg?.imageUrl || primaryImg?.image_url || '';
+        } else if (p.images && p.images.length > 0) {
+          const primaryImg = p.images.find((img: any) => img.is_primary === 1) || p.images[0];
+          primaryImageUrl = primaryImg?.imageUrl || primaryImg?.image_url || '';
+        }
+
+        let basePrice = firstVariant?.price || p.selling_price || p.sellingPrice || p.base_price || p.basePrice || 0;
+        if (typeof basePrice === 'string') {
+          basePrice = parseFloat(basePrice);
+        }
+
+        let finalPrice = basePrice;
+        let originalPrice = undefined;
+        let discount = 0;
+
+        if (promotionsData?.data?.promotions && basePrice > 0) {
+          const activePromotions = filterActivePromotions(promotionsData.data.promotions);
+          const discountData = calculateProductDiscount(p.id, basePrice, activePromotions);
+
+          if (discountData.discountPercent > 0) {
+            finalPrice = discountData.discountedPrice;
+            originalPrice = discountData.originalPrice;
+            discount = discountData.discountPercent;
+          }
+        }
+
+        const stock = firstVariant?.stock || p.total_stock || p.totalStock || 0;
+        const stockNumber = typeof stock === 'string' ? parseInt(stock) : stock;
+
+        return {
+          id: p?.id,
+          name: p?.name,
+          price: finalPrice,
+          originalPrice: originalPrice,
+          discount: discount,
+          image: primaryImageUrl,
+          slug: p?.slug || p?.name.toLowerCase().replace(/\s+/g, '-'),
+          brand: typeof p.brand === 'string' ? p.brand : (p.brand?.name || p.brand_name || ''),
+          stock: stockNumber,
+          isBestSeller: false,
+          isFeatured: p.is_featured === 1 || p.isFeatured === true,
+          isNew: p.is_new === 1 || p.isNew === true,
+        };
+      });
+
     return filteredProducts;
   }, [allProductsData, productData?.data, promotionsData]);
 
@@ -811,7 +522,7 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50/50 to-white">
       <div className="container mx-auto py-8">
-        {}
+        { }
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -839,14 +550,14 @@ export default function ProductDetail() {
         </motion.div>
 
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8">
-          {}
+          { }
           <motion.div
             className="w-full"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {}
+            { }
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border flex items-center justify-center">
               {selectedVariant && selectedVariant.images && selectedVariant.images.length > 0 ? (
                 <>
@@ -883,7 +594,7 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {}
+            { }
             {selectedVariant && selectedVariant.images && selectedVariant.images.length > 1 && (
               <div className="grid grid-cols-5 gap-4 mt-4">
                 {selectedVariant.images.map((image: IProductImage, index: number) => (
@@ -913,17 +624,17 @@ export default function ProductDetail() {
             )}
           </motion.div>
 
-          {}
+          { }
           <motion.div
             className="w-full space-y-4"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {}
+            { }
             <div className="space-y-3">
               <div className="flex items-center gap-4">
-              <div className="font-mono border h-[22px] bg-gray-100 px-3 flex items-center justify-center text-primary text-sm font-medium rounded-full">
+                <div className="font-mono border h-[22px] bg-gray-100 px-3 flex items-center justify-center text-primary text-sm font-medium rounded-full">
                   {product.code}
                 </div>
                 <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
@@ -938,9 +649,9 @@ export default function ProductDetail() {
                 {product.name}
               </h1>
 
-           
 
-              {}
+
+              { }
               <div className="flex items-center gap-2">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -956,10 +667,10 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {}
+            { }
             <Card className="p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
               <div className="space-y-4">
-                {}
+                { }
                 {productDiscount && productDiscount.discountPercent > 0 && (
                   <motion.div
                     initial={{ scale: 0, rotate: 180 }}
@@ -972,14 +683,14 @@ export default function ProductDetail() {
                   </motion.div>
                 )}
 
-                {}
+                { }
                 <div className="flex items-center gap-4">
                   <motion.div
                     className="text-4xl font-bold text-primary"
                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {productDiscount && productDiscount.discountPercent > 0 
+                    {productDiscount && productDiscount.discountPercent > 0
                       ? formatPrice(productDiscount.discountedPrice)
                       : selectedVariant && formatPrice(selectedVariant.price)
                     }
@@ -991,7 +702,7 @@ export default function ProductDetail() {
                   )}
                 </div>
 
-                {}
+                { }
                 {productDiscount && productDiscount.discountPercent > 0 && (
                   <div className="text-sm text-green-600 font-medium space-y-1">
                     <div>🎉 Áp dụng khuyến mãi: {productDiscount.appliedPromotion?.name}</div>
@@ -1003,7 +714,7 @@ export default function ProductDetail() {
                   </div>
                 )}
 
-                {}
+                { }
                 {(!productDiscount || productDiscount.discountPercent === 0) && selectedVariant && (
                   <div className="text-sm text-maintext">
                     Giá bán: {formatPrice(selectedVariant.price)}
@@ -1012,7 +723,7 @@ export default function ProductDetail() {
               </div>
             </Card>
 
-            {}
+            { }
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1063,7 +774,7 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {}
+            { }
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1087,7 +798,7 @@ export default function ProductDetail() {
                       v => String(v.color?.id || v.colorId) === String(selectedColor) && String(v.size?.id || v.sizeId) === sizeId
                     );
                     const isAvailable = !!variantForColorAndSize && variantForColorAndSize.stock > 0;
-                    
+
                     return (
                       <Button
                         variant={String(selectedSize) === sizeId ? "default" : "outline"}
@@ -1105,7 +816,7 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {}
+            { }
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1142,7 +853,7 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {}
+            { }
             <div className="grid grid-cols-2 gap-4 pt-4">
               <Button
                 variant="outline"
@@ -1162,7 +873,7 @@ export default function ProductDetail() {
               </Button>
             </div>
 
-            {}
+            { }
             <Card className="p-4 bg-gray-50/50">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-4">
@@ -1204,7 +915,7 @@ export default function ProductDetail() {
               </div>
             </Card>
 
-            {}
+            { }
             <Card className="p-4">
               <h3 className="font-semibold text-maintext mb-4 flex items-center gap-2">
                 <Icon path={mdiInformation} size={1} className="text-primary" />
@@ -1235,7 +946,7 @@ export default function ProductDetail() {
                   <div className="flex justify-between items-center py-2">
                     <span className="!text-maintext">Giá hiện tại</span>
                     <span className="font-medium text-primary">
-                      {productDiscount && productDiscount.discountPercent > 0 
+                      {productDiscount && productDiscount.discountPercent > 0
                         ? formatPrice(productDiscount.discountedPrice)
                         : formatPrice(selectedVariant.price)
                       }
@@ -1247,7 +958,7 @@ export default function ProductDetail() {
           </motion.div>
         </div>
 
-        {}
+        { }
         <motion.div
           className="mt-20"
           initial={{ opacity: 0, y: 50 }}
@@ -1351,7 +1062,7 @@ export default function ProductDetail() {
           </Tabs>
         </motion.div>
 
-        {}
+        { }
         {similarProducts.length > 0 && (
           <motion.div
             className="mt-20"
@@ -1366,19 +1077,23 @@ export default function ProductDetail() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <AnimatePresence>
-                {similarProducts.map((similarProduct: IProduct, index: number) => (
-                  <motion.div
-                    key={similarProduct.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                  >
-                    <SimilarProductCard product={similarProduct} promotionsData={promotionsData} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+            <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+              {similarProducts.map((similarProduct: ProductCardType, index: number) => (
+                <ProductCard
+                  key={similarProduct.id}
+                  product={similarProduct}
+                  index={index}
+                  onAddToCart={() => {
+                    toast.success('Đã thêm sản phẩm vào giỏ hàng');
+                  }}
+                  onQuickView={() => {
+                    window.location.href = `/products/${similarProduct.slug}-${similarProduct.id}`;
+                  }}
+                  onAddToWishlist={() => {
+                    toast.success('Đã thêm vào danh sách yêu thích');
+                  }}
+                />
+              ))}
             </div>
 
             <div className="text-center mt-12">
@@ -1388,7 +1103,7 @@ export default function ProductDetail() {
                 </a>
               </Button>
             </div>
-          </motion.div> 
+          </motion.div>
         )}
       </div>
       <div className="fixed bottom-6 right-6 z-50 shadow-lg rounded-full bg-primary p-2 hover:bg-primary/80 transition-all duration-300">
