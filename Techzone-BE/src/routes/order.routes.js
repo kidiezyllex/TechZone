@@ -162,6 +162,7 @@ router.get('/:id', getOrderById);
  *         description: Đơn hàng được hủy
  */
 router.put('/:id/cancel', authenticate, cancelOrder);
+router.patch('/:id/cancel', authenticate, cancelOrder);
 
 /**
  * @swagger

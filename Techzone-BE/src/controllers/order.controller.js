@@ -502,19 +502,32 @@ export const updateOrderStatus = async (req, res, next) => {
 
 export const cancelOrder = async (req, res, next) => {
   try {
-    const userId = req.user.id;
     const { id } = req.params;
+    console.log('DEBUG CANCEL USER:', req.user);
+    const userRole = req.user.role_name;
+    const roleId = req.user.role_id;
 
-    // Get customer_id from user_id
-    const [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
-    if (!customer) {
-      return errorResponse(res, 'Không tìm thấy thông tin khách hàng', 404);
+    let order;
+
+    if ((userRole && ['admin', 'staff'].includes(userRole.toLowerCase())) || [1, 2].includes(roleId)) {
+      [order] = await query(
+        'SELECT id, status FROM orders WHERE id = ?',
+        [id]
+      );
+    } else {
+      const userId = req.user.id;
+
+      // Get customer_id from user_id
+      const [customer] = await query('SELECT id FROM customers WHERE user_id = ?', [userId]);
+      if (!customer) {
+        return errorResponse(res, 'Không tìm thấy thông tin khách hàng', 404);
+      }
+
+      [order] = await query(
+        'SELECT id, status FROM orders WHERE id = ? AND customer_id = ?',
+        [id, customer.id]
+      );
     }
-
-    const [order] = await query(
-      'SELECT id, status FROM orders WHERE id = ? AND customer_id = ?',
-      [id, customer.id]
-    );
 
     if (!order) {
       return errorResponse(res, 'Không tìm thấy đơn hàng', 404);
