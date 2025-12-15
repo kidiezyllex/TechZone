@@ -6,7 +6,8 @@ import {
   updateProduct,
   deleteProduct,
   getBestSellers,
-  getNewProducts
+  getNewProducts,
+  searchProducts
 } from '../controllers/product.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 
@@ -78,6 +79,23 @@ router.get('/best-sellers', getBestSellers);
  *         description: Sản phẩm mới nhất
  */
 router.get('/new-products', getNewProducts);
+
+/**
+ * @swagger
+ * /api/products/search:
+ *   get:
+ *     summary: Tìm kiếm sản phẩm
+ *     tags: [2. Products - Quản lý Sản Phẩm]
+ *     parameters:
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Kết quả tìm kiếm
+ */
+router.get('/search', searchProducts);
 
 /**
  * @swagger

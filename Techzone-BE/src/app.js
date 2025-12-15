@@ -41,8 +41,8 @@ if (process.env.NODE_ENV === 'development') {
 app.set('trust proxy', 1);
 
 app.get('/health', (req, res) => {
-  res.json({ 
-    success: true, 
+  res.json({
+    success: true,
     message: 'Techzone API đang hoạt động',
     timestamp: new Date().toISOString()
   });
@@ -80,12 +80,12 @@ const PORT = parseInt(process.env.PORT || '8000');
 const startServer = async () => {
   try {
     const dbConnected = await testConnection();
-    
+
     if (!dbConnected) {
       console.error('⚠️  Warning: Cannot connect to MySQL database');
       console.log('💡 Run ./start-mysql.sh to start MySQL server');
     }
-    
+
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`🌟 Techzone API Server đang chạy`);
       console.log(`📍 URL: http://localhost:${PORT}`);

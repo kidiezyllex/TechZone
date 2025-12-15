@@ -17,13 +17,13 @@ export const getProducts = async (req, res, next) => {
       is_featured,
       in_stock
     } = req.query;
-    
+
     const offset = (page - 1) * limit;
-    
+
     // Base SQL với WHERE conditions
     let whereConditions = ['p.is_active = TRUE'];
     const params = [];
-    
+
     if (category_id) {
       whereConditions.push('p.category_id = ?');
       params.push(category_id);
@@ -51,9 +51,9 @@ export const getProducts = async (req, res, next) => {
     if (in_stock === 'true') {
       whereConditions.push('(SELECT SUM(quantity) FROM inventory WHERE product_id = p.id) > 0');
     }
-    
+
     const whereClause = whereConditions.join(' AND ');
-    
+
     const countSql = `
       SELECT COUNT(*) as total 
       FROM products p
@@ -61,7 +61,7 @@ export const getProducts = async (req, res, next) => {
       LEFT JOIN brands b ON p.brand_id = b.id
       WHERE ${whereClause}
     `;
-    
+
     // Main query với SELECT đầy đủ
     let sql = `
       SELECT p.*, c.name as category_name, b.name as brand_name,
@@ -71,36 +71,36 @@ export const getProducts = async (req, res, next) => {
       LEFT JOIN brands b ON p.brand_id = b.id
       WHERE ${whereClause}
     `;
-    
+
     const countResult = await query(countSql, params);
     const total = Number(countResult[0]?.total ?? 0);
-    
+
     const validSortBy = ['name', 'price', 'selling_price', 'created_at', 'sold_count'];
     const mappedSortBy = sort_by === 'price' ? 'selling_price' : sort_by;
     const sortField = validSortBy.includes(mappedSortBy) ? mappedSortBy : 'created_at';
     const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-    
+
     sql += ` ORDER BY p.${sortField} ${sortOrder} LIMIT ? OFFSET ?`;
     const queryParams = [...params, parseInt(limit), offset];
-    
+
     const products = await query(sql, queryParams);
-    
+
     if (products.length > 0) {
       const productIds = products.map(p => p.id);
       const placeholders = productIds.map(() => '?').join(',');
-      
+
       const allImages = await query(
         `SELECT * FROM product_images 
          WHERE product_id IN (${placeholders}) 
          ORDER BY product_id, display_order`,
         productIds
       );
-      
+
       products.forEach(product => {
         product.images = allImages.filter(img => img.product_id === product.id);
       });
     }
-    
+
     return paginatedResponse(res, products, page, limit, total, 'Lấy danh sách sản phẩm thành công');
   } catch (error) {
     next(error);
@@ -111,7 +111,7 @@ export const getProducts = async (req, res, next) => {
 export const getProductById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     const [product] = await query(
       `SELECT p.*, c.name as category_name, b.name as brand_name,
               (SELECT SUM(quantity) FROM inventory WHERE product_id = p.id) as total_stock,
@@ -123,18 +123,18 @@ export const getProductById = async (req, res, next) => {
        WHERE p.id = ? AND p.is_active = TRUE`,
       [id]
     );
-    
+
     if (!product) {
       return errorResponse(res, 'Không tìm thấy sản phẩm', 404);
     }
-    
+
     // Lấy hình ảnh sản phẩm
     const images = await query(
       'SELECT * FROM product_images WHERE product_id = ? ORDER BY display_order',
       [id]
     );
     product.images = images;
-    
+
     // Lấy tồn kho theo chi nhánh
     const inventory = await query(
       `SELECT i.*, s.name as store_name 
@@ -144,7 +144,7 @@ export const getProductById = async (req, res, next) => {
       [id]
     );
     product.inventory = inventory;
-    
+
     return successResponse(res, product, 'Lấy chi tiết sản phẩm thành công');
   } catch (error) {
     next(error);
@@ -158,22 +158,22 @@ export const createProduct = async (req, res, next) => {
       name, description, sku, category_id, brand_id, price, cost_price, discount_percentage, warranty_period,
       specifications, images
     } = req.body;
-    
+
     // Kiểm tra SKU trùng
     const [existing] = await query('SELECT id FROM products WHERE sku = ?', [sku]);
     if (existing) {
       return errorResponse(res, 'Mã SKU đã tồn tại', 409);
     }
-    
+
     // Tạo product
     const result = await query(
       `INSERT INTO products (name, description, sku, category_id, brand_id, price, cost_price, discount_percentage, warranty_period)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [name, description, sku, category_id, brand_id, price, cost_price || null, discount_percentage || 0, warranty_period || 12]
     );
-    
+
     const productId = result.insertId;
-    
+
     // Thêm specifications nếu có
     if (specifications && specifications.length > 0) {
       for (const spec of specifications) {
@@ -183,7 +183,7 @@ export const createProduct = async (req, res, next) => {
         );
       }
     }
-    
+
     // Thêm hình ảnh nếu có
     if (images && images.length > 0) {
       for (let i = 0; i < images.length; i++) {
@@ -193,9 +193,9 @@ export const createProduct = async (req, res, next) => {
         );
       }
     }
-    
+
     const [newProduct] = await query('SELECT * FROM products WHERE id = ?', [productId]);
-    
+
     return successResponse(res, newProduct, 'Tạo sản phẩm thành công', 201);
   } catch (error) {
     next(error);
@@ -206,20 +206,20 @@ export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
     const {
-      name, description, category_id, brand_id, 
+      name, description, category_id, brand_id,
       base_price, selling_price, discount_price,
       specifications, images,
       is_featured, is_new, is_active
     } = req.body;
-    
+
     const [product] = await query('SELECT id FROM products WHERE id = ?', [id]);
     if (!product) {
       return errorResponse(res, 'Không tìm thấy sản phẩm', 404);
     }
-    
+
     const updates = [];
     const values = [];
-    
+
     if (name) { updates.push('name = ?'); values.push(name); }
     if (description !== undefined) { updates.push('description = ?'); values.push(description); }
     if (category_id) { updates.push('category_id = ?'); values.push(category_id); }
@@ -235,25 +235,25 @@ export const updateProduct = async (req, res, next) => {
     if (is_featured !== undefined) { updates.push('is_featured = ?'); values.push(is_featured); }
     if (is_new !== undefined) { updates.push('is_new = ?'); values.push(is_new); }
     if (is_active !== undefined) { updates.push('is_active = ?'); values.push(is_active); }
-    
+
     // Cập nhật thông tin sản phẩm nếu có
     if (updates.length > 0) {
       values.push(id);
       await query(`UPDATE products SET ${updates.join(', ')}, updated_at = NOW() WHERE id = ?`, values);
     }
-    
+
     // Cập nhật hình ảnh nếu có
     if (images !== undefined && Array.isArray(images)) {
       // Xóa tất cả hình ảnh cũ
       await query('DELETE FROM product_images WHERE product_id = ?', [id]);
-      
+
       // Thêm hình ảnh mới
       if (images.length > 0) {
         for (let i = 0; i < images.length; i++) {
           // Hỗ trợ cả mảng string và mảng object
           const imageUrl = typeof images[i] === 'string' ? images[i] : images[i].image_url || images[i].url;
           const isPrimary = i === 0; // Ảnh đầu tiên là primary
-          
+
           await query(
             'INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES (?, ?, ?, ?)',
             [id, imageUrl, isPrimary, i]
@@ -261,17 +261,17 @@ export const updateProduct = async (req, res, next) => {
         }
       }
     }
-    
+
     // Lấy thông tin sản phẩm đã cập nhật
     const [updated] = await query('SELECT * FROM products WHERE id = ?', [id]);
-    
+
     // Lấy hình ảnh sản phẩm
     const productImages = await query(
       'SELECT * FROM product_images WHERE product_id = ? ORDER BY display_order',
       [id]
     );
     updated.images = productImages;
-    
+
     return successResponse(res, updated, 'Cập nhật sản phẩm thành công');
   } catch (error) {
     next(error);
@@ -282,14 +282,14 @@ export const updateProduct = async (req, res, next) => {
 export const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     const [product] = await query('SELECT id FROM products WHERE id = ?', [id]);
     if (!product) {
       return errorResponse(res, 'Không tìm thấy sản phẩm', 404);
     }
-    
+
     await query('UPDATE products SET is_active = FALSE, updated_at = NOW() WHERE id = ?', [id]);
-    
+
     return successResponse(res, null, 'Xóa sản phẩm thành công');
   } catch (error) {
     next(error);
@@ -300,7 +300,7 @@ export const deleteProduct = async (req, res, next) => {
 export const getBestSellers = async (req, res, next) => {
   try {
     const { limit = 10 } = req.query;
-    
+
     const products = await query(
       `SELECT p.*, c.name as category_name, b.name as brand_name, p.sold_count
        FROM products p
@@ -311,7 +311,7 @@ export const getBestSellers = async (req, res, next) => {
        LIMIT ?`,
       [parseInt(limit)]
     );
-    
+
     return successResponse(res, products, 'Lấy sản phẩm bán chạy thành công');
   } catch (error) {
     next(error);
@@ -322,7 +322,7 @@ export const getBestSellers = async (req, res, next) => {
 export const getNewProducts = async (req, res, next) => {
   try {
     const { limit = 10 } = req.query;
-    
+
     const products = await query(
       `SELECT p.*, c.name as category_name, b.name as brand_name
        FROM products p
@@ -333,9 +333,19 @@ export const getNewProducts = async (req, res, next) => {
        LIMIT ?`,
       [parseInt(limit)]
     );
-    
+
     return successResponse(res, products, 'Lấy sản phẩm mới nhất thành công');
   } catch (error) {
     next(error);
   }
 };
+
+// TÌM KIẾM SẢN PHẨM (Wrapper for getProducts to support /search endpoint)
+export const searchProducts = async (req, res, next) => {
+  // Map 'keyword' from query to 'search' which getProducts expects
+  if (req.query.keyword) {
+    req.query.search = req.query.keyword;
+  }
+  return getProducts(req, res, next);
+};
+
